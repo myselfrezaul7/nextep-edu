@@ -86,11 +86,11 @@ export function Header() {
                         {/* Dropdown Menu */}
                         <div
                             className={cn(
-                                "absolute top-full left-1/2 -translate-x-1/2 pt-4 w-56 transition-all duration-200 origin-top",
+                                "absolute top-full left-1/2 -translate-x-1/2 w-56 transition-all duration-200 origin-top",
                                 dropdownOpen ? "opacity-100 scale-100 visible" : "opacity-0 scale-95 invisible"
                             )}
                         >
-                            <div className="bg-white dark:bg-slate-800 rounded-xl shadow-xl border border-slate-100 dark:border-slate-700 p-2 grid gap-1 relative overflow-hidden">
+                            <div className="mt-2 bg-white dark:bg-slate-800 rounded-xl shadow-xl border border-slate-100 dark:border-slate-700 p-2 grid gap-1 relative overflow-hidden">
                                 {/* Glass effect implementation for dropdown too */}
                                 <div className="absolute inset-0 bg-white/50 dark:bg-slate-900/50 backdrop-blur-md -z-10" />
 
