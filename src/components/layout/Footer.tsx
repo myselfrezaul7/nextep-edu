@@ -6,24 +6,24 @@ import { Facebook, Instagram, Phone, Mail, MapPin } from "lucide-react";
 
 export function Footer() {
     return (
-        <footer className="bg-slate-900 border-t border-slate-800 text-slate-300 py-16">
+        <footer className="relative z-10 bg-white/75 dark:bg-slate-900/80 backdrop-blur-lg border-t border-gray-200 dark:border-slate-800 text-slate-600 dark:text-slate-300 py-16 transition-colors duration-300">
             <div className="container mx-auto px-4 grid grid-cols-1 md:grid-cols-4 gap-12">
                 {/* Brand */}
                 <div className="space-y-4">
                     <div className="flex items-center gap-2">
-                        <div className="relative w-8 h-8 rounded-md overflow-hidden bg-white p-0.5">
+                        <div className="relative w-8 h-8 rounded-md overflow-hidden bg-white/50 p-0.5 border border-gray-200 dark:border-transparent">
                             <Image src="/assets/logo.png" alt="Logo" fill className="object-contain" />
                         </div>
-                        <span className="font-heading font-bold text-xl text-white">NexTep Edu</span>
+                        <span className="font-heading font-bold text-xl text-gray-900 dark:text-white">NexTep Edu</span>
                     </div>
-                    <p className="text-sm leading-relaxed text-slate-400">
+                    <p className="text-sm leading-relaxed text-slate-600 dark:text-slate-400">
                         Your trusted partner for global education. We simplify the journey from application to admission.
                     </p>
                 </div>
 
                 {/* Quick Links */}
                 <div>
-                    <h4 className="text-white font-bold mb-6">Quick Links</h4>
+                    <h4 className="text-gray-900 dark:text-white font-bold mb-6">Quick Links</h4>
                     <ul className="space-y-3 text-sm">
                         <li><Link href="/" className="hover:text-accent transition-colors">Home</Link></li>
                         <li><Link href="/#services" className="hover:text-accent transition-colors">Services</Link></li>
@@ -34,7 +34,7 @@ export function Footer() {
 
                 {/* Destinations */}
                 <div>
-                    <h4 className="text-white font-bold mb-6">Popular Destinations</h4>
+                    <h4 className="text-gray-900 dark:text-white font-bold mb-6">Popular Destinations</h4>
                     <ul className="space-y-3 text-sm">
                         <li><Link href="/destinations/uk" className="hover:text-accent transition-colors">United Kingdom</Link></li>
                         <li><Link href="/destinations/usa" className="hover:text-accent transition-colors">USA</Link></li>
@@ -46,7 +46,7 @@ export function Footer() {
 
                 {/* Contact */}
                 <div>
-                    <h4 className="text-white font-bold mb-6">Contact Us</h4>
+                    <h4 className="text-gray-900 dark:text-white font-bold mb-6">Contact Us</h4>
                     <ul className="space-y-4 text-sm">
                         <li className="flex items-start gap-3">
                             <Phone className="w-4 h-4 mt-1 text-accent" />
@@ -64,7 +64,7 @@ export function Footer() {
                 </div>
             </div>
 
-            <div className="container mx-auto px-4 mt-12 pt-8 border-t border-slate-800 text-center">
+            <div className="container mx-auto px-4 mt-12 pt-8 border-t border-gray-200 dark:border-slate-800 text-center">
                 <div className="flex justify-center gap-4 mb-4">
                     <a href="https://facebook.com/nextepbd" target="_blank" rel="noopener noreferrer" className="text-slate-400 hover:text-accent transition-colors"><Facebook className="w-5 h-5" /></a>
                     <a href="https://instagram.com/nextepedu" target="_blank" rel="noopener noreferrer" className="text-slate-400 hover:text-accent transition-colors"><Instagram className="w-5 h-5" /></a>
@@ -73,6 +73,6 @@ export function Footer() {
                     &copy; 2025 NexTep Edu. All rights reserved.
                 </p>
             </div>
-        </footer >
+        </footer>
     );
 }
