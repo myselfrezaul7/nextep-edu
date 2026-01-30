@@ -4,7 +4,6 @@ import { AboutSection } from "@/components/home/AboutSection";
 import { TestimonialCarousel } from "@/components/home/TestimonialCarousel";
 
 export default function Home() {
-  console.log("NextEp Edu Deployment: v2.1 - Post-Reconnect"); // Verification log
   return (
     <div className="flex flex-col">
       <HeroSection />
