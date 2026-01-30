@@ -58,6 +58,7 @@ export function Header() {
                             fill
                             className="object-contain"
                             sizes="40px"
+                            priority
                         />
                     </div>
                     <span className="font-heading font-bold text-xl md:text-2xl text-primary group-hover:text-accent transition-colors">
