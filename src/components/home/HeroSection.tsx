@@ -70,8 +70,20 @@ export function HeroSection() {
                 {/* Hero Image */}
                 <motion.div
                     initial={{ opacity: 0, x: 50 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    transition={{ duration: 0.8, delay: 0.2 }}
+                    animate={{
+                        opacity: 1,
+                        x: 0,
+                        y: [0, -15, 0] // Floating breathing effect
+                    }}
+                    transition={{
+                        opacity: { duration: 0.8, delay: 0.2 },
+                        x: { duration: 0.8, delay: 0.2 },
+                        y: {
+                            duration: 6,
+                            repeat: Infinity,
+                            ease: "easeInOut"
+                        }
+                    }}
                     className="relative group perspective-1000"
                 >
                     <div className="relative rounded-2xl overflow-hidden shadow-2xl transform transition-transform duration-500 hover:rotate-y-0 -rotate-y-6 bg-white p-2 border border-white/20">
