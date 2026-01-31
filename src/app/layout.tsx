@@ -18,12 +18,52 @@ export const metadata: Metadata = {
   alternates: {
     canonical: './',
   },
-  title: "NexTep Edu | Build Your Future Abroad",
-  description: "Premier higher study consultancy in Bangladesh helping students achieve their dreams of studying in UK, USA, Canada, Australia, Germany and 20+ countries.",
+  title: {
+    default: "NexTep Edu | Build Your Future Abroad",
+    template: "%s | NexTep Edu"
+  },
+  description: "Premier higher study consultancy in Bangladesh. Expert guidance for UK, USA, Canada, Australia, Germany & 20+ countries. 98% visa success rate.",
+  keywords: ["study abroad", "higher education", "consultancy", "Bangladesh", "student visa", "scholarships", "university admission", "UK", "USA", "Canada", "Australia", "Germany"],
+  authors: [{ name: "NexTep Edu Team" }],
+  creator: "NexTep Edu",
+  publisher: "NexTep Edu",
+  openGraph: {
+    title: "NexTep Edu | Build Your Future Abroad",
+    description: "Start your international education journey today. Expert counseling, visa processing, and university admissions for students in Bangladesh.",
+    url: 'https://www.nextepedu.com',
+    siteName: 'NexTep Edu',
+    locale: 'en_US',
+    type: 'website',
+    images: [
+      {
+        url: '/assets/logo.png', // Ideally a larger OG image, but logo serves for now
+        width: 800,
+        height: 600,
+        alt: 'NexTep Edu Logo',
+      },
+    ],
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: "NexTep Edu | Study Abroad Consultants",
+    description: "Join hundreds of students who achieved their dreams with NexTep Edu. 98% Visa Success Rate.",
+    images: ['/assets/logo.png'],
+  },
   icons: {
-    icon: '/assets/logo.png', // Fallback to logo if favicon.ico is missing or cached
+    icon: '/assets/logo.png',
     shortcut: '/assets/logo.png',
     apple: '/assets/apple-touch-icon.png',
+  },
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      'max-video-preview': -1,
+      'max-image-preview': 'large',
+      'max-snippet': -1,
+    },
   },
 };
 
@@ -37,6 +77,32 @@ export default function RootLayout({
       <body
         className={`${ibmPlexSans.variable} antialiased`}
       >
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify({
+              "@context": "https://schema.org",
+              "@type": "EducationalOrganization",
+              "name": "NexTep Edu",
+              "url": "https://www.nextepedu.com",
+              "logo": "https://www.nextepedu.com/assets/logo.png",
+              "sameAs": [
+                "https://facebook.com/nextepbd",
+                "https://instagram.com/nextepedu"
+              ],
+              "contactPoint": {
+                "@type": "ContactPoint",
+                "telephone": "+49 157 73855748",
+                "contactType": "customer service"
+              },
+              "address": {
+                "@type": "PostalAddress",
+                "addressLocality": "Dhaka",
+                "addressCountry": "BD"
+              }
+            })
+          }}
+        />
         <ThemeProvider
           attribute="class"
           defaultTheme="system"
