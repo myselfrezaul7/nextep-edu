@@ -8,7 +8,24 @@ const features = [
     "98% of our students get their visas approved",
     "Connections with 500+ universities worldwide",
     "Counselors who've actually studied abroad",
+    "BPMN 2.0 optimized workflows for faster, error-free applications",
 ];
+
+const containerVariants = {
+    hidden: { opacity: 0 },
+    visible: {
+        opacity: 1,
+        transition: {
+            staggerChildren: 0.1,
+            delayChildren: 0.3
+        }
+    }
+};
+
+const itemVariants = {
+    hidden: { opacity: 0, x: -20 },
+    visible: { opacity: 1, x: 0 }
+};
 
 const stats = [
     { value: "50+", label: "Students Placed" },
@@ -32,15 +49,24 @@ export function AboutSection() {
                         Honestly? Because we've been in your shoes. Our team includes people who went through this exact process: the stress, the excitement, the million questions. We know what it's like to feel lost navigating all of this. That's why we don't treat you like just another application file. You're a person with dreams, and we take that seriously.
                     </p>
 
-                    <ul className="space-y-4 mb-8">
+                    <motion.ul
+                        variants={containerVariants}
+                        initial="hidden"
+                        whileInView="visible"
+                        viewport={{ once: true }}
+                        className="space-y-4 mb-8"
+                    >
                         {features.map((feature, i) => (
-                            <li key={i} className="flex items-center gap-3 font-medium text-foreground">
+                            <motion.li
+                                key={i}
+                                variants={itemVariants}
+                                className="flex items-center gap-3 font-medium text-foreground"
+                            >
                                 <CheckCircle className="w-5 h-5 text-accent" />
                                 {feature}
-                            </li>
+                            </motion.li>
                         ))}
-                    </ul>
-
+                    </motion.ul>
                     <Button
                         size="lg"
                         onClick={() => document.getElementById('booking-modal')?.classList.remove('hidden')}
