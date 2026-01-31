@@ -29,16 +29,17 @@
 
 :root {
   /* NexTep Edu Brand Colors - Light Mode */
-  --background: #F8FAFC;
+  --background: #FAF9F6;
+  /* Off-white / Soothing White */
   --foreground: #1E293B;
 
   --primary: #0F172A;
   /* Deep Navy */
   --primary-foreground: #FFFFFF;
 
-  --secondary: #334155;
-  /* Slate */
-  --secondary-foreground: #FFFFFF;
+  --secondary: #E2E8F0;
+  /* Softer Slate for secondary bg */
+  --secondary-foreground: #0F172A;
 
   --accent: #D4AF37;
   /* Muted Gold */
@@ -61,29 +62,31 @@
 
 .dark {
   /* NexTep Edu Brand Colors - Dark Mode */
-  --background: #0F172A;
+  --background: #0B1120;
+  /* Deep Premium Black */
   --foreground: #F8FAFC;
 
   --primary: #F8FAFC;
   --primary-foreground: #0F172A;
 
-  --secondary: #94A3B8;
-  --secondary-foreground: #0F172A;
+  --secondary: #1E293B;
+  --secondary-foreground: #F8FAFC;
 
   --accent: #D4AF37;
   /* Gold stays compliant */
   --accent-foreground: #0F172A;
 
   --muted: #1E293B;
-  --muted-foreground: #CBD5E1;
+  --muted-foreground: #94A3B8;
 
-  --card: #1E293B;
+  --card: #151F32;
+  /* Slightly lighter than bg for hierarchy */
   --card-foreground: #F8FAFC;
 
-  --surface: #1E293B;
+  --surface: #151F32;
 
-  --border: #334155;
-  --input: #334155;
+  --border: #1E293B;
+  --input: #1E293B;
   --ring: #D4AF37;
 }
 

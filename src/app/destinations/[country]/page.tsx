@@ -108,19 +108,30 @@ export default async function DestinationPage({ params }: Props) {
                 </div>
             </section>
 
-            {/* CTA Section */}
-            <section className="py-24 relative overflow-hidden">
-                <div className="absolute inset-0 bg-primary z-0" />
-                <div className="absolute inset-0 opacity-10 bg-[url('https://www.transparenttextures.com/patterns/cubes.png')] z-0 pointer-events-none" />
+            {/* CTA Section (Glassmorphism) */}
+            <section className="py-24 relative overflow-hidden flex items-center justify-center">
+                {/* Background Image (Blurred) */}
+                <div className="absolute inset-0 z-0">
+                    <Image
+                        src={heroImage}
+                        alt="Background"
+                        fill
+                        className="object-cover opacity-30 blur-xl"
+                    />
+                    <div className="absolute inset-0 bg-background/60" />
+                </div>
 
-                <div className="container mx-auto px-4 relative z-10 text-center">
-                    <h2 className="text-3xl md:text-5xl font-bold font-heading mb-6 text-primary-foreground">Ready to start your journey?</h2>
-                    <p className="text-xl text-primary-foreground/80 mb-10 max-w-2xl mx-auto">
-                        Your dream university in {destination.name} is just a click away. Book a free consultation with our experts today.
-                    </p>
-                    <BookingButton size="lg" variant="secondary" className="text-lg px-8 py-6 shadow-2xl">
-                        Book Free Consultation
-                    </BookingButton>
+                <div className="container mx-auto px-4 relative z-10 w-full max-w-4xl">
+                    {/* Glass Card */}
+                    <div className="bg-white/20 dark:bg-black/40 backdrop-blur-xl border border-white/30 dark:border-white/10 p-12 rounded-3xl text-center shadow-2xl">
+                        <h2 className="text-3xl md:text-5xl font-bold font-heading mb-6 text-foreground">Ready to start your journey?</h2>
+                        <p className="text-xl text-muted-foreground mb-10 max-w-2xl mx-auto">
+                            Your dream university in {destination.name} is just a click away. Book a free consultation with our experts today.
+                        </p>
+                        <BookingButton size="lg" className="text-lg px-8 py-6 shadow-xl">
+                            Book Free Consultation
+                        </BookingButton>
+                    </div>
                 </div>
             </section>
         </div>
