@@ -36,7 +36,6 @@ export default async function DestinationPage({ params }: Props) {
     }
 
     const { hero, benefits, universities, heroImage } = destination;
-    const Icon = hero.icon;
 
     return (
         <div className="min-h-screen">
@@ -54,9 +53,6 @@ export default async function DestinationPage({ params }: Props) {
                 </div>
 
                 <div className="container mx-auto px-4 relative z-10 text-center text-white">
-                    <div className="inline-flex items-center justify-center p-4 bg-white/10 backdrop-blur-md rounded-2xl mb-6 shadow-xl border border-white/20">
-                        <Icon className="w-12 h-12 text-accent" />
-                    </div>
                     <h1 className="text-4xl md:text-7xl font-bold font-heading mb-6 drop-shadow-md">{hero.title}</h1>
                     <p className="text-xl md:text-2xl max-w-2xl mx-auto text-white/90 leading-relaxed font-light drop-shadow">
                         {hero.description}
