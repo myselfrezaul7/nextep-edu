@@ -303,7 +303,7 @@ export const destinations: Record<string, Destination> = {
     "south-korea": {
         slug: "south-korea",
         name: "South Korea",
-        heroImage: "/assets/hero.jpg",
+        heroImage: "/assets/south_korea_hero_blend.png",
         hero: {
             title: "Study in South Korea",
             description: "Leading technology, vibrant pop culture, and world-class universities.",

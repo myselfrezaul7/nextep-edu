@@ -20,6 +20,11 @@ export const metadata: Metadata = {
   },
   title: "NexTep Edu | Build Your Future Abroad",
   description: "Premier higher study consultancy in Bangladesh helping students achieve their dreams of studying in UK, USA, Canada, Australia, Germany and 20+ countries.",
+  icons: {
+    icon: '/assets/logo.png', // Fallback to logo if favicon.ico is missing or cached
+    shortcut: '/assets/logo.png',
+    apple: '/assets/apple-touch-icon.png',
+  },
 };
 
 export default function RootLayout({
