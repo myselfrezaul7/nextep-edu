@@ -29,8 +29,8 @@
 
 :root {
   /* NexTep Edu Brand Colors - Light Mode */
-  --background: #FAF9F6;
-  /* Off-white / Soothing White */
+  --background: #F8F9FA;
+  /* Soft off-white background */
   --foreground: #1E293B;
 
   --primary: #0F172A;
@@ -45,13 +45,15 @@
   /* Muted Gold */
   --accent-foreground: #0F172A;
 
-  --muted: #F1F5F9;
+  --muted: #F3F4F6;
   --muted-foreground: #64748B;
 
-  --card: #FFFFFF;
+  --card: #FEFEFE;
+  /* Subtle off-white for cards */
   --card-foreground: #1E293B;
 
-  --surface: #FFFFFF;
+  --surface: #F8F9FA;
+  /* Matches background for cohesion */
 
   --border: #e2e8f0;
   --input: #e2e8f0;

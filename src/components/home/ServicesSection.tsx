@@ -51,7 +51,7 @@ export function ServicesSection() {
                     </motion.p>
                 </div>
 
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+                <div className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-8">
                     {services.map((service, index) => (
                         <motion.div
                             key={service.title}
@@ -59,7 +59,7 @@ export function ServicesSection() {
                             whileInView={{ opacity: 1, y: 0 }}
                             viewport={{ once: true }}
                             transition={{ delay: index * 0.1 }}
-                            className="bg-card dark:bg-slate-800/50 p-8 rounded-2xl shadow-sm border border-border/50 hover:border-accent hover:shadow-lg hover:-translate-y-2 transition-all duration-300 group"
+                            className="bg-card p-8 rounded-2xl shadow-sm border border-border/50 hover:border-accent hover:shadow-lg hover:-translate-y-2 transition-all duration-300 group"
                         >
                             <div className="w-14 h-14 bg-accent/10 rounded-xl flex items-center justify-center mb-6 text-accent group-hover:bg-accent group-hover:text-primary transition-colors">
                                 <service.icon className="w-7 h-7" />
