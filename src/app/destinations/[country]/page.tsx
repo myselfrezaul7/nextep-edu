@@ -73,7 +73,7 @@ export default async function DestinationPage({ params }: Props) {
                 <div className="container mx-auto px-4">
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 -mt-32 relative z-20">
                         {benefits.map((benefit, i) => (
-                            <div key={i} className="bg-surface dark:bg-card p-8 rounded-2xl border border-border shadow-lg hover:shadow-xl hover:-translate-y-1 transition-all duration-300">
+                            <div key={i} className="bg-card p-8 rounded-2xl border border-border shadow-lg hover:shadow-xl hover:-translate-y-1 transition-all duration-300">
                                 <div className="w-12 h-12 bg-accent/10 rounded-xl flex items-center justify-center mb-6 text-accent">
                                     <benefit.icon className="w-6 h-6" />
                                 </div>
@@ -86,7 +86,7 @@ export default async function DestinationPage({ params }: Props) {
             </section>
 
             {/* Universities Section */}
-            <section id="universities" className="py-24 bg-surface dark:bg-slate-900/50">
+            <section id="universities" className="py-24 bg-surface">
                 <div className="container mx-auto px-4">
                     <div className="text-center max-w-2xl mx-auto mb-16">
                         <h2 className="text-3xl md:text-4xl font-bold font-heading mb-4 text-primary">Top Universities in {destination.name}</h2>
@@ -95,7 +95,7 @@ export default async function DestinationPage({ params }: Props) {
 
                     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 max-w-5xl mx-auto">
                         {universities.map((uni, i) => (
-                            <div key={uni.name} className="group bg-background dark:bg-card p-6 rounded-xl border border-border hover:border-accent/50 hover:shadow-md transition-all flex items-center gap-4">
+                            <div key={uni.name} className="group bg-card p-6 rounded-xl border border-border hover:border-accent/50 hover:shadow-md transition-all flex items-center gap-4">
                                 <div className="w-10 h-10 rounded-full bg-primary/5 flex items-center justify-center shrink-0">
                                     <CheckCircle className="w-5 h-5 text-primary" />
                                 </div>

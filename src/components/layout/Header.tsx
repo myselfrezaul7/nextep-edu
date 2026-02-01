@@ -44,7 +44,7 @@ export function Header() {
             className={cn(
                 "fixed top-0 left-0 w-full z-50 transition-all duration-300 border-b border-transparent",
                 scrolled
-                    ? "bg-white/70 dark:bg-slate-900/80 backdrop-blur-xl border-white/20 dark:border-white/10 shadow-lg py-3"
+                    ? "bg-background/70 backdrop-blur-xl border-border/20 shadow-lg py-3"
                     : "bg-transparent py-5"
             )}
         >
@@ -91,20 +91,20 @@ export function Header() {
                                 dropdownOpen ? "opacity-100 scale-100 visible" : "opacity-0 scale-95 invisible"
                             )}
                         >
-                            <div className="mt-2 bg-white dark:bg-slate-800 rounded-xl shadow-xl border border-slate-100 dark:border-slate-700 p-2 grid gap-1 relative overflow-hidden">
+                            <div className="mt-2 bg-card rounded-xl shadow-xl border border-border p-2 grid gap-1 relative overflow-hidden">
                                 {/* Glass effect implementation for dropdown too */}
-                                <div className="absolute inset-0 bg-white/50 dark:bg-slate-900/50 backdrop-blur-md -z-10" />
+                                <div className="absolute inset-0 bg-background/50 backdrop-blur-md -z-10" />
 
                                 {destinations.slice(0, 6).map((item) => (
                                     <Link
                                         key={item.name}
                                         href={item.href}
-                                        className="block px-4 py-2 text-sm rounded-lg hover:bg-slate-50 dark:hover:bg-slate-700 hover:text-accent transition-colors"
+                                        className="block px-4 py-2 text-sm rounded-lg hover:bg-muted hover:text-accent transition-colors"
                                     >
                                         {item.name}
                                     </Link>
                                 ))}
-                                <Link href="/destinations" className="block px-4 py-2 text-xs font-bold text-accent text-center border-t border-slate-100 dark:border-slate-700 mt-1 pt-2">
+                                <Link href="/destinations" className="block px-4 py-2 text-xs font-bold text-accent text-center border-t border-border mt-1 pt-2">
                                     View All Destinations
                                 </Link>
                             </div>
@@ -117,7 +117,7 @@ export function Header() {
 
                     <button
                         onClick={toggleTheme}
-                        className="p-2 rounded-full hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors text-primary"
+                        className="p-2 rounded-full hover:bg-muted transition-colors text-primary"
                         aria-label="Toggle Theme"
                     >
                         {mounted && theme === 'dark' ? <Sun className="w-5 h-5" /> : <Moon className="w-5 h-5" />}
@@ -128,7 +128,7 @@ export function Header() {
                 <div className="flex items-center gap-4 md:hidden">
                     <button
                         onClick={toggleTheme}
-                        className="p-2 rounded-full hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors text-primary"
+                        className="p-2 rounded-full hover:bg-muted transition-colors text-primary"
                     >
                         {mounted && theme === 'dark' ? <Sun className="w-5 h-5" /> : <Moon className="w-5 h-5" />}
                     </button>
@@ -143,17 +143,17 @@ export function Header() {
 
             {/* Mobile Menu Content */}
             {mobileMenuOpen && (
-                <div className="md:hidden absolute top-full left-0 w-full bg-white/95 dark:bg-slate-900/95 backdrop-blur-xl border-b border-slate-200 dark:border-slate-800 shadow-2xl p-6 flex flex-col gap-4 animate-in slide-in-from-top-5">
+                <div className="md:hidden absolute top-full left-0 w-full bg-background/95 backdrop-blur-xl border-b border-border shadow-2xl p-6 flex flex-col gap-4 animate-in slide-in-from-top-5">
                     <Link
                         href="/#services"
-                        className="text-lg font-medium p-2 border-b border-slate-100 dark:border-slate-800"
+                        className="text-lg font-medium p-2 border-b border-border"
                         onClick={() => setMobileMenuOpen(false)}
                     >
                         Services
                     </Link>
                     <Link
                         href="/#about"
-                        className="text-lg font-medium p-2 border-b border-slate-100 dark:border-slate-800"
+                        className="text-lg font-medium p-2 border-b border-border"
                         onClick={() => setMobileMenuOpen(false)}
                     >
                         About

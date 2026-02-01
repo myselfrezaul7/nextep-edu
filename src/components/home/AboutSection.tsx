@@ -84,7 +84,7 @@ export function AboutSection() {
                             whileInView={{ opacity: 1, x: 0 }}
                             viewport={{ once: true }}
                             transition={{ delay: index * 0.1, duration: 0.6 }}
-                            className="bg-card dark:bg-slate-800 p-8 rounded-2xl shadow-sm border border-border/50 text-center hover:border-accent transition-colors"
+                            className="bg-card p-8 rounded-2xl shadow-sm border border-border/50 text-center hover:border-accent transition-colors"
                         >
                             <h3 className="text-4xl md:text-5xl font-bold text-accent mb-2">{stat.value}</h3>
                             <p className="font-medium text-muted-foreground">{stat.label}</p>

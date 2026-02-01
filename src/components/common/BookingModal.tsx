@@ -101,7 +101,7 @@ export function BookingModal() {
                 if (e.target === e.currentTarget) closeModal();
             }}
         >
-            <div className="bg-surface dark:bg-slate-900 w-full max-w-lg rounded-2xl shadow-2xl border border-white/10 overflow-hidden flex flex-col max-h-[90vh]">
+            <div className="bg-surface w-full max-w-lg rounded-2xl shadow-2xl border border-white/10 overflow-hidden flex flex-col max-h-[90vh]">
 
                 {/* Header */}
                 <div className="p-6 border-b border-border flex justify-between items-center bg-accent/5">

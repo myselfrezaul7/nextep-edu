@@ -6,61 +6,64 @@ import { Facebook, Instagram, Phone, Mail, MapPin } from "lucide-react";
 
 export function Footer() {
     return (
-        <footer className="relative z-10 bg-white/75 dark:bg-slate-900/80 backdrop-blur-lg border-t border-gray-200 dark:border-slate-800 text-slate-600 dark:text-slate-300 py-16 transition-colors duration-300">
-            <div className="container mx-auto px-4 grid grid-cols-1 md:grid-cols-4 gap-12">
-                {/* Brand */}
-                <div className="space-y-4">
-                    <div className="flex items-center gap-2">
+        <footer className="relative z-10 bg-background/75 backdrop-blur-lg border-t border-border text-slate-600 dark:text-slate-300 py-16 transition-colors duration-300">
+            <div className="container mx-auto px-4">
+                {/* Brand - Full width on all devices */}
+                <div className="mb-12">
+                    <div className="flex items-center gap-2 mb-4">
                         <div className="relative w-8 h-8 rounded-md overflow-hidden bg-white/50 p-0.5 border border-gray-200 dark:border-transparent">
                             <Image src="/assets/logo.png" alt="Logo" fill className="object-contain" />
                         </div>
                         <span className="font-heading font-bold text-xl text-gray-900 dark:text-white">NexTep Edu</span>
                     </div>
-                    <p className="text-sm leading-relaxed text-slate-600 dark:text-slate-400">
+                    <p className="text-sm leading-relaxed text-slate-600 dark:text-slate-400 max-w-md">
                         Your trusted partner for global education. We simplify the journey from application to admission.
                     </p>
                 </div>
 
-                {/* Quick Links */}
-                <div>
-                    <h4 className="text-gray-900 dark:text-white font-bold mb-6">Quick Links</h4>
-                    <ul className="space-y-3 text-sm">
-                        <li><Link href="/" className="hover:text-accent transition-colors">Home</Link></li>
-                        <li><Link href="/#services" className="hover:text-accent transition-colors">Services</Link></li>
-                        <li><Link href="/#about" className="hover:text-accent transition-colors">About Us</Link></li>
-                        <li><Link href="/destinations" className="hover:text-accent transition-colors">Destinations</Link></li>
-                    </ul>
-                </div>
+                {/* Quick Links and Destinations - Side by side on mobile, part of 3-col on desktop */}
+                <div className="grid grid-cols-2 md:grid-cols-3 gap-8 md:gap-12">
+                    {/* Quick Links */}
+                    <div>
+                        <h4 className="text-gray-900 dark:text-white font-bold mb-6">Quick Links</h4>
+                        <ul className="space-y-3 text-sm">
+                            <li><Link href="/" className="hover:text-accent transition-colors">Home</Link></li>
+                            <li><Link href="/#services" className="hover:text-accent transition-colors">Services</Link></li>
+                            <li><Link href="/#about" className="hover:text-accent transition-colors">About Us</Link></li>
+                            <li><Link href="/destinations" className="hover:text-accent transition-colors">Destinations</Link></li>
+                        </ul>
+                    </div>
 
-                {/* Destinations */}
-                <div>
-                    <h4 className="text-gray-900 dark:text-white font-bold mb-6">Popular Destinations</h4>
-                    <ul className="space-y-3 text-sm">
-                        <li><Link href="/destinations/uk" className="hover:text-accent transition-colors">United Kingdom</Link></li>
-                        <li><Link href="/destinations/usa" className="hover:text-accent transition-colors">USA</Link></li>
-                        <li><Link href="/destinations/canada" className="hover:text-accent transition-colors">Canada</Link></li>
-                        <li><Link href="/destinations/australia" className="hover:text-accent transition-colors">Australia</Link></li>
-                        <li><Link href="/destinations/germany" className="hover:text-accent transition-colors">Germany</Link></li>
-                    </ul>
-                </div>
+                    {/* Destinations */}
+                    <div>
+                        <h4 className="text-gray-900 dark:text-white font-bold mb-6">Popular Destinations</h4>
+                        <ul className="space-y-3 text-sm">
+                            <li><Link href="/destinations/uk" className="hover:text-accent transition-colors">United Kingdom</Link></li>
+                            <li><Link href="/destinations/usa" className="hover:text-accent transition-colors">USA</Link></li>
+                            <li><Link href="/destinations/canada" className="hover:text-accent transition-colors">Canada</Link></li>
+                            <li><Link href="/destinations/australia" className="hover:text-accent transition-colors">Australia</Link></li>
+                            <li><Link href="/destinations/germany" className="hover:text-accent transition-colors">Germany</Link></li>
+                        </ul>
+                    </div>
 
-                {/* Contact */}
-                <div>
-                    <h4 className="text-gray-900 dark:text-white font-bold mb-6">Contact Us</h4>
-                    <ul className="space-y-4 text-sm">
-                        <li className="flex items-start gap-3">
-                            <Phone className="w-4 h-4 mt-1 text-accent" />
-                            <span>+49 157 73855748</span>
-                        </li>
-                        <li className="flex items-start gap-3">
-                            <Mail className="w-4 h-4 mt-1 text-accent" />
-                            <span>info@nextepedu.com</span>
-                        </li>
-                        <li className="flex items-start gap-3">
-                            <MapPin className="w-4 h-4 mt-1 text-accent" />
-                            <span>Dhaka, Bangladesh</span>
-                        </li>
-                    </ul>
+                    {/* Contact - Centered below on mobile (col-span-2), normal column on desktop */}
+                    <div className="col-span-2 md:col-span-1 flex flex-col items-center md:items-start">
+                        <h4 className="text-gray-900 dark:text-white font-bold mb-6">Contact Us</h4>
+                        <ul className="space-y-4 text-sm">
+                            <li className="flex items-start gap-3">
+                                <Phone className="w-4 h-4 mt-1 text-accent" />
+                                <span>+49 157 73855748</span>
+                            </li>
+                            <li className="flex items-start gap-3">
+                                <Mail className="w-4 h-4 mt-1 text-accent" />
+                                <span>info@nextepedu.com</span>
+                            </li>
+                            <li className="flex items-start gap-3">
+                                <MapPin className="w-4 h-4 mt-1 text-accent" />
+                                <span>Dhaka, Bangladesh</span>
+                            </li>
+                        </ul>
+                    </div>
                 </div>
             </div>
 
