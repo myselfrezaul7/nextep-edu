@@ -87,16 +87,17 @@ export function SearchModal() {
 
     return (
         <>
-            {/* Search Trigger Button */}
+            {/* Enhanced Search Trigger Button */}
             <button
                 onClick={() => setIsOpen(true)}
-                className="p-2 rounded-full hover:bg-muted transition-colors text-primary group relative"
+                className="group relative flex items-center gap-2 px-4 py-2 rounded-lg bg-gradient-to-r from-accent/10 to-accent/5 hover:from-accent/20 hover:to-accent/10 border border-accent/20 hover:border-accent/40 transition-all duration-300 hover:shadow-lg hover:shadow-accent/20 hover:scale-105"
                 aria-label="Search"
             >
-                <Search className="w-5 h-5" />
-                <span className="absolute -bottom-8 right-0 text-xs text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap hidden md:block">
-                    <Command className="w-3 h-3 inline" />K
-                </span>
+                <Search className="w-4 h-4 text-accent group-hover:rotate-12 transition-transform duration-300" />
+                <span className="hidden md:inline text-sm font-medium text-foreground">Search</span>
+                <kbd className="hidden lg:inline-flex items-center gap-1 px-2 py-0.5 text-xs font-semibold text-muted-foreground bg-background/50 rounded border border-border/50">
+                    <span className="text-[10px]">⌘</span>K
+                </kbd>
             </button>
 
             {/* Search Modal Overlay */}

@@ -123,9 +123,9 @@ export default async function DestinationPage({ params }: Props) {
 
                 <div className="container mx-auto px-4 relative z-10 w-full max-w-4xl">
                     {/* Glass Card */}
-                    <div className="bg-white/20 dark:bg-black/40 backdrop-blur-xl border border-white/30 dark:border-white/10 p-12 rounded-3xl text-center shadow-2xl">
-                        <h2 className="text-3xl md:text-5xl font-bold font-heading mb-6 text-foreground">Ready to start your journey?</h2>
-                        <p className="text-xl text-muted-foreground mb-10 max-w-2xl mx-auto">
+                    <div className="bg-white/30 dark:bg-black/50 backdrop-blur-md border border-white/40 dark:border-white/20 p-12 rounded-3xl text-center shadow-2xl">
+                        <h2 className="text-3xl md:text-5xl font-bold font-heading mb-6 text-gray-900 dark:text-white">Ready to start your journey?</h2>
+                        <p className="text-xl text-gray-700 dark:text-gray-300 mb-10 max-w-2xl mx-auto">
                             Your dream university in {destination.name} is just a click away. Book a free consultation with our experts today.
                         </p>
                         <BookingButton size="lg" className="text-lg px-8 py-6 shadow-xl">

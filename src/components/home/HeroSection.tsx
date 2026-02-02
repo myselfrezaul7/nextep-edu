@@ -20,7 +20,7 @@ export function HeroSection() {
                         transition={{ duration: 1, ease: [0.22, 1, 0.36, 1] }}
                         className="text-4xl md:text-6xl font-bold font-heading text-primary leading-tight"
                     >
-                        Borders are for Maps. <span className="text-accent underline decoration-4 underline-offset-4">Your Education is for the World.</span>
+                        Borders are for Maps. <span className="text-accent">Your Education is for the World.</span>
                     </motion.h1>
 
                     <motion.p

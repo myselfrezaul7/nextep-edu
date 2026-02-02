@@ -64,7 +64,7 @@ export function ServicesSection() {
                                 duration: 0.6,
                                 ease: [0.22, 1, 0.36, 1]
                             }}
-                            className="relative bg-white/70 dark:bg-slate-800/70 backdrop-blur-xl p-4 md:p-6 lg:p-8 rounded-2xl shadow-lg border border-white/20 dark:border-slate-700/50 hover:border-accent hover:shadow-2xl hover:-translate-y-2 transition-all duration-500 ease-out group overflow-hidden"
+                            className="relative bg-card/95 backdrop-blur-xl p-4 md:p-6 lg:p-8 rounded-2xl shadow-lg border border-border/30 hover:border-accent hover:shadow-2xl hover:-translate-y-2 transition-all duration-500 ease-out group overflow-hidden"
                         >
                             <div className="w-14 h-14 bg-accent/10 rounded-xl flex items-center justify-center mb-6 text-accent group-hover:bg-accent group-hover:text-primary transition-colors">
                                 <service.icon className="w-7 h-7" />
