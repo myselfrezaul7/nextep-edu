@@ -14,9 +14,9 @@ export function Footer() {
                         <div className="relative w-8 h-8 rounded-md overflow-hidden bg-white/50 p-0.5 border border-gray-200 dark:border-transparent">
                             <Image src="/assets/logo.png" alt="Logo" fill className="object-contain" />
                         </div>
-                        <span className="font-heading font-bold text-xl text-gray-900 dark:text-white">NexTep Edu</span>
+                        <span className="font-heading font-bold text-xl text-foreground">NexTep Edu</span>
                     </div>
-                    <p className="text-sm leading-relaxed text-slate-600 dark:text-slate-400 max-w-md">
+                    <p className="text-sm leading-relaxed text-muted-foreground max-w-md">
                         Your trusted partner for global education. We simplify the journey from application to admission.
                     </p>
                 </div>
@@ -25,7 +25,7 @@ export function Footer() {
                 <div className="grid grid-cols-2 md:grid-cols-3 gap-8 md:gap-12">
                     {/* Quick Links */}
                     <div>
-                        <h4 className="text-gray-900 dark:text-white font-bold mb-6">Quick Links</h4>
+                        <h4 className="text-foreground font-bold mb-6">Quick Links</h4>
                         <ul className="space-y-3 text-sm">
                             <li><Link href="/" className="hover:text-accent transition-colors">Home</Link></li>
                             <li><Link href="/#services" className="hover:text-accent transition-colors">Services</Link></li>
@@ -36,7 +36,7 @@ export function Footer() {
 
                     {/* Destinations */}
                     <div>
-                        <h4 className="text-gray-900 dark:text-white font-bold mb-6">Popular Destinations</h4>
+                        <h4 className="text-foreground font-bold mb-6">Popular Destinations</h4>
                         <ul className="space-y-3 text-sm">
                             <li><Link href="/destinations/uk" className="hover:text-accent transition-colors">United Kingdom</Link></li>
                             <li><Link href="/destinations/usa" className="hover:text-accent transition-colors">USA</Link></li>
@@ -48,7 +48,7 @@ export function Footer() {
 
                     {/* Contact - Left aligned on all screen sizes */}
                     <div className="col-span-2 md:col-span-1 flex flex-col items-start">
-                        <h4 className="text-gray-900 dark:text-white font-bold mb-6">Contact Us</h4>
+                        <h4 className="text-foreground font-bold mb-6">Contact Us</h4>
                         <ul className="space-y-4 text-sm">
                             <li className="flex items-start gap-3">
                                 <Phone className="w-4 h-4 mt-1 text-accent" />
@@ -69,8 +69,22 @@ export function Footer() {
 
             <div className="container mx-auto px-4 mt-12 pt-8 border-t border-gray-200 dark:border-slate-800 text-center">
                 <div className="flex justify-center gap-4 mb-4">
-                    <a href="https://facebook.com/nextepbd" target="_blank" rel="noopener noreferrer" className="text-slate-400 hover:text-accent transition-colors"><Facebook className="w-5 h-5" /></a>
-                    <a href="https://instagram.com/nextepedu" target="_blank" rel="noopener noreferrer" className="text-slate-400 hover:text-accent transition-colors"><Instagram className="w-5 h-5" /></a>
+                    <a
+                        href="https://facebook.com/nextepbd"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-muted-foreground hover:text-[#1877F2] hover:scale-110 transition-all duration-300"
+                    >
+                        <Facebook className="w-5 h-5" />
+                    </a>
+                    <a
+                        href="https://instagram.com/nextepedu"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-muted-foreground hover:text-transparent hover:bg-gradient-to-br hover:from-[#833AB4] hover:via-[#FD1D1D] hover:to-[#F77737] hover:bg-clip-text hover:scale-110 transition-all duration-300"
+                    >
+                        <Instagram className="w-5 h-5" />
+                    </a>
                 </div>
                 <p className="text-xs text-slate-500">
                     &copy; 2025 NexTep Edu. All rights reserved.

@@ -192,6 +192,7 @@ export function BookingModal() {
                                 <option value="University_Admission">University Admission</option>
                                 <option value="Visa_Processing">Visa Processing</option>
                                 <option value="Scholarship_Help">Scholarship Help</option>
+                                <option value="LOM_SOP_Writing">LOM/SOP Writing</option>
                             </select>
                         </div>
 
