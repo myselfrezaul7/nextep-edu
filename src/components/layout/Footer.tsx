@@ -6,7 +6,7 @@ import { Facebook, Instagram, Phone, Mail, MapPin } from "lucide-react";
 
 export function Footer() {
     return (
-        <footer className="relative z-10 bg-background/75 backdrop-blur-lg border-t border-border text-slate-600 dark:text-slate-300 py-16 transition-colors duration-300">
+        <footer className="relative z-10 bg-background/75 backdrop-blur-lg border-t border-border text-foreground py-16 transition-colors duration-300">
             <div className="container mx-auto px-4">
                 {/* Brand - Full width on all devices */}
                 <div className="mb-12">
@@ -46,8 +46,8 @@ export function Footer() {
                         </ul>
                     </div>
 
-                    {/* Contact - Centered below on mobile (col-span-2), normal column on desktop */}
-                    <div className="col-span-2 md:col-span-1 flex flex-col items-center md:items-start">
+                    {/* Contact - Left aligned on all screen sizes */}
+                    <div className="col-span-2 md:col-span-1 flex flex-col items-start">
                         <h4 className="text-gray-900 dark:text-white font-bold mb-6">Contact Us</h4>
                         <ul className="space-y-4 text-sm">
                             <li className="flex items-start gap-3">

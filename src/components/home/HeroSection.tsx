@@ -15,18 +15,18 @@ export function HeroSection() {
                 {/* Text Content */}
                 <div className="space-y-6">
                     <motion.h1
-                        initial={{ opacity: 0, y: 20 }}
+                        initial={{ opacity: 0, y: 30 }}
                         animate={{ opacity: 1, y: 0 }}
-                        transition={{ duration: 0.8 }}
+                        transition={{ duration: 1, ease: [0.22, 1, 0.36, 1] }}
                         className="text-4xl md:text-6xl font-bold font-heading text-primary leading-tight"
                     >
-                        That Uni You've Been Dreaming About? <span className="text-accent underline decoration-4 underline-offset-4">Let's Make It Happen.</span>
+                        Borders are for Maps. <span className="text-accent underline decoration-4 underline-offset-4">Your Education is for the World.</span>
                     </motion.h1>
 
                     <motion.p
                         initial={{ opacity: 0, y: 20 }}
                         animate={{ opacity: 1, y: 0 }}
-                        transition={{ duration: 0.8, delay: 0.1 }}
+                        transition={{ duration: 0.9, delay: 0.15, ease: [0.22, 1, 0.36, 1] }}
                         className="text-xl md:text-2xl font-medium italic text-accent"
                     >
                         One step, no limits.
@@ -35,16 +35,16 @@ export function HeroSection() {
                     <motion.p
                         initial={{ opacity: 0, y: 20 }}
                         animate={{ opacity: 1, y: 0 }}
-                        transition={{ duration: 0.8, delay: 0.2 }}
+                        transition={{ duration: 0.9, delay: 0.25, ease: [0.22, 1, 0.36, 1] }}
                         className="text-lg text-muted-foreground max-w-lg leading-relaxed"
                     >
-                        Look, we get it. Applying abroad feels overwhelming. So many forms, so many questions, so many "what ifs." That's exactly why we're here. We've walked this path ourselves, and now we help students like you navigate it. No fancy jargon. No hidden costs. Just real people giving you real guidance.
+                        Your passport shouldn't limit your potential. Whether it's the UK, USA, Canada, or anywhere else, we help students break through borders and access world-class education. No fancy jargon. No hidden costs. Just real people giving you real guidance to achieve your global dreams.
                     </motion.p>
 
                     <motion.div
                         initial={{ opacity: 0, y: 20 }}
                         animate={{ opacity: 1, y: 0 }}
-                        transition={{ duration: 0.8, delay: 0.3 }}
+                        transition={{ duration: 0.9, delay: 0.35, ease: [0.22, 1, 0.36, 1] }}
                         className="flex flex-wrap gap-4 pt-4"
                     >
                         <Button
@@ -73,15 +73,15 @@ export function HeroSection() {
                     animate={{
                         opacity: 1,
                         x: 0,
-                        y: [0, -15, 0] // Floating breathing effect
+                        y: [0, -10, 0] // Subtle floating effect
                     }}
                     transition={{
-                        opacity: { duration: 0.8, delay: 0.2 },
-                        x: { duration: 0.8, delay: 0.2 },
+                        opacity: { duration: 1, delay: 0.3, ease: [0.22, 1, 0.36, 1] },
+                        x: { duration: 1, delay: 0.3, ease: [0.22, 1, 0.36, 1] },
                         y: {
-                            duration: 6,
+                            duration: 8,
                             repeat: Infinity,
-                            ease: "easeInOut"
+                            ease: [0.45, 0, 0.55, 1]
                         }
                     }}
                     className="relative group perspective-1000"

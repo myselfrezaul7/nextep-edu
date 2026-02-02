@@ -36,6 +36,7 @@ export function ServicesSection() {
                         initial={{ opacity: 0, y: 20 }}
                         whileInView={{ opacity: 1, y: 0 }}
                         viewport={{ once: true }}
+                        transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
                         className="text-3xl md:text-5xl font-bold font-heading mb-4 text-primary"
                     >
                         What We Actually Do For You
@@ -44,28 +45,32 @@ export function ServicesSection() {
                         initial={{ opacity: 0, y: 20 }}
                         whileInView={{ opacity: 1, y: 0 }}
                         viewport={{ once: true }}
-                        transition={{ delay: 0.1 }}
+                        transition={{ delay: 0.1, duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
                         className="text-lg text-muted-foreground"
                     >
                         Here's the deal: we don't just give you a list of universities and wish you luck. We stick with you from day one until you're settled in your dorm room abroad.
                     </motion.p>
                 </div>
 
-                <div className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-8">
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-8">
                     {services.map((service, index) => (
                         <motion.div
                             key={service.title}
-                            initial={{ opacity: 0, y: 20 }}
-                            whileInView={{ opacity: 1, y: 0 }}
+                            initial={{ opacity: 0, y: 30, scale: 0.95 }}
+                            whileInView={{ opacity: 1, y: 0, scale: 1 }}
                             viewport={{ once: true }}
-                            transition={{ delay: index * 0.1 }}
-                            className="bg-card p-8 rounded-2xl shadow-sm border border-border/50 hover:border-accent hover:shadow-lg hover:-translate-y-2 transition-all duration-300 group"
+                            transition={{
+                                delay: index * 0.08,
+                                duration: 0.6,
+                                ease: [0.22, 1, 0.36, 1]
+                            }}
+                            className="relative bg-white/70 dark:bg-slate-800/70 backdrop-blur-xl p-4 md:p-6 lg:p-8 rounded-2xl shadow-lg border border-white/20 dark:border-slate-700/50 hover:border-accent hover:shadow-2xl hover:-translate-y-2 transition-all duration-500 ease-out group overflow-hidden"
                         >
                             <div className="w-14 h-14 bg-accent/10 rounded-xl flex items-center justify-center mb-6 text-accent group-hover:bg-accent group-hover:text-primary transition-colors">
                                 <service.icon className="w-7 h-7" />
                             </div>
                             <h3 className="text-xl font-bold mb-3 text-primary">{service.title}</h3>
-                            <p className="text-sm text-muted-foreground leading-relaxed">{service.description}</p>
+                            <p className="text-base md:text-sm text-muted-foreground leading-relaxed">{service.description}</p>
                         </motion.div>
                     ))}
                 </div>

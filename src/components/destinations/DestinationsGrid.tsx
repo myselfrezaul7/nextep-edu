@@ -32,7 +32,7 @@ export function DestinationsGrid() {
             {Object.values(destinations).map((destination) => (
                 <motion.div variants={item} key={destination.slug} className="h-full">
                     <Link href={`/destinations/${destination.slug}`} className="group block h-full">
-                        <div className="relative h-full overflow-hidden rounded-2xl border border-border bg-surface dark:bg-card shadow-lg hover:shadow-2xl transition-all duration-500 hover:-translate-y-2">
+                        <div className="relative h-full overflow-hidden rounded-2xl border border-white/20 dark:border-slate-700/50 bg-white/70 dark:bg-slate-800/70 backdrop-blur-xl shadow-lg hover:shadow-2xl transition-all duration-500 hover:-translate-y-2">
                             {/* Image Wrapper */}
                             <div className="relative h-64 overflow-hidden">
                                 <Image
