@@ -7,6 +7,7 @@ import { useTheme } from "next-themes";
 import { Menu, X, Moon, Sun, ChevronDown } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
+import { SearchModal } from "@/components/common/SearchModal";
 
 const destinations = [
     { name: "Study in UK", href: "/destinations/uk" },
@@ -115,6 +116,8 @@ export function Header() {
                         Book Consultation
                     </Button>
 
+                    <SearchModal />
+
                     <button
                         onClick={toggleTheme}
                         className="p-2 rounded-full hover:bg-muted transition-colors text-primary"
@@ -126,6 +129,7 @@ export function Header() {
 
                 {/* Mobile Menu Toggle */}
                 <div className="flex items-center gap-4 md:hidden">
+                    <SearchModal />
                     <button
                         onClick={toggleTheme}
                         className="p-2 rounded-full hover:bg-muted transition-colors text-primary"
@@ -172,6 +176,13 @@ export function Header() {
                                 </Link>
                             ))}
                         </div>
+                        <Link
+                            href="/destinations"
+                            className="text-sm font-bold text-accent mt-3 block text-center hover:underline"
+                            onClick={() => setMobileMenuOpen(false)}
+                        >
+                            View All Destinations →
+                        </Link>
                     </div>
                     <Button className="w-full mt-4" size="lg" onClick={() => {
                         setMobileMenuOpen(false);

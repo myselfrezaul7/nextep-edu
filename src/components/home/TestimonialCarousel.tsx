@@ -56,12 +56,16 @@ export function TestimonialCarousel() {
                     {testimonials.map((story, i) => (
                         <motion.div
                             key={i}
-                            initial={{ opacity: 0, y: 20 }}
-                            whileInView={{ opacity: 1, y: 0 }}
+                            initial={{ opacity: 0, y: 30, scale: 0.95 }}
+                            whileInView={{ opacity: 1, y: 0, scale: 1 }}
                             viewport={{ once: true }}
-                            transition={{ delay: i * 0.1 }}
+                            transition={{
+                                delay: i * 0.1,
+                                duration: 0.6,
+                                ease: [0.22, 1, 0.36, 1]
+                            }}
                         >
-                            <div className="bg-gradient-to-br from-card to-slate-50 dark:from-slate-800 dark:to-slate-900 p-3 md:p-6 rounded-xl md:rounded-2xl border border-accent/10 hover:border-accent/30 shadow-sm hover:shadow-xl transition-all duration-300 h-full flex flex-col relative group">
+                            <div className="relative bg-white/70 dark:bg-slate-800/70 backdrop-blur-xl p-3 md:p-6 rounded-xl md:rounded-2xl border border-white/20 dark:border-slate-700/50 hover:border-accent/30 shadow-lg hover:shadow-2xl transition-all duration-300 h-full flex flex-col group overflow-hidden">
                                 {/* Top Accent Line */}
                                 <div className="absolute top-0 left-0 right-0 h-0.5 md:h-1 bg-gradient-to-r from-accent via-yellow-400 to-accent opacity-0 group-hover:opacity-100 transition-opacity duration-300 rounded-t-xl md:rounded-t-2xl" />
 

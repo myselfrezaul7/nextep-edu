@@ -1,0 +1,215 @@
+"use client";
+
+import { useState, useEffect, useMemo } from "react";
+import { Search, Globe, GraduationCap, MapPin, X, Command } from "lucide-react";
+import { motion, AnimatePresence } from "framer-motion";
+import Link from "next/link";
+
+interface SearchResult {
+    title: string;
+    category: string;
+    href: string;
+    description?: string;
+}
+
+const searchData: SearchResult[] = [
+    // Destinations
+    { title: "United Kingdom", category: "Destination", href: "/destinations/uk", description: "Top universities, rich history" },
+    { title: "USA", category: "Destination", href: "/destinations/usa", description: "World-class education, diverse culture" },
+    { title: "Canada", category: "Destination", href: "/destinations/canada", description: "Welcoming, high quality of life" },
+    { title: "Australia", category: "Destination", href: "/destinations/australia", description: "Beautiful campuses, great climate" },
+    { title: "Germany", category: "Destination", href: "/destinations/germany", description: "Affordable tuition, strong engineering" },
+    { title: "France", category: "Destination", href: "/destinations/france", description: "Art, culture, excellent cuisine" },
+    { title: "Netherlands", category: "Destination", href: "/destinations/netherlands", description: "English-taught programs, innovation" },
+    { title: "New Zealand", category: "Destination", href: "/destinations/new-zealand", description: "Adventure, pristine nature" },
+
+    // Services
+    { title: "University Selection", category: "Service", href: "/#services", description: "Find the perfect university for you" },
+    { title: "Visa Assistance", category: "Service", href: "/#services", description: "Navigate visa requirements with ease" },
+    { title: "Career Planning", category: "Service", href: "/#services", description: "Plan your future career path" },
+    { title: "Scholarship Search", category: "Service", href: "/#services", description: "Discover funding opportunities" },
+
+    // General
+    { title: "About Us", category: "Page", href: "/#about", description: "Learn about our mission" },
+    { title: "All Destinations", category: "Page", href: "/destinations", description: "Explore all study destinations" },
+];
+
+export function SearchModal() {
+    const [isOpen, setIsOpen] = useState(false);
+    const [query, setQuery] = useState("");
+
+    // Keyboard shortcut (Cmd/Ctrl + K)
+    useEffect(() => {
+        const handleKeyDown = (e: KeyboardEvent) => {
+            if ((e.metaKey || e.ctrlKey) && e.key === "k") {
+                e.preventDefault();
+                setIsOpen(true);
+            }
+            if (e.key === "Escape") {
+                setIsOpen(false);
+            }
+        };
+
+        window.addEventListener("keydown", handleKeyDown);
+        return () => window.removeEventListener("keydown", handleKeyDown);
+    }, []);
+
+    // Filter results based on query
+    const results = useMemo(() => {
+        if (!query.trim()) return searchData.slice(0, 8); // Show popular results
+
+        const lowerQuery = query.toLowerCase();
+        return searchData.filter(
+            item =>
+                item.title.toLowerCase().includes(lowerQuery) ||
+                item.category.toLowerCase().includes(lowerQuery) ||
+                item.description?.toLowerCase().includes(lowerQuery)
+        );
+    }, [query]);
+
+    const closeModal = () => {
+        setIsOpen(false);
+        setQuery("");
+    };
+
+    const getCategoryIcon = (category: string) => {
+        switch (category) {
+            case "Destination":
+                return <Globe className="w-4 h-4" />;
+            case "Service":
+                return <GraduationCap className="w-4 h-4" />;
+            case "Page":
+                return <MapPin className="w-4 h-4" />;
+            default:
+                return <Search className="w-4 h-4" />;
+        }
+    };
+
+    return (
+        <>
+            {/* Search Trigger Button */}
+            <button
+                onClick={() => setIsOpen(true)}
+                className="p-2 rounded-full hover:bg-muted transition-colors text-primary group relative"
+                aria-label="Search"
+            >
+                <Search className="w-5 h-5" />
+                <span className="absolute -bottom-8 right-0 text-xs text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap hidden md:block">
+                    <Command className="w-3 h-3 inline" />K
+                </span>
+            </button>
+
+            {/* Search Modal Overlay */}
+            <AnimatePresence>
+                {isOpen && (
+                    <motion.div
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        exit={{ opacity: 0 }}
+                        transition={{ duration: 0.2 }}
+                        className="fixed inset-0 z-[100] flex items-start justify-center bg-black/60 backdrop-blur-sm p-4 pt-[15vh]"
+                        onClick={closeModal}
+                    >
+                        <motion.div
+                            initial={{ opacity: 0, scale: 0.95, y: -20 }}
+                            animate={{ opacity: 1, scale: 1, y: 0 }}
+                            exit={{ opacity: 0, scale: 0.95, y: -20 }}
+                            transition={{ duration: 0.3, ease: [0.22, 1, 0.36, 1] }}
+                            className="w-full max-w-2xl bg-background/95 backdrop-blur-xl rounded-2xl shadow-2xl border border-border/50 overflow-hidden"
+                            onClick={(e) => e.stopPropagation()}
+                        >
+                            {/* Search Input */}
+                            <div className="flex items-center gap-3 p-4 border-b border-border/50">
+                                <Search className="w-5 h-5 text-muted-foreground flex-shrink-0" />
+                                <input
+                                    type="text"
+                                    value={query}
+                                    onChange={(e) => setQuery(e.target.value)}
+                                    placeholder="Search destinations, universities, programs..."
+                                    className="flex-1 bg-transparent outline-none text-foreground placeholder:text-muted-foreground text-lg"
+                                    autoFocus
+                                />
+                                <button
+                                    onClick={closeModal}
+                                    className="p-1.5 rounded-lg hover:bg-muted transition-colors text-muted-foreground hover:text-foreground"
+                                >
+                                    <X className="w-5 h-5" />
+                                </button>
+                            </div>
+
+                            {/* Search Results */}
+                            <div className="max-h-[60vh] overflow-y-auto">
+                                {results.length > 0 ? (
+                                    <div className="p-2">
+                                        {!query && (
+                                            <p className="text-xs text-muted-foreground px-3 py-2">
+                                                Popular searches
+                                            </p>
+                                        )}
+                                        {results.map((result, index) => (
+                                            <Link
+                                                key={index}
+                                                href={result.href}
+                                                onClick={closeModal}
+                                                className="flex items-center gap-3 p-3 rounded-xl hover:bg-muted/50 transition-all duration-200 group"
+                                            >
+                                                <div className="w-9 h-9 rounded-lg bg-accent/10 flex items-center justify-center text-accent flex-shrink-0 group-hover:bg-accent group-hover:text-primary transition-colors">
+                                                    {getCategoryIcon(result.category)}
+                                                </div>
+                                                <div className="flex-1 min-w-0">
+                                                    <div className="flex items-center gap-2">
+                                                        <h4 className="font-medium text-foreground group-hover:text-accent transition-colors">
+                                                            {result.title}
+                                                        </h4>
+                                                        <span className="text-xs text-muted-foreground px-2 py-0.5 rounded-full bg-muted">
+                                                            {result.category}
+                                                        </span>
+                                                    </div>
+                                                    {result.description && (
+                                                        <p className="text-sm text-muted-foreground truncate">
+                                                            {result.description}
+                                                        </p>
+                                                    )}
+                                                </div>
+                                            </Link>
+                                        ))}
+                                    </div>
+                                ) : (
+                                    <div className="p-12 text-center">
+                                        <div className="w-16 h-16 bg-muted rounded-full flex items-center justify-center mx-auto mb-4">
+                                            <Search className="w-8 h-8 text-muted-foreground" />
+                                        </div>
+                                        <p className="text-muted-foreground">
+                                            No results found for &quot;{query}&quot;
+                                        </p>
+                                        <p className="text-sm text-muted-foreground mt-2">
+                                            Try searching for destinations, universities, or services
+                                        </p>
+                                    </div>
+                                )}
+                            </div>
+
+                            {/* Footer */}
+                            <div className="flex items-center justify-between px-4 py-3 border-t border-border/50 bg-muted/30 text-xs text-muted-foreground">
+                                <div className="flex items-center gap-4">
+                                    <span className="flex items-center gap-1">
+                                        <kbd className="px-1.5 py-0.5 rounded bg-background border border-border">↑↓</kbd>
+                                        Navigate
+                                    </span>
+                                    <span className="flex items-center gap-1">
+                                        <kbd className="px-1.5 py-0.5 rounded bg-background border border-border">↵</kbd>
+                                        Select
+                                    </span>
+                                </div>
+                                <span className="flex items-center gap-1">
+                                    <kbd className="px-1.5 py-0.5 rounded bg-background border border-border">ESC</kbd>
+                                    Close
+                                </span>
+                            </div>
+                        </motion.div>
+                    </motion.div>
+                )}
+            </AnimatePresence>
+        </>
+    );
+}

@@ -42,7 +42,7 @@ export function AboutSection() {
                     initial={{ opacity: 0, scale: 0.95 }}
                     whileInView={{ opacity: 1, scale: 1 }}
                     viewport={{ once: true }}
-                    transition={{ duration: 0.8 }}
+                    transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
                 >
                     <h2 className="text-3xl md:text-5xl font-bold font-heading mb-6 text-primary">Why Do People Choose Us?</h2>
                     <p className="text-lg text-muted-foreground mb-8 leading-relaxed">
@@ -83,8 +83,8 @@ export function AboutSection() {
                             initial={{ opacity: 0, x: 50 }}
                             whileInView={{ opacity: 1, x: 0 }}
                             viewport={{ once: true }}
-                            transition={{ delay: index * 0.1, duration: 0.6 }}
-                            className="bg-card p-8 rounded-2xl shadow-sm border border-border/50 text-center hover:border-accent transition-colors"
+                            transition={{ delay: index * 0.12, duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
+                            className="relative bg-white/70 dark:bg-slate-800/70 backdrop-blur-xl p-8 rounded-2xl shadow-lg border border-white/20 dark:border-slate-700/50 text-center hover:border-accent transition-all duration-500 ease-out overflow-hidden"
                         >
                             <h3 className="text-4xl md:text-5xl font-bold text-accent mb-2">{stat.value}</h3>
                             <p className="font-medium text-muted-foreground">{stat.label}</p>
