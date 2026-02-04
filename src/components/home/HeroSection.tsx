@@ -5,7 +5,11 @@ import Link from "next/link";
 import Image from "next/image";
 import { Button } from "@/components/ui/button";
 
+import { useTranslations } from 'next-intl';
+
 export function HeroSection() {
+    const t = useTranslations('Hero');
+
     return (
         <section className="relative min-h-[90vh] flex items-center overflow-hidden py-16 md:py-32">
             {/* Background Blur Effect */}
@@ -20,7 +24,7 @@ export function HeroSection() {
                         transition={{ duration: 1, ease: [0.22, 1, 0.36, 1] }}
                         className="text-4xl md:text-6xl font-bold font-heading text-primary leading-tight"
                     >
-                        Borders are for Maps. <span className="text-accent">Your Education is for the World.</span>
+                        {t('title')} <span className="text-accent">{t('titleAccent')}</span>
                     </motion.h1>
 
                     <motion.p
@@ -29,7 +33,7 @@ export function HeroSection() {
                         transition={{ duration: 0.9, delay: 0.15, ease: [0.22, 1, 0.36, 1] }}
                         className="text-xl md:text-2xl font-medium italic text-accent"
                     >
-                        One step, no limits.
+                        {t('subtitle')}
                     </motion.p>
 
                     <motion.p
@@ -38,7 +42,7 @@ export function HeroSection() {
                         transition={{ duration: 0.9, delay: 0.25, ease: [0.22, 1, 0.36, 1] }}
                         className="text-lg text-muted-foreground max-w-lg leading-relaxed"
                     >
-                        Your passport shouldn't limit your potential. Whether it's the UK, USA, Canada, or anywhere else, we help students break through borders and access world-class education. No fancy jargon. No hidden costs. Just real people giving you real guidance to achieve your global dreams.
+                        {t('description')}
                     </motion.p>
 
                     <motion.div
@@ -52,7 +56,7 @@ export function HeroSection() {
                             className="rounded-full text-base"
                             onClick={() => document.getElementById('booking-modal')?.classList.remove('hidden')}
                         >
-                            Let's Talk
+                            {t('talkButton')}
                         </Button>
                         <Button
                             size="lg"
@@ -61,7 +65,7 @@ export function HeroSection() {
                             asChild
                         >
                             <Link href="/#services">
-                                See What We Do
+                                {t('seeWorkButton')}
                             </Link>
                         </Button>
                     </motion.div>
