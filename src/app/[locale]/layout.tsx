@@ -13,6 +13,11 @@ const inter = Inter({ subsets: ["latin"] });
 export const metadata: Metadata = {
   title: "NexTep Edu | Your Bridge to Global Education",
   description: "Helping students in Bangladesh achieve their dreams of studying abroad with expert guidance and support.",
+  icons: {
+    icon: "/assets/favicon.ico",
+    shortcut: "/assets/favicon-16x16.png",
+    apple: "/assets/apple-touch-icon.png",
+  },
 };
 
 export default async function RootLayout({
