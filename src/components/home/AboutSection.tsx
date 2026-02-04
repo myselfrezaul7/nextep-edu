@@ -33,7 +33,24 @@ const stats = [
     { value: "1M+", label: "Scholarships Secured (BDT)" },
 ];
 
+import { useTranslations } from 'next-intl';
+
 export function AboutSection() {
+    const t = useTranslations('About');
+
+    const features = [
+        t('features.0'),
+        t('features.1'),
+        t('features.2'),
+        t('features.3'),
+    ];
+
+    const stats = [
+        { value: t('stat1Value'), label: t('stat1Label') },
+        { value: t('stat2Value'), label: t('stat2Label') },
+        { value: t('stat3Value'), label: t('stat3Label') },
+    ];
+
     return (
         <section id="about" className="py-24 bg-background overflow-hidden">
             <div className="container mx-auto px-4 grid lg:grid-cols-2 gap-16 items-center">
@@ -44,9 +61,9 @@ export function AboutSection() {
                     viewport={{ once: true }}
                     transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
                 >
-                    <h2 className="text-3xl md:text-5xl font-bold font-heading mb-6 text-primary">Why Do People Choose Us?</h2>
+                    <h2 className="text-3xl md:text-5xl font-bold font-heading mb-6 text-primary">{t('title')}</h2>
                     <p className="text-lg text-muted-foreground mb-8 leading-relaxed">
-                        Honestly? Because we've been in your shoes. Our team includes people who went through this exact process: the stress, the excitement, the million questions. We know what it's like to feel lost navigating all of this. That's why we don't treat you like just another application file. You're a person with dreams, and we take that seriously.
+                        {t('description')}
                     </p>
 
                     <motion.ul
@@ -71,7 +88,7 @@ export function AboutSection() {
                         size="lg"
                         onClick={() => document.getElementById('booking-modal')?.classList.remove('hidden')}
                     >
-                        Chat With Us
+                        {t('chatButton')}
                     </Button>
                 </motion.div>
 
