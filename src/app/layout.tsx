@@ -4,7 +4,9 @@ import { ThemeProvider } from "@/components/theme-provider";
 import { Header } from "@/components/layout/Header";
 import { Footer } from "@/components/layout/Footer";
 import { StructuredData } from "@/components/common/structured-data";
+import { BookingModal } from "@/components/common/BookingModal";
 import "./globals.css";
+
 
 const ibmPlexSans = IBM_Plex_Sans({
     subsets: ["latin"],
@@ -156,6 +158,7 @@ export default function RootLayout({
                         <main className="flex-grow pt-20">{children}</main>
                         <Footer />
                     </div>
+                    <BookingModal />
                 </ThemeProvider>
             </body>
         </html>
