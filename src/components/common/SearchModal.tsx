@@ -21,7 +21,7 @@ const searchData: SearchResult[] = [
     { title: "Germany", category: "Destination", href: "/destinations/germany", description: "Affordable tuition, strong engineering" },
     { title: "France", category: "Destination", href: "/destinations/france", description: "Art, culture, excellent cuisine" },
     { title: "Netherlands", category: "Destination", href: "/destinations/netherlands", description: "English-taught programs, innovation" },
-    { title: "New Zealand", category: "Destination", href: "/destinations/new-zealand", description: "Adventure, pristine nature" },
+    { title: "South Korea", category: "Destination", href: "/destinations/south-korea", description: "Technology, K-culture" },
 
     // Services
     { title: "University Selection", category: "Service", href: "/#services", description: "Find the perfect university for you" },

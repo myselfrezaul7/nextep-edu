@@ -198,7 +198,7 @@ export function BookingModal() {
 
                         <div className="pt-4">
                             <Button type="submit" className="w-full h-12 text-lg font-bold" disabled={isSubmitting}>
-                                {isSubmitting ? "Bookng..." : "Confirm Booking"}
+                                {isSubmitting ? "Booking..." : "Confirm Booking"}
                             </Button>
                         </div>
                     </form>
