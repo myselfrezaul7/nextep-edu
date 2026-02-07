@@ -5,18 +5,18 @@ import { Star, Quote } from "lucide-react";
 
 const testimonials = [
     {
-        text: "I was honestly lost before I found these guys. My SOP was a mess, and I had no idea how visa interviews worked. They sat with me, fixed everything, and now I'm actually in Toronto studying Computer Science.",
-        author: "Rahim Ahmed",
-        university: "University of Toronto, Canada",
-        flag: "🇨🇦",
-        initials: "RA",
+        text: "NexTep Edu guided me through every step of my application to Germany. From document preparation to university selection, their support was invaluable. Now I'm pursuing my Master's in IMIS and it's been an incredible journey.",
+        author: "Mehedi Drubok",
+        university: "IMIS, South Westphalia University of Applied Sciences, Germany",
+        flag: "🇩🇪",
+        initials: "MD",
     },
     {
-        text: "They found me a scholarship I had never even heard of. The team is super chill and actually listens to what you want. Made the whole UK dream possible for my family.",
-        author: "Fatima Akter",
-        university: "University of Manchester, UK",
-        flag: "🇬🇧",
-        initials: "FA",
+        text: "I couldn't have imagined studying in Germany without NexTep Edu's help. They made the complex admission process feel simple and were always there to answer my questions. My dream of studying at South Westphalia University came true!",
+        author: "Jannatul Ferdous",
+        university: "IMIS, South Westphalia University of Applied Sciences, Germany",
+        flag: "🇩🇪",
+        initials: "JF",
     },
     {
         text: "What I loved is they didn't just help with applications, they helped me figure out where to live, how to manage money abroad, everything. It's like having an older sibling.",

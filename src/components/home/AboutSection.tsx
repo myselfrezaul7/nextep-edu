@@ -33,24 +33,7 @@ const stats = [
     { value: "1M+", label: "Scholarships Secured (BDT)" },
 ];
 
-import { useTranslations } from 'next-intl';
-
 export function AboutSection() {
-    const t = useTranslations('About');
-
-    const features = [
-        t('features.0'),
-        t('features.1'),
-        t('features.2'),
-        t('features.3'),
-    ];
-
-    const stats = [
-        { value: t('stat1Value'), label: t('stat1Label') },
-        { value: t('stat2Value'), label: t('stat2Label') },
-        { value: t('stat3Value'), label: t('stat3Label') },
-    ];
-
     return (
         <section id="about" className="py-24 bg-background overflow-hidden">
             <div className="container mx-auto px-4 grid lg:grid-cols-2 gap-16 items-center">
@@ -61,9 +44,9 @@ export function AboutSection() {
                     viewport={{ once: true }}
                     transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
                 >
-                    <h2 className="text-3xl md:text-5xl font-bold font-heading mb-6 text-primary">{t('title')}</h2>
+                    <h2 className="text-3xl md:text-5xl font-bold font-heading mb-6 text-primary">Why Students Trust Us</h2>
                     <p className="text-lg text-muted-foreground mb-8 leading-relaxed">
-                        {t('description')}
+                        We&apos;ve helped hundreds of Bangladeshi students achieve their dreams of studying abroad. Our team combines personal experience with professional expertise.
                     </p>
 
                     <motion.ul
@@ -88,7 +71,7 @@ export function AboutSection() {
                         size="lg"
                         onClick={() => document.getElementById('booking-modal')?.classList.remove('hidden')}
                     >
-                        {t('chatButton')}
+                        Chat With Us
                     </Button>
                 </motion.div>
 

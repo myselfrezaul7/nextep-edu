@@ -5,11 +5,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { Button } from "@/components/ui/button";
 
-import { useTranslations } from 'next-intl';
-
 export function HeroSection() {
-    const t = useTranslations('Hero');
-
     return (
         <section className="relative min-h-[90vh] flex items-center overflow-hidden py-16 md:py-32">
             {/* Background Blur Effect */}
@@ -24,7 +20,7 @@ export function HeroSection() {
                         transition={{ duration: 1, ease: [0.22, 1, 0.36, 1] }}
                         className="text-4xl md:text-6xl font-bold font-heading text-primary leading-tight"
                     >
-                        {t('title')} <span className="text-accent">{t('titleAccent')}</span>
+                        Your Bridge to <span className="text-accent">Global Education</span>
                     </motion.h1>
 
                     <motion.p
@@ -33,7 +29,7 @@ export function HeroSection() {
                         transition={{ duration: 0.9, delay: 0.15, ease: [0.22, 1, 0.36, 1] }}
                         className="text-xl md:text-2xl font-medium italic text-accent"
                     >
-                        {t('subtitle')}
+                        Dream it. Plan it. Achieve it.
                     </motion.p>
 
                     <motion.p
@@ -42,7 +38,7 @@ export function HeroSection() {
                         transition={{ duration: 0.9, delay: 0.25, ease: [0.22, 1, 0.36, 1] }}
                         className="text-lg text-muted-foreground max-w-lg leading-relaxed"
                     >
-                        {t('description')}
+                        Expert guidance for Bangladeshi students aspiring to study abroad. We make your international education journey seamless and successful.
                     </motion.p>
 
                     <motion.div
@@ -56,7 +52,7 @@ export function HeroSection() {
                             className="rounded-full text-base"
                             onClick={() => document.getElementById('booking-modal')?.classList.remove('hidden')}
                         >
-                            {t('talkButton')}
+                            Let&apos;s Talk
                         </Button>
                         <Button
                             size="lg"
@@ -65,7 +61,7 @@ export function HeroSection() {
                             asChild
                         >
                             <Link href="/#services">
-                                {t('seeWorkButton')}
+                                See Our Work
                             </Link>
                         </Button>
                     </motion.div>
