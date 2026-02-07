@@ -52,11 +52,11 @@ export function Footer() {
                         <ul className="space-y-4 text-sm">
                             <li className="flex items-start gap-3">
                                 <Phone className="w-4 h-4 mt-1 text-accent" />
-                                <span>+49 157 73855748</span>
+                                <a href="https://wa.me/4915773855748" target="_blank" rel="noopener noreferrer" className="hover:text-accent transition-colors">+49 157 73855748</a>
                             </li>
                             <li className="flex items-start gap-3">
                                 <Mail className="w-4 h-4 mt-1 text-accent" />
-                                <span>info@nextepedu.com</span>
+                                <a href="https://mail.google.com/mail/?view=cm&fs=1&to=info@nextepedu.com" target="_blank" rel="noopener noreferrer" className="hover:text-accent transition-colors">info@nextepedu.com</a>
                             </li>
                             <li className="flex items-start gap-3">
                                 <MapPin className="w-4 h-4 mt-1 text-accent" />
