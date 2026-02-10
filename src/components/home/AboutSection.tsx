@@ -1,6 +1,7 @@
 "use client";
 
-import { motion } from "framer-motion";
+import { motion, useInView } from "framer-motion";
+import { useEffect, useRef, useState } from "react";
 import { CheckCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
@@ -28,10 +29,46 @@ const itemVariants = {
 };
 
 const stats = [
-    { value: "50+", label: "Students Placed" },
-    { value: "20+", label: "Countries" },
-    { value: "1M+", label: "Scholarships Secured (BDT)" },
+    { value: 50, suffix: "+", label: "Students Placed" },
+    { value: 20, suffix: "+", label: "Countries" },
+    { value: 1, suffix: "M+", label: "Scholarships Secured (BDT)" },
 ];
+
+function AnimatedCounter({ value, suffix }: { value: number; suffix: string }) {
+    const [display, setDisplay] = useState(0);
+    const ref = useRef<HTMLSpanElement>(null);
+    const isInView = useInView(ref, { once: true, amount: 0.5 });
+
+    useEffect(() => {
+        if (!isInView) return;
+
+        let start = 0;
+        const duration = 2000;
+        const startTime = performance.now();
+
+        const step = (currentTime: number) => {
+            const elapsed = currentTime - startTime;
+            const progress = Math.min(elapsed / duration, 1);
+            // Ease out cubic
+            const eased = 1 - Math.pow(1 - progress, 3);
+            const current = Math.round(eased * value);
+
+            setDisplay(current);
+
+            if (progress < 1) {
+                requestAnimationFrame(step);
+            }
+        };
+
+        requestAnimationFrame(step);
+    }, [isInView, value]);
+
+    return (
+        <span ref={ref}>
+            {display}{suffix}
+        </span>
+    );
+}
 
 export function AboutSection() {
     return (
@@ -75,7 +112,7 @@ export function AboutSection() {
                     </Button>
                 </motion.div>
 
-                {/* Stats Grid */}
+                {/* Stats Grid with animated counters */}
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-1 gap-6">
                     {stats.map((stat, index) => (
                         <motion.div
@@ -86,7 +123,9 @@ export function AboutSection() {
                             transition={{ delay: index * 0.12, duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
                             className="relative bg-card/95 backdrop-blur-xl p-8 rounded-2xl shadow-lg border border-border/30 text-center hover:border-accent transition-all duration-500 ease-out overflow-hidden"
                         >
-                            <h3 className="text-4xl md:text-5xl font-bold text-accent mb-2">{stat.value}</h3>
+                            <h3 className="text-4xl md:text-5xl font-bold text-accent mb-2">
+                                <AnimatedCounter value={stat.value} suffix={stat.suffix} />
+                            </h3>
                             <p className="font-medium text-muted-foreground">{stat.label}</p>
                         </motion.div>
                     ))}

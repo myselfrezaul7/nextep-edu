@@ -5,6 +5,11 @@ import { Header } from "@/components/layout/Header";
 import { Footer } from "@/components/layout/Footer";
 import { StructuredData } from "@/components/common/structured-data";
 import { BookingModal } from "@/components/common/BookingModal";
+import { WhatsAppFAB } from "@/components/common/WhatsAppFAB";
+import { ScrollProgress } from "@/components/common/ScrollProgress";
+import { BackToTop } from "@/components/common/BackToTop";
+import { PageTransition } from "@/components/common/PageTransition";
+import { ErrorBoundary } from "@/components/common/ErrorBoundary";
 import "./globals.css";
 
 
@@ -153,12 +158,19 @@ export default function RootLayout({
                     enableSystem
                     disableTransitionOnChange
                 >
+                    <ScrollProgress />
                     <div className="flex flex-col min-h-screen">
                         <Header />
-                        <main className="flex-grow pt-20">{children}</main>
+                        <main className="flex-grow pt-20">
+                            <ErrorBoundary>
+                                <PageTransition>{children}</PageTransition>
+                            </ErrorBoundary>
+                        </main>
                         <Footer />
                     </div>
                     <BookingModal />
+                    <WhatsAppFAB />
+                    <BackToTop />
                 </ThemeProvider>
             </body>
         </html>

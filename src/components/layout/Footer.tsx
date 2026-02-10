@@ -87,7 +87,7 @@ export function Footer() {
                     </a>
                 </div>
                 <p className="text-xs text-slate-500">
-                    &copy; 2025 NexTep Edu. All rights reserved.
+                    &copy; {new Date().getFullYear()} NexTep Edu. All rights reserved.
                 </p>
             </div>
         </footer>

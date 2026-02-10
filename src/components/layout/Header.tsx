@@ -8,17 +8,13 @@ import { Menu, X, Moon, Sun, ChevronDown } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { SearchModal } from "@/components/common/SearchModal";
+import { destinations as destinationsData } from "@/data/destinations";
 
-const destinations = [
-    { name: "Study in UK", href: "/destinations/uk" },
-    { name: "Study in USA", href: "/destinations/usa" },
-    { name: "Study in Canada", href: "/destinations/canada" },
-    { name: "Study in Australia", href: "/destinations/australia" },
-    { name: "Study in Germany", href: "/destinations/germany" },
-    { name: "Study in France", href: "/destinations/france" },
-    { name: "Study in Netherlands", href: "/destinations/netherlands" },
-    { name: "Study in South Korea", href: "/destinations/south-korea" },
-];
+// Auto-generate destination nav items from data
+const allDestinations = Object.values(destinationsData).map(d => ({
+    name: `Study in ${d.name}`,
+    href: `/destinations/${d.slug}`
+}));
 
 export function Header() {
     const [scrolled, setScrolled] = useState(false);
@@ -81,22 +77,25 @@ export function Header() {
                         onMouseEnter={() => setDropdownOpen(true)}
                         onMouseLeave={() => setDropdownOpen(false)}
                     >
-                        <button className="flex items-center gap-1 text-sm font-medium hover:text-accent transition-colors py-2">
+                        <button
+                            className="flex items-center gap-1 text-sm font-medium hover:text-accent transition-colors py-2"
+                            aria-expanded={dropdownOpen}
+                            aria-haspopup="true"
+                        >
                             Destinations <ChevronDown className={cn("w-4 h-4 transition-transform", dropdownOpen && "rotate-180")} />
                         </button>
 
-                        {/* Dropdown Menu */}
+                        {/* Dropdown Menu — now shows all destinations with scroll */}
                         <div
                             className={cn(
-                                "absolute top-full left-1/2 -translate-x-1/2 w-56 transition-all duration-200 origin-top",
+                                "absolute top-full left-1/2 -translate-x-1/2 w-60 transition-all duration-200 origin-top",
                                 dropdownOpen ? "opacity-100 scale-100 visible" : "opacity-0 scale-95 invisible"
                             )}
                         >
-                            <div className="mt-2 bg-card rounded-xl shadow-xl border border-border p-2 grid gap-1 relative overflow-hidden">
-                                {/* Glass effect implementation for dropdown too */}
+                            <div className="mt-2 bg-card rounded-xl shadow-xl border border-border p-2 grid gap-1 relative overflow-hidden max-h-80 overflow-y-auto">
                                 <div className="absolute inset-0 bg-background/50 backdrop-blur-md -z-10" />
 
-                                {destinations.slice(0, 6).map((item) => (
+                                {allDestinations.map((item) => (
                                     <Link
                                         key={item.name}
                                         href={item.href}
@@ -133,19 +132,22 @@ export function Header() {
                     <button
                         onClick={toggleTheme}
                         className="p-2 rounded-full hover:bg-muted transition-colors text-primary"
+                        aria-label="Toggle theme"
                     >
                         {mounted && theme === 'dark' ? <Sun className="w-5 h-5" /> : <Moon className="w-5 h-5" />}
                     </button>
                     <button
                         onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
                         className="p-2 text-primary"
+                        aria-label={mobileMenuOpen ? "Close menu" : "Open menu"}
+                        aria-expanded={mobileMenuOpen}
                     >
                         {mobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
                     </button>
                 </div>
             </div>
 
-            {/* Mobile Menu Content */}
+            {/* Mobile Menu Content — now shows all destinations */}
             {mobileMenuOpen && (
                 <div className="md:hidden absolute top-full left-0 w-full bg-background/95 backdrop-blur-xl border-b border-border shadow-2xl p-6 flex flex-col gap-4 animate-in slide-in-from-top-5">
                     <Link
@@ -164,8 +166,8 @@ export function Header() {
                     </Link>
                     <div className="py-2">
                         <p className="text-sm font-bold text-slate-400 mb-2 uppercase tracking-wider">Destinations</p>
-                        <div className="grid grid-cols-2 gap-2">
-                            {destinations.slice(0, 6).map(item => (
+                        <div className="grid grid-cols-2 gap-2 max-h-48 overflow-y-auto">
+                            {allDestinations.map(item => (
                                 <Link
                                     key={item.href}
                                     href={item.href}
