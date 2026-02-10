@@ -1,9 +1,10 @@
 "use client";
 
 import { useState, useEffect, useMemo } from "react";
-import { Search, Globe, GraduationCap, MapPin, X, Command } from "lucide-react";
+import { Search, Globe, GraduationCap, MapPin, X } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import Link from "next/link";
+import { destinations } from "@/data/destinations";
 
 interface SearchResult {
     title: string;
@@ -12,27 +13,28 @@ interface SearchResult {
     description?: string;
 }
 
-const searchData: SearchResult[] = [
-    // Destinations
-    { title: "United Kingdom", category: "Destination", href: "/destinations/uk", description: "Top universities, rich history" },
-    { title: "USA", category: "Destination", href: "/destinations/usa", description: "World-class education, diverse culture" },
-    { title: "Canada", category: "Destination", href: "/destinations/canada", description: "Welcoming, high quality of life" },
-    { title: "Australia", category: "Destination", href: "/destinations/australia", description: "Beautiful campuses, great climate" },
-    { title: "Germany", category: "Destination", href: "/destinations/germany", description: "Affordable tuition, strong engineering" },
-    { title: "France", category: "Destination", href: "/destinations/france", description: "Art, culture, excellent cuisine" },
-    { title: "Netherlands", category: "Destination", href: "/destinations/netherlands", description: "English-taught programs, innovation" },
-    { title: "South Korea", category: "Destination", href: "/destinations/south-korea", description: "Technology, K-culture" },
+// Auto-generate search data from destinations data source
+const destinationResults: SearchResult[] = Object.values(destinations).map(d => ({
+    title: d.name,
+    category: "Destination",
+    href: `/destinations/${d.slug}`,
+    description: d.hero.description.slice(0, 60) + "..."
+}));
 
-    // Services
+const serviceResults: SearchResult[] = [
     { title: "University Selection", category: "Service", href: "/#services", description: "Find the perfect university for you" },
     { title: "Visa Assistance", category: "Service", href: "/#services", description: "Navigate visa requirements with ease" },
     { title: "Career Planning", category: "Service", href: "/#services", description: "Plan your future career path" },
     { title: "Scholarship Search", category: "Service", href: "/#services", description: "Discover funding opportunities" },
+];
 
-    // General
+const pageResults: SearchResult[] = [
     { title: "About Us", category: "Page", href: "/#about", description: "Learn about our mission" },
     { title: "All Destinations", category: "Page", href: "/destinations", description: "Explore all study destinations" },
+    { title: "Student Stories", category: "Page", href: "/#stories", description: "Hear from our students" },
 ];
+
+const searchData: SearchResult[] = [...destinationResults, ...serviceResults, ...pageResults];
 
 export function SearchModal() {
     const [isOpen, setIsOpen] = useState(false);
@@ -56,7 +58,7 @@ export function SearchModal() {
 
     // Filter results based on query
     const results = useMemo(() => {
-        if (!query.trim()) return searchData.slice(0, 8); // Show popular results
+        if (!query.trim()) return searchData.slice(0, 10); // Show popular results
 
         const lowerQuery = query.toLowerCase();
         return searchData.filter(
@@ -91,7 +93,7 @@ export function SearchModal() {
             <button
                 onClick={() => setIsOpen(true)}
                 className="group relative flex items-center gap-2 px-4 py-2 rounded-lg bg-gradient-to-r from-accent/10 to-accent/5 hover:from-accent/20 hover:to-accent/10 border border-accent/20 hover:border-accent/40 transition-all duration-300 hover:shadow-lg hover:shadow-accent/20 hover:scale-105"
-                aria-label="Search"
+                aria-label="Search destinations, services, and pages"
             >
                 <Search className="w-4 h-4 text-accent group-hover:rotate-12 transition-transform duration-300" />
                 <span className="hidden md:inline text-sm font-medium text-foreground">Search</span>
@@ -133,6 +135,7 @@ export function SearchModal() {
                                 <button
                                     onClick={closeModal}
                                     className="p-1.5 rounded-lg hover:bg-muted transition-colors text-muted-foreground hover:text-foreground"
+                                    aria-label="Close search"
                                 >
                                     <X className="w-5 h-5" />
                                 </button>

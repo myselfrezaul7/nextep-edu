@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import { useForm } from "react-hook-form";
 import toast from "react-hot-toast";
 import { X, Calendar, Clock, BookOpen, User, Mail, Phone } from "lucide-react";
@@ -21,12 +21,19 @@ export function BookingModal() {
     const [isOpen, setIsOpen] = useState(false);
     const { register, handleSubmit, reset, formState: { errors, isSubmitting } } = useForm<FormData>();
     const [minDate, setMinDate] = useState("");
+    const modalRef = useRef<HTMLDivElement>(null);
+    const firstInputRef = useRef<HTMLInputElement | null>(null);
 
     useEffect(() => {
-        // Set min date to today
         setMinDate(new Date().toISOString().split("T")[0]);
+    }, []);
 
-        // Listen for open events (simple DOM-based trigger as requested for quick migration)
+    // Expose global open function for other components to call
+    useEffect(() => {
+        const openModal = () => setIsOpen(true);
+        window.__openBookingModal = openModal;
+
+        // Legacy support: listen for DOM class changes on #booking-modal
         const modal = document.getElementById("booking-modal");
         if (!modal) return;
 
@@ -35,8 +42,6 @@ export function BookingModal() {
                 if (mutation.type === "attributes" && mutation.attributeName === "class") {
                     if (!modal.classList.contains("hidden")) {
                         setIsOpen(true);
-                    } else {
-                        setIsOpen(false);
                     }
                 }
             });
@@ -44,15 +49,59 @@ export function BookingModal() {
 
         observer.observe(modal, { attributes: true });
 
-        return () => observer.disconnect();
+        return () => {
+            delete window.__openBookingModal;
+            observer.disconnect();
+        };
     }, []);
 
-    const closeModal = () => {
+    // Focus trap & ESC to close
+    useEffect(() => {
+        if (!isOpen) return;
+
+        const handleKeyDown = (e: KeyboardEvent) => {
+            if (e.key === "Escape") {
+                closeModal();
+                return;
+            }
+
+            // Focus trap
+            if (e.key === "Tab" && modalRef.current) {
+                const focusable = modalRef.current.querySelectorAll<HTMLElement>(
+                    'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
+                );
+                const first = focusable[0];
+                const last = focusable[focusable.length - 1];
+
+                if (e.shiftKey && document.activeElement === first) {
+                    e.preventDefault();
+                    last.focus();
+                } else if (!e.shiftKey && document.activeElement === last) {
+                    e.preventDefault();
+                    first.focus();
+                }
+            }
+        };
+
+        document.addEventListener("keydown", handleKeyDown);
+        document.body.style.overflow = "hidden";
+
+        // Focus first input on open
+        setTimeout(() => firstInputRef.current?.focus(), 100);
+
+        return () => {
+            document.removeEventListener("keydown", handleKeyDown);
+            document.body.style.overflow = "";
+        };
+    }, [isOpen]);
+
+    const closeModal = useCallback(() => {
+        setIsOpen(false);
+        // Also update DOM class for legacy compatibility
         const modal = document.getElementById("booking-modal");
         if (modal) modal.classList.add("hidden");
-        setIsOpen(false);
         reset();
-    };
+    }, [reset]);
 
     const onSubmit = async (data: FormData) => {
         if (data.website_url) return; // Honeypot trap
@@ -60,56 +109,60 @@ export function BookingModal() {
         const formData = new FormData();
         Object.entries(data).forEach(([key, value]) => formData.append(key, value));
 
-        // Add access key for Web3Forms (Using a demo public key or placeholder, 
-        // user should provide env var. For now hardcoding or using public demo key if available? 
-        // The original site had it somewhere? Let's assume standard endpoint behavior)
-        // Actually original script used: `https://api.web3forms.com/submit`
-        // I need an access_key. I'll use a placeholder or check if I missed it in `index.html`. 
-        // I'll check `index.html` again via `grep` if needed, but for now I'll use a placeholder env var.
-
-        formData.append("access_key", "YOUR_ACCESS_KEY_HERE"); // Placeholder
+        // Use environment variable for access key, fallback to placeholder
+        const accessKey = process.env.NEXT_PUBLIC_WEB3FORMS_KEY || "0bb2085c-f181-4e50-986e-c4c62cfdfc75";
+        formData.append("access_key", accessKey);
 
         try {
-            // Simulate success for now as I don't have the key
-            await new Promise(resolve => setTimeout(resolve, 1000));
-
-            /* 
             const response = await fetch("https://api.web3forms.com/submit", {
-             method: "POST",
-             body: formData
-           });
-           const result = await response.json();
-           if (!result.success) throw new Error(result.message);
-           */
+                method: "POST",
+                body: formData
+            });
+            const result = await response.json();
+
+            if (!result.success) {
+                throw new Error(result.message || "Submission failed");
+            }
 
             toast.success("Booking confirmed! We'll contact you shortly.");
             closeModal();
-        } catch (error) {
+        } catch {
             toast.error("Something went wrong. Please try again.");
         }
     };
 
-    // If using DOM class manipulation to show/hide, we render essentially always but hide via parent class
-    // But React state helps controls mounting/animation.
-    // For the 'id="booking-modal"' approach to work, this component must render a div with that ID.
+    if (!isOpen) {
+        return <div id="booking-modal" className="hidden" />;
+    }
 
     return (
         <div
             id="booking-modal"
-            className={`fixed inset-0 z-[100] flex items-center justify-center bg-black/60 backdrop-blur-sm p-4 transition-all duration-300 ${!isOpen ? "hidden opacity-0 pointer-events-none" : "opacity-100 pointer-events-auto"}`}
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="booking-modal-title"
+            className="fixed inset-0 z-[100] flex items-center justify-center bg-black/60 backdrop-blur-sm p-4 transition-all duration-300"
             onClick={(e) => {
                 if (e.target === e.currentTarget) closeModal();
             }}
         >
-            <div className="bg-surface w-full max-w-lg rounded-2xl shadow-2xl border border-white/10 overflow-hidden flex flex-col max-h-[90vh]">
-
+            <div
+                ref={modalRef}
+                className="bg-surface w-full max-w-lg rounded-2xl shadow-2xl border border-white/10 overflow-hidden flex flex-col max-h-[90vh] animate-in fade-in zoom-in-95 duration-200"
+            >
                 {/* Header */}
                 <div className="p-6 border-b border-border flex justify-between items-center bg-accent/5">
                     <div>
-                        <h3 className="text-xl font-bold font-heading text-primary">Book Your Free Consultation</h3>
-                        <p className="text-sm text-muted-foreground">Let's plan your future together.</p>
+                        <h3 id="booking-modal-title" className="text-xl font-bold font-heading text-primary">
+                            Book Your Free Consultation
+                        </h3>
+                        <p className="text-sm text-muted-foreground">Let&apos;s plan your future together.</p>
                     </div>
-                    <button onClick={closeModal} className="p-2 hover:bg-black/5 dark:hover:bg-white/10 rounded-full transition-colors">
+                    <button
+                        onClick={closeModal}
+                        className="p-2 hover:bg-black/5 dark:hover:bg-white/10 rounded-full transition-colors"
+                        aria-label="Close booking modal"
+                    >
                         <X className="w-5 h-5" />
                     </button>
                 </div>
@@ -119,12 +172,16 @@ export function BookingModal() {
                     <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
 
                         {/* Honeypot */}
-                        <input type="text" className="hidden" {...register("website_url")} autoComplete="off" />
+                        <input type="text" className="hidden" {...register("website_url")} autoComplete="off" tabIndex={-1} />
 
                         <div className="space-y-2">
                             <label className="text-sm font-medium flex items-center gap-2"><User className="w-4 h-4 text-accent" /> Full Name</label>
                             <input
                                 {...register("name", { required: "Name is required" })}
+                                ref={(e) => {
+                                    register("name").ref(e);
+                                    firstInputRef.current = e;
+                                }}
                                 className="w-full p-3 rounded-lg border border-border bg-background focus:ring-2 focus:ring-accent/50 outline-none transition-all"
                                 placeholder="e.g. Rahim Ahmed"
                             />
@@ -206,4 +263,11 @@ export function BookingModal() {
             </div>
         </div>
     );
+}
+
+// Type augmentation for window
+declare global {
+    interface Window {
+        __openBookingModal?: () => void;
+    }
 }
