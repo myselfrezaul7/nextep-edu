@@ -10,6 +10,7 @@ const testimonials = [
         university: "IMIS, South Westphalia University of Applied Sciences, Germany",
         flag: "🇩🇪",
         initials: "MD",
+        visaDate: "January 12, 2025",
     },
     {
         text: "I couldn't have imagined studying in Germany without NexTep Edu's help. They made the complex admission process feel simple and were always there to answer my questions. My dream of studying at South Westphalia University came true!",
@@ -17,6 +18,7 @@ const testimonials = [
         university: "IMIS, South Westphalia University of Applied Sciences, Germany",
         flag: "🇩🇪",
         initials: "JF",
+        visaDate: "February 10, 2025",
     },
     {
         text: "What I loved is they didn't just help with applications, they helped me figure out where to live, how to manage money abroad, everything. It's like having an older sibling.",
@@ -24,6 +26,7 @@ const testimonials = [
         university: "Monash University, Australia",
         flag: "🇦🇺",
         initials: "TH",
+        visaDate: "March 22, 2025",
     },
     {
         text: "No pushy sales tactics, no fake promises. Just real people doing their job well. I respected that, and it made me trust them with my education.",
@@ -31,6 +34,7 @@ const testimonials = [
         university: "University of Leeds, UK",
         flag: "🇬🇧",
         initials: "NJ",
+        visaDate: "June 8, 2025",
     },
 ];
 
@@ -96,6 +100,9 @@ export function TestimonialCarousel() {
                                         <p className="text-[9px] md:text-xs text-muted-foreground flex items-center gap-1 truncate">
                                             <span className="text-xs md:text-sm">{story.flag}</span>
                                             <span className="truncate">{story.university}</span>
+                                        </p>
+                                        <p className="text-[8px] md:text-[11px] text-accent font-medium mt-0.5">
+                                            ✅ Visa approved · {story.visaDate}
                                         </p>
                                     </div>
                                 </div>
