@@ -109,7 +109,7 @@ export const metadata: Metadata = {
     },
     // Verification (add your IDs after setting up)
     verification: {
-        google: "your-google-verification-code",
+        google: "-rite_oeT3HO65k-rhGykyzD6x-V05loAJ27NfqRteM",
         // yandex: 'your-yandex-verification-code',
     },
     // Category
