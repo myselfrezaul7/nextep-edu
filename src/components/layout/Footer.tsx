@@ -81,7 +81,7 @@ export function Footer() {
                         href="https://instagram.com/nextepedu"
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="text-muted-foreground hover:text-transparent hover:bg-gradient-to-br hover:from-[#833AB4] hover:via-[#FD1D1D] hover:to-[#F77737] hover:bg-clip-text hover:scale-110 transition-all duration-300"
+                        className="text-muted-foreground hover:text-[#E1306C] hover:scale-110 transition-all duration-300"
                     >
                         <Instagram className="w-5 h-5" />
                     </a>
