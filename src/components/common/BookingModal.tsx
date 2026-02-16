@@ -19,6 +19,7 @@ type FormData = {
 
 export function BookingModal() {
     const [isOpen, setIsOpen] = useState(false);
+    const [isSuccess, setIsSuccess] = useState(false);
     const { register, handleSubmit, reset, formState: { errors, isSubmitting } } = useForm<FormData>();
     const [minDate, setMinDate] = useState("");
     const modalRef = useRef<HTMLDivElement>(null);
@@ -97,6 +98,7 @@ export function BookingModal() {
 
     const closeModal = useCallback(() => {
         setIsOpen(false);
+        setTimeout(() => setIsSuccess(false), 300); // Reset success state after animation
         // Also update DOM class for legacy compatibility
         const modal = document.getElementById("booking-modal");
         if (modal) modal.classList.add("hidden");
@@ -124,8 +126,8 @@ export function BookingModal() {
                 throw new Error(result.message || "Submission failed");
             }
 
-            toast.success("Booking confirmed! We'll contact you shortly.");
-            closeModal();
+            setIsSuccess(true);
+            // toast.success("Booking confirmed! We'll contact you shortly.");
         } catch {
             toast.error("Something went wrong. Please try again.");
         }
@@ -154,9 +156,9 @@ export function BookingModal() {
                 <div className="p-6 border-b border-border flex justify-between items-center bg-accent/5">
                     <div>
                         <h3 id="booking-modal-title" className="text-xl font-bold font-heading text-primary">
-                            Book Your Free Consultation
+                            {isSuccess ? "Booking Confirmed" : "Book Your Free Consultation"}
                         </h3>
-                        <p className="text-sm text-muted-foreground">Let&apos;s plan your future together.</p>
+                        {!isSuccess && <p className="text-sm text-muted-foreground">Let&apos;s plan your future together.</p>}
                     </div>
                     <button
                         onClick={closeModal}
@@ -167,98 +169,125 @@ export function BookingModal() {
                     </button>
                 </div>
 
-                {/* Scrollable Form */}
-                <div className="overflow-y-auto p-6 space-y-4">
-                    <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
-
-                        {/* Honeypot */}
-                        <input type="text" className="hidden" {...register("website_url")} autoComplete="off" tabIndex={-1} />
-
-                        <div className="space-y-2">
-                            <label className="text-sm font-medium flex items-center gap-2"><User className="w-4 h-4 text-accent" /> Full Name</label>
-                            <input
-                                {...register("name", { required: "Name is required" })}
-                                ref={(e) => {
-                                    register("name").ref(e);
-                                    firstInputRef.current = e;
-                                }}
-                                className="w-full p-3 rounded-lg border border-border bg-background focus:ring-2 focus:ring-accent/50 outline-none transition-all"
-                                placeholder="e.g. Rahim Ahmed"
-                            />
-                            {errors.name && <p className="text-xs text-red-500">{errors.name.message}</p>}
-                        </div>
-
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                            <div className="space-y-2">
-                                <label className="text-sm font-medium flex items-center gap-2"><Mail className="w-4 h-4 text-accent" /> Email</label>
-                                <input
-                                    {...register("email", { required: "Email is required", pattern: { value: /^\S+@\S+$/i, message: "Invalid email" } })}
-                                    className="w-full p-3 rounded-lg border border-border bg-background focus:ring-2 focus:ring-accent/50 outline-none transition-all"
-                                    placeholder="hello@example.com"
-                                />
-                                {errors.email && <p className="text-xs text-red-500">{errors.email.message}</p>}
-                            </div>
-                            <div className="space-y-2">
-                                <label className="text-sm font-medium flex items-center gap-2"><Phone className="w-4 h-4 text-accent" /> Phone</label>
-                                <input
-                                    {...register("phone", { required: "Phone is required" })}
-                                    className="w-full p-3 rounded-lg border border-border bg-background focus:ring-2 focus:ring-accent/50 outline-none transition-all"
-                                    placeholder="017..."
-                                />
-                                {errors.phone && <p className="text-xs text-red-500">{errors.phone.message}</p>}
-                            </div>
-                        </div>
-
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                            <div className="space-y-2">
-                                <label className="text-sm font-medium flex items-center gap-2"><Calendar className="w-4 h-4 text-accent" /> Date</label>
-                                <input
-                                    type="date"
-                                    min={minDate}
-                                    {...register("date", { required: "Date is required" })}
-                                    className="w-full p-3 rounded-lg border border-border bg-background focus:ring-2 focus:ring-accent/50 outline-none transition-all"
-                                />
-                                {errors.date && <p className="text-xs text-red-500">{errors.date.message}</p>}
-                            </div>
-                            <div className="space-y-2">
-                                <label className="text-sm font-medium flex items-center gap-2"><Clock className="w-4 h-4 text-accent" /> Time</label>
-                                <select
-                                    {...register("time", { required: "Time is required" })}
-                                    className="w-full p-3 rounded-lg border border-border bg-background focus:ring-2 focus:ring-accent/50 outline-none transition-all"
+                {/* Content */}
+                <div className="overflow-y-auto p-6">
+                    {isSuccess ? (
+                        <div className="flex flex-col items-center text-center py-8 space-y-4 animate-in fade-in slide-in-from-bottom-4 duration-500">
+                            <div className="w-20 h-20 bg-green-100 dark:bg-green-900/30 rounded-full flex items-center justify-center mb-2">
+                                <svg
+                                    className="w-10 h-10 text-green-600 dark:text-green-400"
+                                    fill="none"
+                                    stroke="currentColor"
+                                    viewBox="0 0 24 24"
                                 >
-                                    <option value="">Select Time</option>
-                                    <option value="10:00 AM">10:00 AM</option>
-                                    <option value="11:00 AM">11:00 AM</option>
-                                    <option value="12:00 PM">12:00 PM</option>
-                                    <option value="02:00 PM">02:00 PM</option>
-                                    <option value="03:00 PM">03:00 PM</option>
-                                    <option value="04:00 PM">04:00 PM</option>
-                                    <option value="05:00 PM">05:00 PM</option>
-                                </select>
-                                {errors.time && <p className="text-xs text-red-500">{errors.time.message}</p>}
+                                    <path
+                                        strokeLinecap="round"
+                                        strokeLinejoin="round"
+                                        strokeWidth={3}
+                                        d="M5 13l4 4L19 7"
+                                    />
+                                </svg>
                             </div>
-                        </div>
-
-                        <div className="space-y-2">
-                            <label className="text-sm font-medium flex items-center gap-2"><BookOpen className="w-4 h-4 text-accent" /> Interested In</label>
-                            <select
-                                {...register("topic")}
-                                className="w-full p-3 rounded-lg border border-border bg-background focus:ring-2 focus:ring-accent/50 outline-none transition-all"
-                            >
-                                <option value="General_Inquiry">General Inquiry</option>
-                                <option value="University_Admission">University Admission</option>
-                                <option value="Visa_Processing">Visa Processing</option>
-                                <option value="Scholarship_Help">Scholarship Help</option>
-                                <option value="LOM_SOP_Writing">LOM/SOP Writing</option>
-                            </select>
-                        </div>
-
-                        <div className="pt-4">
-                            <Button type="submit" className="w-full h-12 text-lg font-bold" disabled={isSubmitting}>
-                                {isSubmitting ? "Booking..." : "Confirm Booking"}
+                            <h4 className="text-2xl font-bold text-foreground">Thank You!</h4>
+                            <p className="text-muted-foreground max-w-xs mx-auto">
+                                Your appointment has been booked. We will have a nice conversation soon!
+                            </p>
+                            <Button onClick={closeModal} className="mt-6 w-full max-w-xs">
+                                Close
                             </Button>
                         </div>
-                    </form>
+                    ) : (
+                        <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+
+                            {/* Honeypot */}
+                            <input type="text" className="hidden" {...register("website_url")} autoComplete="off" tabIndex={-1} />
+
+                            <div className="space-y-2">
+                                <label className="text-sm font-medium flex items-center gap-2"><User className="w-4 h-4 text-accent" /> Full Name</label>
+                                <input
+                                    {...register("name", { required: "Name is required" })}
+                                    ref={(e) => {
+                                        register("name").ref(e);
+                                        firstInputRef.current = e;
+                                    }}
+                                    className="w-full p-3 rounded-lg border border-border bg-background focus:ring-2 focus:ring-accent/50 outline-none transition-all"
+                                    placeholder="e.g. Rahim Ahmed"
+                                />
+                                {errors.name && <p className="text-xs text-red-500">{errors.name.message}</p>}
+                            </div>
+
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <div className="space-y-2">
+                                    <label className="text-sm font-medium flex items-center gap-2"><Mail className="w-4 h-4 text-accent" /> Email</label>
+                                    <input
+                                        {...register("email", { required: "Email is required", pattern: { value: /^\S+@\S+$/i, message: "Invalid email" } })}
+                                        className="w-full p-3 rounded-lg border border-border bg-background focus:ring-2 focus:ring-accent/50 outline-none transition-all"
+                                        placeholder="hello@example.com"
+                                    />
+                                    {errors.email && <p className="text-xs text-red-500">{errors.email.message}</p>}
+                                </div>
+                                <div className="space-y-2">
+                                    <label className="text-sm font-medium flex items-center gap-2"><Phone className="w-4 h-4 text-accent" /> Phone</label>
+                                    <input
+                                        {...register("phone", { required: "Phone is required" })}
+                                        className="w-full p-3 rounded-lg border border-border bg-background focus:ring-2 focus:ring-accent/50 outline-none transition-all"
+                                        placeholder="017..."
+                                    />
+                                    {errors.phone && <p className="text-xs text-red-500">{errors.phone.message}</p>}
+                                </div>
+                            </div>
+
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <div className="space-y-2">
+                                    <label className="text-sm font-medium flex items-center gap-2"><Calendar className="w-4 h-4 text-accent" /> Date</label>
+                                    <input
+                                        type="date"
+                                        min={minDate}
+                                        {...register("date", { required: "Date is required" })}
+                                        className="w-full p-3 rounded-lg border border-border bg-background focus:ring-2 focus:ring-accent/50 outline-none transition-all"
+                                    />
+                                    {errors.date && <p className="text-xs text-red-500">{errors.date.message}</p>}
+                                </div>
+                                <div className="space-y-2">
+                                    <label className="text-sm font-medium flex items-center gap-2"><Clock className="w-4 h-4 text-accent" /> Time</label>
+                                    <select
+                                        {...register("time", { required: "Time is required" })}
+                                        className="w-full p-3 rounded-lg border border-border bg-background focus:ring-2 focus:ring-accent/50 outline-none transition-all"
+                                    >
+                                        <option value="">Select Time</option>
+                                        <option value="10:00 AM">10:00 AM</option>
+                                        <option value="11:00 AM">11:00 AM</option>
+                                        <option value="12:00 PM">12:00 PM</option>
+                                        <option value="02:00 PM">02:00 PM</option>
+                                        <option value="03:00 PM">03:00 PM</option>
+                                        <option value="04:00 PM">04:00 PM</option>
+                                        <option value="05:00 PM">05:00 PM</option>
+                                    </select>
+                                    {errors.time && <p className="text-xs text-red-500">{errors.time.message}</p>}
+                                </div>
+                            </div>
+
+                            <div className="space-y-2">
+                                <label className="text-sm font-medium flex items-center gap-2"><BookOpen className="w-4 h-4 text-accent" /> Interested In</label>
+                                <select
+                                    {...register("topic")}
+                                    className="w-full p-3 rounded-lg border border-border bg-background focus:ring-2 focus:ring-accent/50 outline-none transition-all"
+                                >
+                                    <option value="General_Inquiry">General Inquiry</option>
+                                    <option value="University_Admission">University Admission</option>
+                                    <option value="Visa_Processing">Visa Processing</option>
+                                    <option value="Scholarship_Help">Scholarship Help</option>
+                                    <option value="LOM_SOP_Writing">LOM/SOP Writing</option>
+                                </select>
+                            </div>
+
+                            <div className="pt-4">
+                                <Button type="submit" className="w-full h-12 text-lg font-bold" disabled={isSubmitting}>
+                                    {isSubmitting ? "Booking..." : "Confirm Booking"}
+                                </Button>
+                            </div>
+                        </form>
+                    )}
                 </div>
             </div>
         </div>

@@ -27,7 +27,11 @@ const item = {
     show: { opacity: 1, y: 0, transition: { type: "spring" as const, stiffness: 50 } }
 };
 
-export function DestinationsGrid() {
+export function DestinationsGrid({ featuredOnly = false }: { featuredOnly?: boolean }) {
+    const displayedDestinations = featuredOnly
+        ? topDestinations
+        : Object.values(destinations);
+
     return (
         <div>
             <motion.div
@@ -36,7 +40,7 @@ export function DestinationsGrid() {
                 animate="show"
                 className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8"
             >
-                {topDestinations.map((destination) => (
+                {displayedDestinations.map((destination) => (
                     <motion.div variants={item} key={destination.slug} className="h-full">
                         <Link href={`/destinations/${destination.slug}`} className="group block h-full">
                             <div className="relative h-full overflow-hidden rounded-2xl border border-border/30 bg-card/95 backdrop-blur-xl shadow-lg hover:shadow-2xl transition-all duration-500 hover:-translate-y-2">
@@ -79,21 +83,23 @@ export function DestinationsGrid() {
                 ))}
             </motion.div>
 
-            {/* See All Destinations Button */}
-            <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.8, duration: 0.5 }}
-                className="text-center mt-12"
-            >
-                <Link
-                    href="/destinations"
-                    className="inline-flex items-center gap-2 px-8 py-4 rounded-full bg-primary text-primary-foreground font-bold text-lg hover:opacity-90 hover:scale-105 transition-all duration-300 shadow-lg hover:shadow-xl"
+            {/* See All Destinations Button - Only show if featuredOnly is true */}
+            {featuredOnly && (
+                <motion.div
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 0.8, duration: 0.5 }}
+                    className="text-center mt-12"
                 >
-                    See All Destinations
-                    <ArrowRight className="w-5 h-5" />
-                </Link>
-            </motion.div>
+                    <Link
+                        href="/destinations"
+                        className="inline-flex items-center gap-2 px-8 py-4 rounded-full bg-primary text-primary-foreground font-bold text-lg hover:opacity-90 hover:scale-105 transition-all duration-300 shadow-lg hover:shadow-xl"
+                    >
+                        See All Destinations
+                        <ArrowRight className="w-5 h-5" />
+                    </Link>
+                </motion.div>
+            )}
         </div>
     );
 }
