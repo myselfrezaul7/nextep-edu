@@ -34,7 +34,7 @@ export default function Home() {
                             Explore top study destinations for Bangladeshi students. Each country offers unique opportunities for your academic journey.
                         </p>
                     </div>
-                    <DestinationsGrid />
+                    <DestinationsGrid featuredOnly={true} />
                 </div>
             </section>
 

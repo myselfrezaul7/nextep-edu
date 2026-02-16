@@ -46,7 +46,7 @@ export default function DestinationsPage() {
                         Our expert counselors will help you choose the perfect destination based on your academic goals, budget, and career aspirations.
                     </p>
                     <a
-                        href="https://wa.me/8801712345678?text=Hi%2C%20I%20need%20help%20choosing%20a%20study%20destination"
+                        href="https://wa.me/4915773855748?text=Hi%2C%20I%20need%20help%20choosing%20a%20study%20destination"
                         target="_blank"
                         rel="noopener noreferrer"
                         className="inline-flex items-center gap-2 bg-accent text-accent-foreground px-8 py-4 rounded-full font-semibold hover:bg-accent/90 transition-colors"

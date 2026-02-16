@@ -322,5 +322,51 @@ export const destinations: Record<string, Destination> = {
             { name: "Korea University" },
             { name: "Sungkyunkwan University" },
         ],
+    },
+    malaysia: {
+        slug: "malaysia",
+        name: "Malaysia",
+        heroImage: "/assets/malaysia_hero_blend.png",
+        hero: {
+            title: "Study in Malaysia",
+            description: "World-class education at an affordable cost in a vibrant, multicultural setting.",
+            icon: Globe2,
+        },
+        benefits: [
+            { title: "Affordability", description: "Low tuition fees and living costs.", icon: Wallet },
+            { title: "Quality Education", description: "Twinning programs with UK, US, and Australian universities.", icon: Trophy },
+            { title: "Multicultural", description: "Diverse culture with Malay, Chinese, and Indian influences.", icon: Users },
+            { title: "English-Friendly", description: "English is widely spoken and used in education.", icon: BookOpen },
+        ],
+        universities: [
+            { name: "Universiti Malaya (UM)" },
+            { name: "Universiti Putra Malaysia (UPM)" },
+            { name: "Universiti Kebangsaan Malaysia (UKM)" },
+            { name: "Universiti Sains Malaysia (USM)" },
+            { name: "Universiti Teknologi Malaysia (UTM)" },
+        ],
+    },
+    turkey: {
+        slug: "turkey",
+        name: "Turkey",
+        heroImage: "/assets/turkey_hero_blend.png",
+        hero: {
+            title: "Study in Turkey",
+            description: "A bridge between East and West, offering quality education and rich history.",
+            icon: Landmark,
+        },
+        benefits: [
+            { title: "Strategic Location", description: "Gateway between Europe and Asia.", icon: MapPin },
+            { title: "Quality Education", description: "Part of the Bologna Process, ensuring European standards.", icon: Award },
+            { title: "Culture & History", description: "Immerse yourself in thousands of years of history.", icon: Landmark },
+            { title: "Scholarships", description: "Government scholarships (Türkiye Bursları) available.", icon: Wallet },
+        ],
+        universities: [
+            { name: "Koç University" },
+            { name: "Sabancı University" },
+            { name: "Middle East Technical University (METU)" },
+            { name: "Bilkent University" },
+            { name: "Boğaziçi University" },
+        ],
     }
 };
