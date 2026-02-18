@@ -53,7 +53,7 @@ export const metadata: Metadata = {
         "tuition free universities for Bangladeshi students",
         "Germany student visa from Bangladesh",
     ],
-    authors: [{ name: "NexTep Edu", url: "https://nextepedu.com" }],
+    authors: [{ name: "NexTep Edu", url: "https://www.nextepedu.com" }],
     creator: "NexTep Edu",
     publisher: "NexTep Edu",
     formatDetection: {
@@ -61,18 +61,18 @@ export const metadata: Metadata = {
         address: true,
         telephone: true,
     },
-    metadataBase: new URL("https://nextepedu.com"),
+    metadataBase: new URL("https://www.nextepedu.com"),
     alternates: {
-        canonical: "/",
+        canonical: "./",
         languages: {
-            "en-BD": "/",
+            "en-BD": "./",
         },
     },
     // Open Graph for Facebook/LinkedIn (popular in Bangladesh)
     openGraph: {
         type: "website",
         locale: "en_BD",
-        url: "https://nextepedu.com",
+        url: "https://www.nextepedu.com",
         siteName: "NexTep Edu",
         title: "NexTep Edu | Study Abroad Consultancy Bangladesh",
         description:
