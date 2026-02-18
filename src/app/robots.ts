@@ -17,7 +17,7 @@ export default function robots(): MetadataRoute.Robots {
                 allow: "/",
             },
         ],
-        sitemap: "https://nextepedu.com/sitemap.xml",
-        host: "https://nextepedu.com",
+        sitemap: "https://www.nextepedu.com/sitemap.xml",
+        host: "https://www.nextepedu.com",
     };
 }

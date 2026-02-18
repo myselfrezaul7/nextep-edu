@@ -2,7 +2,7 @@ import { MetadataRoute } from "next";
 import { destinations } from "@/data/destinations";
 
 export default function sitemap(): MetadataRoute.Sitemap {
-    const baseUrl = "https://nextepedu.com";
+    const baseUrl = "https://www.nextepedu.com";
 
     // Static pages
     const staticPages: MetadataRoute.Sitemap = [
