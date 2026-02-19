@@ -45,11 +45,11 @@ export function HeroSection() {
                         initial={{ opacity: 0, y: 20 }}
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ duration: 0.9, delay: 0.35, ease: [0.22, 1, 0.36, 1] }}
-                        className="flex flex-wrap gap-4 pt-4"
+                        className="flex flex-col sm:flex-row flex-wrap gap-4 pt-4"
                     >
                         <Button
                             size="lg"
-                            className="rounded-full text-base"
+                            className="rounded-full text-base w-full sm:w-auto"
                             onClick={() => document.getElementById('booking-modal')?.classList.remove('hidden')}
                         >
                             Let&apos;s Talk
@@ -57,7 +57,7 @@ export function HeroSection() {
                         <Button
                             size="lg"
                             variant="outline"
-                            className="rounded-full text-base"
+                            className="rounded-full text-base w-full sm:w-auto"
                             asChild
                         >
                             <Link href="/#services">

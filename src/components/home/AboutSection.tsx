@@ -72,8 +72,8 @@ function AnimatedCounter({ value, suffix }: { value: number; suffix: string }) {
 
 export function AboutSection() {
     return (
-        <section id="about" className="py-24 bg-background overflow-hidden">
-            <div className="container mx-auto px-4 grid lg:grid-cols-2 gap-16 items-center">
+        <section id="about" className="py-16 md:py-24 bg-background overflow-hidden">
+            <div className="container mx-auto px-4 grid lg:grid-cols-2 gap-12 md:gap-16 items-center">
                 {/* Text Content */}
                 <motion.div
                     initial={{ opacity: 0, scale: 0.95 }}

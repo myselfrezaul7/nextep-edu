@@ -5,6 +5,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { useTheme } from "next-themes";
 import { Menu, X, Moon, Sun, ChevronDown } from "lucide-react";
+import { motion, AnimatePresence } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { SearchModal } from "@/components/common/SearchModal";
@@ -147,53 +148,61 @@ export function Header() {
                 </div>
             </div>
 
-            {/* Mobile Menu Content — now shows all destinations */}
-            {mobileMenuOpen && (
-                <div className="md:hidden absolute top-full left-0 w-full bg-background/95 backdrop-blur-xl border-b border-border shadow-2xl p-6 flex flex-col gap-4 animate-in slide-in-from-top-5">
-                    <Link
-                        href="/#services"
-                        className="text-lg font-medium p-2 border-b border-border"
-                        onClick={() => setMobileMenuOpen(false)}
+            {/* Mobile Menu Content — now uses AnimatePresence for smooth slide/fade */}
+            <AnimatePresence>
+                {mobileMenuOpen && (
+                    <motion.div
+                        initial={{ opacity: 0, y: -20 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        exit={{ opacity: 0, y: -20 }}
+                        transition={{ duration: 0.2, ease: "easeOut" }}
+                        className="md:hidden absolute top-full left-0 w-full bg-background/95 backdrop-blur-xl border-b border-border shadow-2xl p-6 flex flex-col gap-4"
                     >
-                        Services
-                    </Link>
-                    <Link
-                        href="/#about"
-                        className="text-lg font-medium p-2 border-b border-border"
-                        onClick={() => setMobileMenuOpen(false)}
-                    >
-                        About
-                    </Link>
-                    <div className="py-2">
-                        <p className="text-sm font-bold text-slate-400 mb-2 uppercase tracking-wider">Destinations</p>
-                        <div className="grid grid-cols-2 gap-2 max-h-48 overflow-y-auto">
-                            {allDestinations.map(item => (
-                                <Link
-                                    key={item.href}
-                                    href={item.href}
-                                    className="text-sm p-2 hover:text-accent transition-colors"
-                                    onClick={() => setMobileMenuOpen(false)}
-                                >
-                                    {item.name}
-                                </Link>
-                            ))}
-                        </div>
                         <Link
-                            href="/destinations"
-                            className="text-sm font-bold text-accent mt-3 block text-center hover:underline"
+                            href="/#services"
+                            className="text-lg font-medium p-3 -mx-3 rounded-lg hover:bg-muted transition-colors border-b border-border"
                             onClick={() => setMobileMenuOpen(false)}
                         >
-                            View All Destinations →
+                            Services
                         </Link>
-                    </div>
-                    <Button className="w-full mt-4" size="lg" onClick={() => {
-                        setMobileMenuOpen(false);
-                        document.getElementById('booking-modal')?.classList.remove('hidden');
-                    }}>
-                        Book Consultation
-                    </Button>
-                </div>
-            )}
+                        <Link
+                            href="/#about"
+                            className="text-lg font-medium p-3 -mx-3 rounded-lg hover:bg-muted transition-colors border-b border-border"
+                            onClick={() => setMobileMenuOpen(false)}
+                        >
+                            About
+                        </Link>
+                        <div className="py-2">
+                            <p className="text-sm font-bold text-slate-400 mb-2 uppercase tracking-wider px-1">Destinations</p>
+                            <div className="grid grid-cols-2 gap-2 max-h-[40vh] overflow-y-auto pr-2">
+                                {allDestinations.map(item => (
+                                    <Link
+                                        key={item.href}
+                                        href={item.href}
+                                        className="text-sm p-3 -mx-2 rounded-lg hover:bg-muted hover:text-accent transition-colors"
+                                        onClick={() => setMobileMenuOpen(false)}
+                                    >
+                                        {item.name}
+                                    </Link>
+                                ))}
+                            </div>
+                            <Link
+                                href="/destinations"
+                                className="text-sm font-bold text-accent mt-4 block text-center hover:underline p-3 rounded-lg hover:bg-muted/50 transition-colors"
+                                onClick={() => setMobileMenuOpen(false)}
+                            >
+                                View All Destinations →
+                            </Link>
+                        </div>
+                        <Button className="w-full mt-2 py-6 text-base shadow-md" size="lg" onClick={() => {
+                            setMobileMenuOpen(false);
+                            document.getElementById('booking-modal')?.classList.remove('hidden');
+                        }}>
+                            Book Consultation
+                        </Button>
+                    </motion.div>
+                )}
+            </AnimatePresence>
         </nav>
     );
 }
