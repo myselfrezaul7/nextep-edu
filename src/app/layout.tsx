@@ -77,14 +77,7 @@ export const metadata: Metadata = {
         title: "NexTep Edu | Study Abroad Consultancy Bangladesh",
         description:
             "Expert guidance for Bangladeshi students to study abroad. We help you achieve your dream of international education in Germany, UK, USA, Canada & more.",
-        images: [
-            {
-                url: "/assets/og-image.png",
-                width: 1200,
-                height: 630,
-                alt: "NexTep Edu - Your Bridge to Global Education",
-            },
-        ],
+
     },
     // Twitter Card
     twitter: {
@@ -92,7 +85,6 @@ export const metadata: Metadata = {
         title: "NexTep Edu | Study Abroad from Bangladesh",
         description:
             "Leading study abroad consultancy helping Bangladeshi students achieve their dreams of international education.",
-        images: ["/assets/og-image.png"],
         creator: "@nextepedu",
     },
     // Robots
