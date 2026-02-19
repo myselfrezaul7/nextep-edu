@@ -97,3 +97,22 @@ body {
     color: var(--foreground);
     font-family: var(--font-sans);
 }
+
+@keyframes marquee {
+    from {
+        transform: translateX(0);
+    }
+
+    to {
+        transform: translateX(calc(-100% - 1.5rem));
+        /* gap-6 is 1.5rem */
+    }
+}
+
+.animate-marquee {
+    animation: marquee 30s linear infinite;
+}
+
+.hover\:pause:hover {
+    animation-play-state: paused;
+}
