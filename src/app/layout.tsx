@@ -10,6 +10,7 @@ import { ScrollProgress } from "@/components/common/ScrollProgress";
 import { BackToTop } from "@/components/common/BackToTop";
 import { PageTransition } from "@/components/common/PageTransition";
 import { ErrorBoundary } from "@/components/common/ErrorBoundary";
+import { SpeedInsights } from "@vercel/speed-insights/next";
 import "./globals.css";
 
 
@@ -163,6 +164,7 @@ export default function RootLayout({
                     <BookingModal />
                     <WhatsAppFAB />
                     <BackToTop />
+                    <SpeedInsights />
                 </ThemeProvider>
             </body>
         </html>
