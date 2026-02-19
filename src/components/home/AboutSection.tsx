@@ -8,7 +8,7 @@ import { Button } from "@/components/ui/button";
 const features = [
     "Zero Fraud Risk: We NEVER hold your original passport or documents",
     "No Advance Fees: You pay only after service delivery (consultation excluded)",
-    "Connections with 500+ universities worldwide",
+    "Connections with 200+ universities worldwide",
     "BPMN 2.0 optimized workflows for faster, error-free applications",
 ];
 
