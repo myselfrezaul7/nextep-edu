@@ -1,6 +1,8 @@
 import { ImageResponse } from 'next/og';
+import { readFile } from 'fs/promises';
+import { join } from 'path';
 
-export const runtime = 'edge';
+export const runtime = 'nodejs';
 
 export const alt = 'NexTep Edu - Your Bridge to Global Education';
 export const size = {
@@ -10,6 +12,9 @@ export const size = {
 export const contentType = 'image/png';
 
 export default async function Image() {
+    const logoData = await readFile(join(process.cwd(), 'public/assets/logo.png'));
+    const logoSrc = `data:image/png;base64,${logoData.toString('base64')}`;
+
     return new ImageResponse(
         (
             <div
@@ -62,19 +67,16 @@ export default async function Image() {
                         zIndex: 1,
                     }}
                 >
-                    {/* Graduation cap icon */}
-                    <div
+                    {/* Brand Logo */}
+                    <img
+                        src={logoSrc}
+                        alt="NexTep Edu Logo"
+                        width="150"
+                        height="150"
                         style={{
-                            display: 'flex',
-                            alignItems: 'center',
-                            justifyContent: 'center',
-                            width: '80px',
-                            height: '80px',
-                            fontSize: '56px',
+                            objectFit: 'contain',
                         }}
-                    >
-                        🎓
-                    </div>
+                    />
 
                     {/* Brand name */}
                     <div
