@@ -6,9 +6,9 @@ import { CheckCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 const features = [
-    "98% of our students get their visas approved",
+    "Zero Fraud Risk: We NEVER hold your original passport or documents",
+    "No Advance Fees: You pay only after service delivery (consultation excluded)",
     "Connections with 500+ universities worldwide",
-    "Counselors who've actually studied abroad",
     "BPMN 2.0 optimized workflows for faster, error-free applications",
 ];
 
