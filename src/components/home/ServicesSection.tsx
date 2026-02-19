@@ -1,6 +1,5 @@
 "use client";
 
-import { BentoGrid, BentoGridItem } from "../ui/bento-grid";
 import {
     FileCheck,
     ScrollText,
@@ -49,111 +48,94 @@ export function ServicesSection() {
                     </motion.p>
                 </div>
 
-                <BentoGrid className="max-w-7xl mx-auto md:grid-cols-4">
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 max-w-7xl mx-auto">
                     {items.map((item, i) => (
-                        <BentoGridItem
+                        <motion.div
                             key={i}
-                            title={item.title}
-                            description={item.description}
-                            header={item.header}
-                            icon={item.icon}
-                        />
+                            initial={{ opacity: 0, y: 20 }}
+                            whileInView={{ opacity: 1, y: 0 }}
+                            viewport={{ once: true }}
+                            transition={{ duration: 0.4, delay: i * 0.05 }}
+                            className="group relative bg-surface/50 dark:bg-card/50 backdrop-blur-sm border border-border/50 rounded-2xl p-6 hover:border-accent/40 hover:shadow-lg hover:shadow-accent/5 transition-all duration-300 flex flex-col"
+                        >
+                            {/* Icon Container */}
+                            <div className={`w-12 h-12 rounded-full flex items-center justify-center mb-6 bg-gradient-to-br ${item.colorClass}`}>
+                                <item.icon className={`h-6 w-6 ${item.iconColorClass}`} />
+                            </div>
+
+                            {/* Content */}
+                            <h3 className="font-heading font-semibold text-xl text-primary mb-3">
+                                {item.title}
+                            </h3>
+                            <p className="font-sans text-muted-foreground text-sm leading-relaxed flex-grow">
+                                {item.description}
+                            </p>
+
+                            {/* Subtle decorative accent on hover */}
+                            <div className="absolute inset-x-0 bottom-0 h-1 bg-gradient-to-r from-transparent via-accent/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 rounded-b-2xl" />
+                        </motion.div>
                     ))}
-                </BentoGrid>
+                </div>
             </div>
         </section>
     );
 }
 
-const Skeleton = ({ children, className }: { children?: React.ReactNode, className?: string }) => (
-    <div className={`flex flex-1 w-full h-full min-h-[6rem] rounded-xl bg-gradient-to-br from-muted/50 to-muted/20 ${className}`}>
-        {children}
-    </div>
-);
-
 const items = [
     {
         title: "LOM / SOP Solution",
         description: "We craft your story, not just edit grammar. Our experts help you write compelling Letters of Motivation and SOPs that admissions officers actually read.",
-        header: (
-            <Skeleton className="items-center justify-center text-accent/20">
-                <ScrollText className="w-20 h-20" />
-            </Skeleton>
-        ),
-        icon: <ScrollText className="h-4 w-4 text-neutral-500" />,
+        icon: ScrollText,
+        colorClass: "from-accent/20 to-accent/5",
+        iconColorClass: "text-accent"
     },
     {
         title: "Offer Letter",
         description: "Fast-tracked applications via our university network. We ensure your application is complete and error-free to maximize acceptance chances.",
-        header: (
-            <Skeleton className="items-center justify-center text-primary/10">
-                <Megaphone className="w-20 h-20" />
-            </Skeleton>
-        ),
-        icon: <Megaphone className="h-4 w-4 text-neutral-500" />,
+        icon: Megaphone,
+        colorClass: "from-primary/10 to-primary/5",
+        iconColorClass: "text-primary dark:text-primary-foreground"
     },
     {
         title: "Visa Support",
         description: "End-to-end guidance from appointment booking to mock interviews. We know the checklists inside out.",
-        header: (
-            <Skeleton className="items-center justify-center text-green-500/10">
-                <FileCheck className="w-20 h-20" />
-            </Skeleton>
-        ),
-        icon: <FileCheck className="h-4 w-4 text-neutral-500" />,
+        icon: FileCheck,
+        colorClass: "from-green-500/20 to-green-500/5",
+        iconColorClass: "text-green-600 dark:text-green-400"
     },
     {
         title: "University Selection",
         description: "Oxford or Toronto? We help you shortlist unis that fit your vibe, budget, and goals.",
-        header: (
-            <Skeleton className="justify-center items-center">
-                <div className="grid grid-cols-3 gap-4 opacity-50">
-                    <div className="h-12 w-12 rounded-full bg-accent/20" />
-                    <div className="h-12 w-12 rounded-full bg-primary/20" />
-                    <div className="h-12 w-12 rounded-full bg-accent/20" />
-                </div>
-            </Skeleton>
-        ),
-        icon: <GraduationCap className="h-4 w-4 text-neutral-500" />,
+        icon: GraduationCap,
+        colorClass: "from-blue-500/20 to-blue-500/5",
+        iconColorClass: "text-blue-600 dark:text-blue-400"
     },
     {
         title: "Bank Solvency",
-        description: " struggling to show funds? We guide you on proper documentation, blocked accounts, and financial proof strategies that satisfy visa officers.",
-        header: (
-            <Skeleton className="items-center justify-center text-purple-500/10">
-                <Landmark className="w-20 h-20" />
-            </Skeleton>
-        ),
-        icon: <Landmark className="h-4 w-4 text-neutral-500" />,
+        description: "Struggling to show funds? We guide you on proper documentation, blocked accounts, and financial proof strategies that satisfy visa officers.",
+        icon: Landmark,
+        colorClass: "from-purple-500/20 to-purple-500/5",
+        iconColorClass: "text-purple-600 dark:text-purple-400"
     },
     {
         title: "Scholarship Hunting",
         description: "Studying abroad is expensive. We find hidden financial aid options and help you apply effectively.",
-        header: (
-            <Skeleton className="items-center justify-center text-yellow-500/10">
-                <Coins className="w-20 h-20" />
-            </Skeleton>
-        ),
-        icon: <Coins className="h-4 w-4 text-neutral-500" />,
+        icon: Coins,
+        colorClass: "from-yellow-500/20 to-yellow-500/5",
+        iconColorClass: "text-yellow-600 dark:text-yellow-400"
     },
     {
         title: "Pre-Departure",
         description: "Blocked accounts, housing, packing lists—we prepare you for life abroad before you even board the plane.",
-        header: (
-            <Skeleton className="items-center justify-center text-blue-500/10">
-                <Plane className="w-20 h-20" />
-            </Skeleton>
-        ),
-        icon: <Plane className="h-4 w-4 text-neutral-500" />,
+        icon: Plane,
+        colorClass: "from-teal-500/20 to-teal-500/5",
+        iconColorClass: "text-teal-600 dark:text-teal-400"
     },
     {
         title: "A Global Network",
         description: "Join a community of students who have gone before you. Get tips, support, and connections in your new city.",
-        header: (
-            <Skeleton className="items-center justify-center relative overflow-hidden">
-                <Globe className="w-32 h-32 absolute -right-10 -bottom-10 text-slate-500/10" />
-            </Skeleton>
-        ),
-        icon: <Globe className="h-4 w-4 text-neutral-500" />,
+        icon: Globe,
+        colorClass: "from-slate-500/20 to-slate-500/5",
+        iconColorClass: "text-slate-600 dark:text-slate-400"
     },
 ];
