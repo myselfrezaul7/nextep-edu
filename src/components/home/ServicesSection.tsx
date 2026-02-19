@@ -152,10 +152,6 @@ const items = [
         header: (
             <Skeleton className="items-center justify-center relative overflow-hidden">
                 <Globe className="w-32 h-32 absolute -right-10 -bottom-10 text-slate-500/10" />
-                <div className="z-10 text-center px-4">
-                    <span className="text-4xl font-bold text-accent">500+</span>
-                    <p className="text-sm text-muted-foreground uppercase tracking-widest mt-1">Students Placed</p>
-                </div>
             </Skeleton>
         ),
         icon: <Globe className="h-4 w-4 text-neutral-500" />,
