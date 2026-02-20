@@ -60,7 +60,7 @@ export function Footer() {
                             </li>
                             <li className="flex items-start gap-3">
                                 <MapPin className="w-4 h-4 mt-1 text-accent" />
-                                <span>Dhaka, Bangladesh</span>
+                                <span>1500, Munshiganj, Dhaka, Bangladesh</span>
                             </li>
                         </ul>
                     </div>
