@@ -48,7 +48,7 @@ export function Header() {
         >
             <div className="container mx-auto px-4 flex justify-between items-center">
                 {/* Logo */}
-                <Link href="/" className="flex items-center gap-2 group">
+                <Link href="/" className="flex items-center gap-2 group" onClick={() => window.scrollTo({ top: 0, behavior: "instant" })}>
                     <div className="relative w-10 h-10 overflow-hidden rounded-lg">
                         <Image
                             src="/assets/logo.png"

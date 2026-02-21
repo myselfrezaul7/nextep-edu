@@ -17,6 +17,7 @@ export function StructuredData() {
             "Leading study abroad consultancy in Bangladesh helping students achieve their dreams of international education in Germany, UK, USA, Canada, Australia and more.",
         address: {
             "@type": "PostalAddress",
+            streetAddress: "1500, Munshiganj",
             addressLocality: "Dhaka",
             addressCountry: "BD",
         },
@@ -54,10 +55,10 @@ export function StructuredData() {
         priceRange: "$$",
         address: {
             "@type": "PostalAddress",
-            streetAddress: "Dhaka",
+            streetAddress: "1500, Munshiganj",
             addressLocality: "Dhaka",
             addressRegion: "Dhaka Division",
-            postalCode: "1000",
+            postalCode: "1500",
             addressCountry: "BD",
         },
         geo: {
