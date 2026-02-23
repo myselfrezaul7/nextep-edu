@@ -3,7 +3,7 @@
 import { useState, useEffect, useRef, useCallback } from "react";
 import { useForm } from "react-hook-form";
 import toast from "react-hot-toast";
-import { X, Calendar, Clock, BookOpen, User, Mail, Phone } from "lucide-react";
+import { X, Calendar, Clock, BookOpen, User, Mail, Phone, GraduationCap } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 type FormData = {
@@ -265,6 +265,22 @@ export function BookingModal() {
                                     </select>
                                     {errors.time && <p className="text-xs text-red-500">{errors.time.message}</p>}
                                 </div>
+                            </div>
+
+                            <div className="space-y-2">
+                                <label className="text-sm font-medium flex items-center gap-2"><GraduationCap className="w-4 h-4 text-accent" /> Education Level</label>
+                                <select
+                                    {...register("education_level", { required: "Education level is required" })}
+                                    className="w-full p-3 rounded-lg border border-border bg-background focus:ring-2 focus:ring-accent/50 outline-none transition-all"
+                                >
+                                    <option value="">Select Level</option>
+                                    <option value="Bachelors">Bachelor&apos;s</option>
+                                    <option value="Masters">Master&apos;s</option>
+                                    <option value="PhD">PhD</option>
+                                    <option value="Language_Course">Language Course</option>
+                                    <option value="Foundation_Year">Foundation Year</option>
+                                </select>
+                                {errors.education_level && <p className="text-xs text-red-500">{errors.education_level.message}</p>}
                             </div>
 
                             <div className="space-y-2">
