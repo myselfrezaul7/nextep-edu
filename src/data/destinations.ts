@@ -280,7 +280,7 @@ export const destinations: Record<string, Destination> = {
     belgium: {
         slug: "belgium",
         name: "Belgium",
-        heroImage: "/assets/belgium_hero_blend.png",
+        heroImage: "/assets/destinations/belgium.png",
         hero: {
             title: "Study in Belgium",
             description: "The heart of the EU, multicultural environment, and high-quality education.",
