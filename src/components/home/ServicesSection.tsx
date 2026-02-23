@@ -123,19 +123,5 @@ const items = [
         icon: Coins,
         colorClass: "from-yellow-500/20 to-yellow-500/5",
         iconColorClass: "text-yellow-600 dark:text-yellow-400"
-    },
-    {
-        title: "Pre-Departure",
-        description: "Blocked accounts, housing, packing lists—we prepare you for life abroad before you even board the plane.",
-        icon: Plane,
-        colorClass: "from-teal-500/20 to-teal-500/5",
-        iconColorClass: "text-teal-600 dark:text-teal-400"
-    },
-    {
-        title: "A Global Network",
-        description: "Join a community of students who have gone before you. Get tips, support, and connections in your new city.",
-        icon: Globe,
-        colorClass: "from-slate-500/20 to-slate-500/5",
-        iconColorClass: "text-slate-600 dark:text-slate-400"
-    },
+    }
 ];
