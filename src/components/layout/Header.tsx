@@ -17,6 +17,13 @@ const allDestinations = Object.values(destinationsData).map(d => ({
     href: `/destinations/${d.slug}`
 }));
 
+// Top 6 for mobile menu to avoid excessive scrolling
+const MOBILE_TOP_SLUGS = ["germany", "usa", "australia", "canada", "uk", "south-korea"];
+const mobileTopDestinations = MOBILE_TOP_SLUGS
+    .map(slug => destinationsData[slug])
+    .filter(Boolean)
+    .map(d => ({ name: `Study in ${d.name}`, href: `/destinations/${d.slug}` }));
+
 export function Header() {
     const [scrolled, setScrolled] = useState(false);
     const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -174,8 +181,8 @@ export function Header() {
                         </Link>
                         <div className="py-2">
                             <p className="text-sm font-bold text-slate-400 mb-2 uppercase tracking-wider px-1">Destinations</p>
-                            <div className="grid grid-cols-2 gap-2 max-h-[40vh] overflow-y-auto pr-2">
-                                {allDestinations.map(item => (
+                            <div className="grid grid-cols-2 gap-2">
+                                {mobileTopDestinations.map(item => (
                                     <Link
                                         key={item.href}
                                         href={item.href}
