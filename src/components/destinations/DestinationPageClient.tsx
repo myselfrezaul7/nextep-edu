@@ -201,9 +201,13 @@ export function DestinationPageClient({ destination }: DestinationPageClientProp
                         initial={{ opacity: 0, scale: 0.95 }}
                         whileInView={{ opacity: 1, scale: 1 }}
                         viewport={{ once: true }}
-                        className="relative bg-gradient-to-br from-primary to-slate-800 dark:from-accent/20 dark:to-primary/20 p-8 md:p-12 rounded-3xl overflow-hidden"
+                        className="relative p-8 md:p-12 rounded-3xl overflow-hidden border border-white/10 shadow-2xl"
                     >
-                        <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_50%,_rgba(212,175,55,0.1)_0%,_transparent_50%)]" />
+                        {/* Solid opaque dark background — no bleed-through */}
+                        <div className="absolute inset-0 bg-[#0F172A]" />
+                        {/* Frosted glass inner glow */}
+                        <div className="absolute inset-0 bg-gradient-to-br from-accent/10 via-transparent to-accent/5" />
+                        <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_50%,_rgba(212,175,55,0.12)_0%,_transparent_50%)]" />
 
                         <div className="relative z-10 text-center max-w-2xl mx-auto">
                             <h2 className="text-3xl md:text-4xl font-bold font-heading text-white mb-4">
@@ -216,7 +220,7 @@ export function DestinationPageClient({ destination }: DestinationPageClientProp
                             <div className="flex flex-col sm:flex-row gap-4 justify-center">
                                 <Button
                                     size="lg"
-                                    className="rounded-full bg-accent hover:bg-accent/90 text-slate-900"
+                                    className="rounded-full bg-accent hover:bg-accent/90 text-slate-900 font-bold shadow-lg"
                                     onClick={() => document.getElementById('booking-modal')?.classList.remove('hidden')}
                                 >
                                     Book Free Consultation

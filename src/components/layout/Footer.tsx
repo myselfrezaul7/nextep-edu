@@ -10,18 +10,21 @@ export function Footer() {
         <footer className="relative z-10 bg-background transition-colors duration-300">
             {/* CTA Banner */}
             <div className="relative overflow-hidden">
-                <div className="absolute inset-0 bg-gradient-to-r from-primary via-primary/95 to-primary pointer-events-none" />
+                {/* Solid opaque dark background — no bleed-through in light mode */}
+                <div className="absolute inset-0 bg-[#0F172A] pointer-events-none" />
+                {/* Frosted glass inner glow */}
+                <div className="absolute inset-0 bg-gradient-to-br from-accent/10 via-transparent to-accent/5 pointer-events-none" />
                 <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_50%,_rgba(212,175,55,0.15)_0%,_transparent_60%)] pointer-events-none" />
                 <div className="container mx-auto px-4 py-12 md:py-16 relative z-10 text-center">
-                    <h3 className="text-2xl md:text-3xl font-bold font-heading text-primary-foreground mb-3">
+                    <h3 className="text-2xl md:text-3xl font-bold font-heading text-white mb-3">
                         Ready to Start Your Journey?
                     </h3>
-                    <p className="text-primary-foreground/70 mb-6 max-w-lg mx-auto text-sm md:text-base">
+                    <p className="text-white/70 mb-6 max-w-lg mx-auto text-sm md:text-base">
                         Book a free consultation and take the first step toward studying abroad.
                     </p>
                     <Button
                         size="lg"
-                        className="rounded-full bg-accent text-accent-foreground hover:bg-accent/90 font-bold text-base px-8"
+                        className="rounded-full bg-accent text-accent-foreground hover:bg-accent/90 font-bold text-base px-8 shadow-lg"
                         onClick={() => document.getElementById('booking-modal')?.classList.remove('hidden')}
                     >
                         Book Free Consultation
