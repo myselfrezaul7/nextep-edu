@@ -1,6 +1,7 @@
 import { Metadata } from "next";
 import { HeroSection } from "@/components/home/HeroSection";
 import { ServicesSection } from "@/components/home/ServicesSection";
+import { HowItWorksSection } from "@/components/home/HowItWorksSection";
 import { AboutSection } from "@/components/home/AboutSection";
 import { TestimonialCarousel } from "@/components/home/TestimonialCarousel";
 import { DestinationsGrid } from "@/components/destinations/DestinationsGrid";
@@ -39,6 +40,7 @@ export default function Home() {
             </section>
 
             <ServicesSection />
+            <HowItWorksSection />
             <AboutSection />
             <TestimonialCarousel />
         </div>
