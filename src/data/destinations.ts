@@ -368,5 +368,51 @@ export const destinations: Record<string, Destination> = {
             { name: "Bilkent University" },
             { name: "Boğaziçi University" },
         ],
+    },
+    cyprus: {
+        slug: "cyprus",
+        name: "Cyprus",
+        heroImage: "/assets/cyprus_hero_blend.png",
+        hero: {
+            title: "Study in Cyprus",
+            description: "Mediterranean climate, affordable tuition, and a gateway between Europe, Asia, and Africa.",
+            icon: Sun,
+        },
+        benefits: [
+            { title: "Affordable", description: "Low tuition fees and cost of living compared to Western Europe.", icon: Wallet },
+            { title: "English Programs", description: "Wide range of English-taught degree programs.", icon: BookOpen },
+            { title: "Weather", description: "Enjoy over 300 days of sunshine per year.", icon: Sun },
+            { title: "Safety", description: "One of the safest countries in Europe.", icon: Trophy },
+        ],
+        universities: [
+            { name: "University of Cyprus" },
+            { name: "Cyprus University of Technology" },
+            { name: "European University Cyprus" },
+            { name: "University of Nicosia" },
+            { name: "Frederick University" },
+        ],
+    },
+    latvia: {
+        slug: "latvia",
+        name: "Latvia",
+        heroImage: "/assets/latvia_hero_blend.png",
+        hero: {
+            title: "Study in Latvia",
+            description: "Affordable European education in the heart of the Baltics with rich cultural heritage.",
+            icon: Landmark,
+        },
+        benefits: [
+            { title: "Affordable", description: "Low tuition and living costs in the EU.", icon: Wallet },
+            { title: "English Programs", description: "Many programs taught in English at all levels.", icon: BookOpen },
+            { title: "Central Location", description: "Easy access to Scandinavia, Western Europe, and Russia.", icon: Train },
+            { title: "Quality Education", description: "EU-recognized degrees with strong academic traditions.", icon: Trophy },
+        ],
+        universities: [
+            { name: "University of Latvia" },
+            { name: "Riga Technical University" },
+            { name: "Riga Stradiņš University" },
+            { name: "Latvia University of Life Sciences" },
+            { name: "Turiba University" },
+        ],
     }
 };
