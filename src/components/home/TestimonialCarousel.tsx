@@ -13,9 +13,9 @@ const testimonials = [
         visaDate: "January 12, 2025",
     },
     {
-        text: "I couldn't have imagined studying in Germany without NexTep Edu's help. They made the complex admission process feel simple and were always there to answer my questions. My dream of studying at South Westphalia University came true!",
+        text: "I couldn't have imagined studying in Germany without NexTep Edu's help. They made the complex admission process feel simple and were always there to answer my questions. My dream of studying at Wismar University came true!",
         author: "Jannatul Ferdous",
-        university: "IMIS, South Westphalia University of Applied Sciences, Germany",
+        university: "Wismar University of Applied Sciences, Germany",
         flag: "🇩🇪",
         initials: "JF",
         visaDate: "February 10, 2025",
