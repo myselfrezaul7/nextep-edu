@@ -24,7 +24,7 @@
     --color-surface: var(--surface);
 
     --font-sans: var(--font-ibm-plex-sans), ui-sans-serif, system-ui, sans-serif;
-    --font-heading: var(--font-ibm-plex-sans), ui-sans-serif, system-ui, sans-serif;
+    --font-heading: var(--font-playfair), Georgia, serif;
 }
 
 :root {

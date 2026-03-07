@@ -3,7 +3,7 @@
 import { motion } from "framer-motion";
 import Image from "next/image";
 import Link from "next/link";
-import { ArrowLeft, GraduationCap, CheckCircle, Globe2, Trophy, Clock, Users, BookOpen, Wallet, Sun, Coffee, MapPin, Landmark, Train, Building2 } from "lucide-react";
+import { ArrowLeft, ArrowRight, GraduationCap, CheckCircle, Globe2, Trophy, Clock, Users, BookOpen, Wallet, Sun, Coffee, MapPin, Landmark, Train, Building2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 interface SerializedDestination {
@@ -16,8 +16,17 @@ interface SerializedDestination {
     universities: { name: string }[];
 }
 
+interface RelatedDestination {
+    slug: string;
+    name: string;
+    heroImage: string;
+    flag: string;
+    benefits: { title: string; description: string }[];
+}
+
 interface DestinationPageClientProps {
     destination: SerializedDestination;
+    relatedDestinations?: RelatedDestination[];
 }
 
 // Map benefit titles to icons
@@ -72,7 +81,7 @@ const iconMap: Record<string, React.ComponentType<{ className?: string }>> = {
     "Culture": Users,
 };
 
-export function DestinationPageClient({ destination }: DestinationPageClientProps) {
+export function DestinationPageClient({ destination, relatedDestinations = [] }: DestinationPageClientProps) {
     return (
         <article className="min-h-screen">
             {/* Hero Section */}
@@ -193,6 +202,83 @@ export function DestinationPageClient({ destination }: DestinationPageClientProp
                     </div>
                 </div>
             </section>
+
+            {/* Related Destinations Section */}
+            {relatedDestinations.length > 0 && (
+                <section className="py-16 md:py-24 bg-background">
+                    <div className="container mx-auto px-4">
+                        <motion.div
+                            initial={{ opacity: 0, y: 20 }}
+                            whileInView={{ opacity: 1, y: 0 }}
+                            viewport={{ once: true }}
+                            className="text-center mb-12"
+                        >
+                            <h2 className="text-3xl md:text-4xl font-bold font-heading text-primary mb-4">
+                                You Might Also Like
+                            </h2>
+                            <p className="text-muted-foreground max-w-2xl mx-auto">
+                                Explore other popular destinations chosen by Bangladeshi students.
+                            </p>
+                        </motion.div>
+
+                        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-6xl mx-auto">
+                            {relatedDestinations.map((related, index) => (
+                                <motion.div
+                                    key={related.slug}
+                                    initial={{ opacity: 0, y: 30 }}
+                                    whileInView={{ opacity: 1, y: 0 }}
+                                    viewport={{ once: true }}
+                                    transition={{ delay: index * 0.1 }}
+                                    className="h-full"
+                                >
+                                    <Link href={`/destinations/${related.slug}`} className="group block h-full">
+                                        <div className="relative h-full overflow-hidden rounded-2xl border border-border/30 bg-card/95 backdrop-blur-xl shadow-lg hover:shadow-2xl transition-all duration-500 hover:-translate-y-2">
+                                            {/* Image Wrapper */}
+                                            <div className="relative h-48 overflow-hidden">
+                                                <Image
+                                                    src={related.heroImage}
+                                                    alt={related.name}
+                                                    fill
+                                                    className="object-cover transition-transform duration-700 group-hover:scale-110"
+                                                    sizes="(max-width: 768px) 100vw, 33vw"
+                                                />
+                                                <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent opacity-80 group-hover:opacity-60 transition-opacity" />
+                                                <div className="absolute bottom-4 left-4 text-white z-10">
+                                                    <h3 className="text-xl font-bold font-heading flex items-center gap-2">
+                                                        <span>{related.flag}</span> {related.name}
+                                                    </h3>
+                                                </div>
+                                            </div>
+
+                                            <div className="p-5">
+                                                <div className="space-y-3 mb-6">
+                                                    {related.benefits.slice(0, 2).map((benefit, i) => {
+                                                        const BenefitIcon = iconMap[benefit.title] || Globe2;
+                                                        return (
+                                                            <div key={i} className="flex items-start gap-3">
+                                                                <div className="w-8 h-8 rounded-lg bg-accent/10 flex items-center justify-center shrink-0 text-accent">
+                                                                    <BenefitIcon className="w-4 h-4" />
+                                                                </div>
+                                                                <div>
+                                                                    <h4 className="font-bold text-sm text-foreground">{benefit.title}</h4>
+                                                                    <p className="text-xs text-muted-foreground line-clamp-1">{benefit.description}</p>
+                                                                </div>
+                                                            </div>
+                                                        );
+                                                    })}
+                                                </div>
+                                                <div className="flex items-center gap-2 text-sm font-bold text-accent group-hover:text-accent/80 transition-colors">
+                                                    View Guide <ArrowRight className="w-4 h-4 transform group-hover:translate-x-1 transition-transform" />
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </Link>
+                                </motion.div>
+                            ))}
+                        </div>
+                    </div>
+                </section>
+            )}
 
             {/* CTA Section */}
             <section className="py-16 md:py-24 bg-background">

@@ -3,6 +3,7 @@
 import { motion } from "framer-motion";
 import Link from "next/link";
 import Image from "next/image";
+import { Plane, GraduationCap, Globe2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 export function HeroSection() {
@@ -65,6 +66,22 @@ export function HeroSection() {
                             </Link>
                         </Button>
                     </motion.div>
+
+                    <motion.div
+                        initial={{ opacity: 0, y: 20 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ duration: 0.9, delay: 0.45, ease: [0.22, 1, 0.36, 1] }}
+                        className="pt-6"
+                    >
+                        <div className="flex items-center gap-4 text-sm text-muted-foreground bg-surface/50 dark:bg-card/50 px-4 py-2 rounded-full w-fit border border-border/50 backdrop-blur-sm">
+                            <div className="flex -space-x-2">
+                                <div className="w-8 h-8 rounded-full border-2 border-background bg-blue-100 flex items-center justify-center text-xs font-bold text-blue-800">TH</div>
+                                <div className="w-8 h-8 rounded-full border-2 border-background bg-green-100 flex items-center justify-center text-xs font-bold text-green-800">NJ</div>
+                                <div className="w-8 h-8 rounded-full border-2 border-background bg-purple-100 flex items-center justify-center text-xs font-bold text-purple-800">MD</div>
+                            </div>
+                            <span>Trusted by <strong className="text-accent">200+ students</strong> across 20+ countries</span>
+                        </div>
+                    </motion.div>
                 </div>
 
                 {/* Hero Image */}
@@ -96,6 +113,32 @@ export function HeroSection() {
                             priority
                         />
                     </div>
+
+                    {/* Floating Decorative Icons */}
+                    <motion.div
+                        animate={{ y: [0, -15, 0], rotate: [0, 5, 0] }}
+                        transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
+                        className="absolute -top-6 -right-6 bg-accent/20 backdrop-blur-md p-4 rounded-full border border-accent/20 shadow-lg text-accent"
+                    >
+                        <Plane className="w-8 h-8" />
+                    </motion.div>
+
+                    <motion.div
+                        animate={{ y: [0, 20, 0], rotate: [0, -10, 0] }}
+                        transition={{ duration: 5, repeat: Infinity, ease: "easeInOut", delay: 1 }}
+                        className="absolute top-1/2 -left-8 bg-blue-500/20 backdrop-blur-md p-4 rounded-full border border-blue-500/20 shadow-lg text-blue-500"
+                    >
+                        <GraduationCap className="w-8 h-8" />
+                    </motion.div>
+
+                    <motion.div
+                        animate={{ y: [0, -10, 0], rotate: [0, 15, 0] }}
+                        transition={{ duration: 6, repeat: Infinity, ease: "easeInOut", delay: 2 }}
+                        className="absolute -bottom-6 right-10 bg-green-500/20 backdrop-blur-md p-3 rounded-full border border-green-500/20 shadow-lg text-green-500"
+                    >
+                        <Globe2 className="w-6 h-6" />
+                    </motion.div>
+
                     {/* Decorative element behind image */}
                     <div className="absolute -inset-4 bg-accent/10 rounded-3xl -z-10 blur-xl opacity-70" />
                 </motion.div>

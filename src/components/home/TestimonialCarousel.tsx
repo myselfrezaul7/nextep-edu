@@ -36,6 +36,30 @@ const testimonials = [
         initials: "NJ",
         visaDate: "June 8, 2025",
     },
+    {
+        text: "I was worried about the costs of studying in Europe, but the team found an incredibly affordable program in Latvia that perfectly matched my career goals.",
+        author: "Rafiul Islam",
+        university: "Riga Technical University, Latvia",
+        flag: "🇱🇻",
+        initials: "RI",
+        visaDate: "April 15, 2025",
+    },
+    {
+        text: "The guidance on English-taught programs in the Mediterranean was spot on. Highly recommend their services for anyone looking beyond the traditional destinations.",
+        author: "Ayesha Khan",
+        university: "University of Nicosia, Cyprus",
+        flag: "🇨🇾",
+        initials: "AK",
+        visaDate: "May 2, 2025",
+    },
+    {
+        text: "They didn't just help me get admitted, they helped me strategize my post-graduation work opportunities in North America. Worth every penny.",
+        author: "Sakib Hossain",
+        university: "University of Toronto, Canada",
+        flag: "🇨🇦",
+        initials: "SH",
+        visaDate: "July 20, 2025",
+    }
 ];
 
 export function TestimonialCarousel() {

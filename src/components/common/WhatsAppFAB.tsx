@@ -1,30 +1,44 @@
 "use client";
 
 import { MessageCircle } from "lucide-react";
+import { useEffect, useState } from "react";
+import { motion, AnimatePresence } from "framer-motion";
 
 export function WhatsAppFAB() {
+    const [isVisible, setIsVisible] = useState(false);
+
+    // Show after scrolling down a bit
+    useEffect(() => {
+        const handleScroll = () => {
+            if (window.scrollY > 300) {
+                setIsVisible(true);
+            } else {
+                setIsVisible(false);
+            }
+        };
+
+        window.addEventListener("scroll", handleScroll);
+        return () => window.removeEventListener("scroll", handleScroll);
+    }, []);
+
     return (
-        <a
-            href="https://wa.me/4915147483493?text=Hi%20NexTep%20Edu!%20I%20want%20to%20know%20about%20studying%20abroad."
-            target="_blank"
-            rel="noopener noreferrer"
-            className="fixed bottom-6 right-6 z-50 group"
-            aria-label="Chat on WhatsApp"
-        >
-            <div className="relative">
-                {/* Pulse ring */}
-                <div className="absolute inset-0 rounded-full bg-green-500 animate-ping opacity-25" />
-
-                {/* Button */}
-                <div className="relative w-14 h-14 bg-[#25D366] rounded-full flex items-center justify-center shadow-lg hover:shadow-xl hover:scale-110 transition-all duration-300">
-                    <MessageCircle className="w-7 h-7 text-white fill-white" />
-                </div>
-
-                {/* Tooltip */}
-                <div className="absolute right-full mr-3 top-1/2 -translate-y-1/2 bg-card border border-border rounded-lg px-3 py-2 text-sm font-medium text-primary whitespace-nowrap opacity-0 group-hover:opacity-100 pointer-events-none transition-opacity duration-200 shadow-lg">
-                    Chat with us!
-                </div>
-            </div>
-        </a>
+        <AnimatePresence>
+            {isVisible && (
+                <motion.a
+                    href="https://wa.me/4915147483493"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    initial={{ opacity: 0, scale: 0.5, y: 20 }}
+                    animate={{ opacity: 1, scale: 1, y: 0 }}
+                    exit={{ opacity: 0, scale: 0.5, y: 20 }}
+                    whileHover={{ scale: 1.1 }}
+                    whileTap={{ scale: 0.9 }}
+                    className="fixed bottom-6 right-6 z-50 flex items-center justify-center w-14 h-14 bg-[#25D366] text-white rounded-full shadow-lg hover:shadow-2xl hover:shadow-[#25D366]/40 transition-all duration-300 before:absolute before:inset-0 before:rounded-full before:bg-[#25D366] before:animate-ping before:opacity-20 hidden sm:flex"
+                    aria-label="Chat with us on WhatsApp"
+                >
+                    <MessageCircle className="w-7 h-7" />
+                </motion.a>
+            )}
+        </AnimatePresence>
     );
 }
