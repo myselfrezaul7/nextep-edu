@@ -1,5 +1,5 @@
 import type { Metadata, Viewport } from "next";
-import { IBM_Plex_Sans } from "next/font/google";
+import { IBM_Plex_Sans, Playfair_Display } from "next/font/google";
 import { ThemeProvider } from "@/components/theme-provider";
 import { Header } from "@/components/layout/Header";
 import { Footer } from "@/components/layout/Footer";
@@ -18,6 +18,12 @@ const ibmPlexSans = IBM_Plex_Sans({
     subsets: ["latin"],
     weight: ["400", "500", "600", "700"],
     variable: "--font-ibm-plex-sans",
+});
+
+const playfair = Playfair_Display({
+    subsets: ["latin"],
+    weight: ["400", "700"],
+    variable: "--font-playfair",
 });
 
 // SEO Metadata targeting Bangladeshi students
@@ -144,7 +150,7 @@ export default function RootLayout({
             <head>
                 <StructuredData />
             </head>
-            <body className={ibmPlexSans.className}>
+            <body className={`${ibmPlexSans.variable} ${playfair.variable} font-sans antialiased min-h-screen flex flex-col selection:bg-accent/20 selection:text-foreground`}>
                 <ThemeProvider
                     attribute="class"
                     defaultTheme="system"
@@ -152,6 +158,7 @@ export default function RootLayout({
                     disableTransitionOnChange
                 >
                     <ScrollProgress />
+                    <WhatsAppFAB />
                     <div className="flex flex-col min-h-screen">
                         <Header />
                         <main className="flex-grow pt-20">

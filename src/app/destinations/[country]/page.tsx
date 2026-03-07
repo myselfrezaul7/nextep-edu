@@ -140,6 +140,22 @@ export default async function DestinationCountryPage({ params }: Props) {
         ],
     };
 
+    // Get 3 related destinations (excluding current)
+    const allDestinations = Object.values(destinations);
+    const related = allDestinations
+        .filter((d) => d.slug !== destination.slug)
+        .slice(0, 3)
+        .map(d => ({
+            slug: d.slug,
+            name: d.name,
+            heroImage: d.heroImage,
+            flag: d.flag,
+            benefits: d.benefits.map((b) => ({
+                title: b.title,
+                description: b.description,
+            })),
+        }));
+
     return (
         <>
             <script
@@ -154,7 +170,7 @@ export default async function DestinationCountryPage({ params }: Props) {
                     __html: JSON.stringify(breadcrumbSchema),
                 }}
             />
-            <DestinationPageClient destination={serializedData} />
+            <DestinationPageClient destination={serializedData} relatedDestinations={related} />
         </>
     );
 }

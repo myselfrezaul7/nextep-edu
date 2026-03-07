@@ -29,9 +29,9 @@ const itemVariants = {
 };
 
 const stats = [
-    { value: 50, suffix: "+", label: "Students Placed" },
+    { value: 200, suffix: "+", label: "Consultations Done" },
     { value: 20, suffix: "+", label: "Countries" },
-    { value: 1, suffix: "M+", label: "Scholarships Secured (BDT)" },
+    { value: 98, suffix: "%", label: "Visa Success Rate" },
 ];
 
 function AnimatedCounter({ value, suffix }: { value: number; suffix: string }) {

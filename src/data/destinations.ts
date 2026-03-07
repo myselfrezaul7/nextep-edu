@@ -14,6 +14,7 @@ export interface Destination {
     slug: string;
     name: string;
     heroImage: string;
+    flag: string;
     hero: {
         title: string;
         description: string;
@@ -28,6 +29,7 @@ export const destinations: Record<string, Destination> = {
         slug: "uk",
         name: "United Kingdom",
         heroImage: "/assets/uk_hero_blend_1769798778947.png",
+        flag: "🇬🇧",
         hero: {
             title: "Study in the UK",
             description: "Home to some of the world's oldest and most prestigious universities. A degree from the UK is recognized globally.",
@@ -51,6 +53,7 @@ export const destinations: Record<string, Destination> = {
         slug: "usa",
         name: "USA",
         heroImage: "/assets/usa_hero_blend_1769798792932.png",
+        flag: "🇺🇸",
         hero: {
             title: "Study in the USA",
             description: "The dream destination for international students. Limitless opportunities and cutting-edge research.",
@@ -74,6 +77,7 @@ export const destinations: Record<string, Destination> = {
         slug: "canada",
         name: "Canada",
         heroImage: "/assets/canada_hero_blend_1769798822200.png",
+        flag: "🇨🇦",
         hero: {
             title: "Study in Canada",
             description: "High quality of life, welcoming environment, and excellent post-study work options.",
@@ -97,6 +101,7 @@ export const destinations: Record<string, Destination> = {
         slug: "australia",
         name: "Australia",
         heroImage: "/assets/australia_hero_blend_1769798807824.png",
+        flag: "🇦🇺",
         hero: {
             title: "Study in Australia",
             description: "Beautiful landscapes, laid-back culture, and a world-class education system.",
@@ -120,6 +125,7 @@ export const destinations: Record<string, Destination> = {
         slug: "germany",
         name: "Germany",
         heroImage: "/assets/germany_hero_blend_1769798837339.png",
+        flag: "🇩🇪",
         hero: {
             title: "Study in Germany",
             description: "Tuition-free education at public universities and a hub for engineering and technology.",
@@ -143,6 +149,7 @@ export const destinations: Record<string, Destination> = {
         slug: "france",
         name: "France",
         heroImage: "/assets/france_hero_blend_1769798860272.png",
+        flag: "🇫🇷",
         hero: {
             title: "Study in France",
             description: "Art, culture, and prestige. France offers a unique study experience in the heart of Europe.",
@@ -166,6 +173,7 @@ export const destinations: Record<string, Destination> = {
         slug: "china",
         name: "China",
         heroImage: "/assets/china_hero_blend_1769798874661.png",
+        flag: "🇨🇳",
         hero: {
             title: "Study in China",
             description: "A blend of ancient tradition and modern innovation. Rapidly growing education sector.",
@@ -189,6 +197,7 @@ export const destinations: Record<string, Destination> = {
         slug: "netherlands",
         name: "Netherlands",
         heroImage: "/assets/netherlands_hero_blend_1769798889972.png",
+        flag: "🇳🇱",
         hero: {
             title: "Study in Netherlands",
             description: "Innovative teaching, English-taught programs, and an open, international society.",
@@ -212,6 +221,7 @@ export const destinations: Record<string, Destination> = {
         slug: "norway",
         name: "Norway",
         heroImage: "/assets/norway_hero_blend_1769798903469.png",
+        flag: "🇳🇴",
         hero: {
             title: "Study in Norway",
             description: "Spectacular nature, high standard of living, and tuition-free education for many.",
@@ -235,6 +245,7 @@ export const destinations: Record<string, Destination> = {
         slug: "portugal",
         name: "Portugal",
         heroImage: "/assets/portugal_hero_blend_1769798919189.png",
+        flag: "🇵🇹",
         hero: {
             title: "Study in Portugal",
             description: "Affordable living, sunny weather, and a welcoming atmosphere in historic cities.",
@@ -258,6 +269,7 @@ export const destinations: Record<string, Destination> = {
         slug: "austria",
         name: "Austria",
         heroImage: "/assets/austria_hero_blend_1769798933623.png",
+        flag: "🇦🇹",
         hero: {
             title: "Study in Austria",
             description: "Quality education in the heart of Europe, known for its rich musical and cultural history.",
@@ -281,6 +293,7 @@ export const destinations: Record<string, Destination> = {
         slug: "belgium",
         name: "Belgium",
         heroImage: "/assets/destinations/belgium.png",
+        flag: "🇧🇪",
         hero: {
             title: "Study in Belgium",
             description: "The heart of the EU, multicultural environment, and high-quality education.",
@@ -304,6 +317,7 @@ export const destinations: Record<string, Destination> = {
         slug: "south-korea",
         name: "South Korea",
         heroImage: "/assets/south_korea_hero_blend.png",
+        flag: "🇰🇷",
         hero: {
             title: "Study in South Korea",
             description: "Leading technology, vibrant pop culture, and world-class universities.",
@@ -327,6 +341,7 @@ export const destinations: Record<string, Destination> = {
         slug: "malaysia",
         name: "Malaysia",
         heroImage: "/assets/malaysia_hero_blend.png",
+        flag: "🇲🇾",
         hero: {
             title: "Study in Malaysia",
             description: "World-class education at an affordable cost in a vibrant, multicultural setting.",
@@ -350,6 +365,7 @@ export const destinations: Record<string, Destination> = {
         slug: "turkey",
         name: "Turkey",
         heroImage: "/assets/turkey_hero_blend.png",
+        flag: "🇹🇷",
         hero: {
             title: "Study in Turkey",
             description: "A bridge between East and West, offering quality education and rich history.",
@@ -373,6 +389,7 @@ export const destinations: Record<string, Destination> = {
         slug: "cyprus",
         name: "Cyprus",
         heroImage: "/assets/cyprus_hero_blend.png",
+        flag: "🇨🇾",
         hero: {
             title: "Study in Cyprus",
             description: "Mediterranean climate, affordable tuition, and a gateway between Europe, Asia, and Africa.",
@@ -396,6 +413,7 @@ export const destinations: Record<string, Destination> = {
         slug: "latvia",
         name: "Latvia",
         heroImage: "/assets/latvia_hero_blend.png",
+        flag: "🇱🇻",
         hero: {
             title: "Study in Latvia",
             description: "Affordable European education in the heart of the Baltics with rich cultural heritage.",

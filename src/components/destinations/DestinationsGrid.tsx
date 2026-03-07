@@ -55,7 +55,9 @@ export function DestinationsGrid({ featuredOnly = false }: { featuredOnly?: bool
                                     />
                                     <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent opacity-80 group-hover:opacity-60 transition-opacity" />
                                     <div className="absolute bottom-6 left-6 text-white z-10">
-                                        <h3 className="text-2xl font-bold font-heading mb-1">{destination.name}</h3>
+                                        <h3 className="text-2xl font-bold font-heading mb-1 flex items-center gap-2">
+                                            <span>{destination.flag}</span> {destination.name}
+                                        </h3>
                                         <div className="flex items-center gap-2 text-sm font-medium text-white/90 opacity-0 group-hover:opacity-100 transform translate-y-4 group-hover:translate-y-0 transition-all duration-500">
                                             Explore <ArrowRight className="w-4 h-4" />
                                         </div>

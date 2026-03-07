@@ -3,7 +3,7 @@
 import { useState, useEffect, useRef, useCallback } from "react";
 import { useForm } from "react-hook-form";
 import toast from "react-hot-toast";
-import { X, Calendar, Clock, BookOpen, User, Mail, Phone, GraduationCap } from "lucide-react";
+import { X, Calendar, Clock, BookOpen, User, Mail, Phone, GraduationCap, CheckCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 type FormData = {
@@ -172,28 +172,16 @@ export function BookingModal() {
                 {/* Content */}
                 <div className="overflow-y-auto p-6">
                     {isSuccess ? (
-                        <div className="flex flex-col items-center text-center py-8 space-y-4 animate-in fade-in slide-in-from-bottom-4 duration-500">
-                            <div className="w-20 h-20 bg-green-100 dark:bg-green-900/30 rounded-full flex items-center justify-center mb-2">
-                                <svg
-                                    className="w-10 h-10 text-green-600 dark:text-green-400"
-                                    fill="none"
-                                    stroke="currentColor"
-                                    viewBox="0 0 24 24"
-                                >
-                                    <path
-                                        strokeLinecap="round"
-                                        strokeLinejoin="round"
-                                        strokeWidth={3}
-                                        d="M5 13l4 4L19 7"
-                                    />
-                                </svg>
+                        <div className="flex flex-col items-center text-center py-8 space-y-4 animate-in fade-in zoom-in duration-500">
+                            <div className="w-20 h-20 bg-green-100 dark:bg-green-900/30 rounded-full flex items-center justify-center mb-4 text-green-600 dark:text-green-400">
+                                <CheckCircle className="w-10 h-10" />
                             </div>
-                            <h4 className="text-2xl font-bold text-foreground">Thank You!</h4>
-                            <p className="text-muted-foreground max-w-xs mx-auto">
-                                Your appointment has been booked. We will have a nice conversation soon!
+                            <h4 className="text-3xl font-bold font-heading text-primary">We Got Your Request!</h4>
+                            <p className="text-muted-foreground text-lg max-w-sm mx-auto">
+                                Our team will reach out within 24 hours.
                             </p>
-                            <Button onClick={closeModal} className="mt-6 w-full max-w-xs">
-                                Close
+                            <Button onClick={closeModal} size="lg" className="mt-8 px-8 rounded-full shadow-lg hover:shadow-xl hover:scale-105 transition-all w-full max-w-xs text-lg font-bold">
+                                Close Window
                             </Button>
                         </div>
                     ) : (
