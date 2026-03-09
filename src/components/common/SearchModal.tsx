@@ -145,12 +145,12 @@ export function SearchModal() {
             {/* Search Trigger Button - Modern Pill Design */}
             <button
                 onClick={() => setIsOpen(true)}
-                className="group relative flex items-center justify-between gap-3 w-10 md:w-56 h-10 px-0 md:px-3 rounded-full bg-surface/50 dark:bg-card/50 hover:bg-surface dark:hover:bg-card border border-border/60 hover:border-accent/50 shadow-sm hover:shadow-md transition-all duration-300"
+                className="group relative flex items-center justify-between gap-3 w-10 lg:w-48 xl:w-56 h-10 px-0 lg:px-3 rounded-full bg-surface/50 dark:bg-card/50 hover:bg-surface dark:hover:bg-card border border-border/60 hover:border-accent/50 shadow-sm hover:shadow-md transition-all duration-300"
                 aria-label="Search destinations, services, and pages"
             >
-                <div className="flex items-center gap-2 justify-center w-full md:w-auto md:justify-start">
+                <div className="flex items-center gap-2 justify-center w-full lg:w-auto lg:justify-start">
                     <Search className="w-[18px] h-[18px] text-muted-foreground group-hover:text-accent transition-colors" />
-                    <span className="hidden md:inline text-sm text-muted-foreground group-hover:text-foreground transition-colors font-sans">
+                    <span className="hidden lg:inline text-sm text-muted-foreground group-hover:text-foreground transition-colors font-sans">
                         Search...
                     </span>
                 </div>
