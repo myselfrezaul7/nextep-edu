@@ -63,7 +63,7 @@ export function Header() {
                 className={cn(
                     "flex justify-between items-center w-full max-w-5xl px-4 md:px-6 py-3 transition-all duration-300",
                     "rounded-full border backdrop-blur-[20px] shadow-[0_4px_30px_rgba(0,0,0,0.1)]",
-                    "bg-[rgba(255,255,255,0.7)] border-[rgba(0,0,0,0.08)]",
+                    "bg-white/70 border-black/5",
                     "dark:bg-[rgba(30,30,30,0.6)] dark:border-[rgba(255,255,255,0.08)] dark:shadow-[0_4px_30px_rgba(0,0,0,0.3)]",
                     "shadow-[inset_0_1px_0_rgba(255,255,255,0.8)] dark:shadow-[inset_0_1px_0_rgba(255,255,255,0.05)]"
                 )}
@@ -112,7 +112,7 @@ export function Header() {
                             className={cn(
                                 "absolute top-full left-1/2 -translate-x-1/2 w-64 transition-all duration-200 origin-top mt-2 p-2 grid gap-1 overflow-hidden max-h-80 overflow-y-auto",
                                 "rounded-[24px] shadow-[0_4px_30px_rgba(0,0,0,0.15)] dark:shadow-[0_4px_30px_rgba(0,0,0,0.5)] border",
-                                "bg-[rgba(255,255,255,0.85)] border-[rgba(0,0,0,0.08)]",
+                                "bg-white/85 border-black/5",
                                 "dark:bg-[rgba(30,30,30,0.85)] dark:border-[rgba(255,255,255,0.08)] backdrop-blur-[20px]",
                                 dropdownOpen ? "opacity-100 scale-100 visible" : "opacity-0 scale-95 invisible"
                             )}
@@ -121,7 +121,7 @@ export function Header() {
                                 <Link
                                     key={item.name}
                                     href={item.href}
-                                    className="block px-4 py-2.5 text-[15px] font-medium rounded-[12px] hover:bg-black/5 dark:hover:bg-white/10 hover:text-accent transition-colors"
+                                    className="block px-4 py-2.5 text-[15px] font-medium text-foreground rounded-[12px] hover:bg-black/5 dark:hover:bg-white/10 hover:text-accent transition-colors"
                                 >
                                     <span className="mr-2 text-base">{item.flag}</span>
                                     {item.name}
