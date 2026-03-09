@@ -40,6 +40,18 @@ export function Header() {
         return () => window.removeEventListener("scroll", handleScroll);
     }, []);
 
+    // Prevent body scroll when mobile menu is open
+    useEffect(() => {
+        if (mobileMenuOpen) {
+            document.body.style.overflow = 'hidden';
+        } else {
+            document.body.style.overflow = '';
+        }
+        return () => {
+            document.body.style.overflow = '';
+        };
+    }, [mobileMenuOpen]);
+
     const toggleTheme = () => {
         setTheme(theme === "dark" ? "light" : "dark");
     };
@@ -93,29 +105,27 @@ export function Header() {
                             Destinations <ChevronDown className={cn("w-4 h-4 transition-transform", dropdownOpen && "rotate-180")} />
                         </button>
 
-                        {/* Dropdown Menu — now shows all destinations with scroll */}
+                        {/* Dropdown Menu — now uses matching glassmorphism */}
                         <div
                             className={cn(
-                                "absolute top-full left-1/2 -translate-x-1/2 w-60 transition-all duration-200 origin-top",
+                                "absolute top-full left-1/2 -translate-x-1/2 w-60 transition-all duration-200 origin-top mt-2 p-2 grid gap-1 relative overflow-hidden max-h-80 overflow-y-auto",
+                                "rounded-2xl shadow-[0_4px_30px_rgba(0,0,0,0.15)] dark:shadow-[0_4px_30px_rgba(0,0,0,0.5)] border",
+                                "bg-white/70 border-black/5 dark:bg-[#1E1E1E]/70 dark:border-white/10 backdrop-blur-xl",
                                 dropdownOpen ? "opacity-100 scale-100 visible" : "opacity-0 scale-95 invisible"
                             )}
                         >
-                            <div className="mt-2 bg-card rounded-xl shadow-xl border border-border p-2 grid gap-1 relative overflow-hidden max-h-80 overflow-y-auto">
-                                <div className="absolute inset-0 bg-background/50 backdrop-blur-md -z-10" />
-
-                                {allDestinations.map((item) => (
-                                    <Link
-                                        key={item.name}
-                                        href={item.href}
-                                        className="block px-4 py-2 text-sm rounded-lg hover:bg-muted hover:text-accent transition-colors"
-                                    >
-                                        {item.name}
-                                    </Link>
-                                ))}
-                                <Link href="/destinations" className="block px-4 py-2 text-xs font-bold text-accent text-center border-t border-border mt-1 pt-2">
-                                    View All Destinations
+                            {allDestinations.map((item) => (
+                                <Link
+                                    key={item.name}
+                                    href={item.href}
+                                    className="block px-4 py-2 text-sm rounded-lg hover:bg-black/5 dark:hover:bg-white/10 hover:text-accent transition-colors"
+                                >
+                                    {item.name}
                                 </Link>
-                            </div>
+                            ))}
+                            <Link href="/destinations" className="block px-4 py-2 text-xs font-bold text-accent text-center border-t border-black/10 dark:border-white/10 mt-1 pt-2 hover:bg-black/5 dark:hover:bg-white/10 rounded-lg transition-colors">
+                                View All Destinations
+                            </Link>
                         </div>
                     </div>
 
@@ -155,58 +165,98 @@ export function Header() {
                 </div>
             </nav>
 
-            {/* Mobile Menu Content */}
+            {/* Mobile Menu Content — Portfolio Style */}
             <AnimatePresence>
                 {mobileMenuOpen && (
                     <motion.div
-                        initial={{ opacity: 0, y: -10, scale: 0.95 }}
-                        animate={{ opacity: 1, y: 0, scale: 1 }}
-                        exit={{ opacity: 0, y: -10, scale: 0.95 }}
-                        transition={{ duration: 0.2, ease: "easeOut" }}
-                        className="fixed top-[84px] left-4 right-4 md:hidden bg-white/85 dark:bg-[#1E1E1E]/85 backdrop-blur-xl border border-black/5 dark:border-white/10 rounded-2xl shadow-2xl p-6 flex flex-col gap-4 overflow-hidden z-40"
+                        initial={{ opacity: 0, y: -20 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        exit={{ opacity: 0, y: -20 }}
+                        transition={{ duration: 0.3 }}
+                        className="fixed top-20 left-4 right-4 md:hidden z-40 bg-white/85 dark:bg-[rgba(30,30,30,0.85)] backdrop-blur-[20px] shadow-2xl border border-black/5 dark:border-white/10 rounded-[24px] overflow-hidden"
                     >
-                        <Link
-                            href="/#services"
-                            className="text-lg font-medium p-3 -mx-3 rounded-lg hover:bg-muted transition-colors border-b border-border"
-                            onClick={() => setMobileMenuOpen(false)}
-                        >
-                            Services
-                        </Link>
-                        <Link
-                            href="/#about"
-                            className="text-lg font-medium p-3 -mx-3 rounded-lg hover:bg-muted transition-colors border-b border-border"
-                            onClick={() => setMobileMenuOpen(false)}
-                        >
-                            About
-                        </Link>
-                        <div className="py-2">
-                            <p className="text-sm font-bold text-slate-400 mb-2 uppercase tracking-wider px-1">Destinations</p>
-                            <div className="grid grid-cols-2 gap-2">
-                                {mobileTopDestinations.map(item => (
+                        <div className="p-6 flex flex-col gap-2">
+                            <motion.div
+                                initial={{ opacity: 0, x: -20 }}
+                                animate={{ opacity: 1, x: 0 }}
+                                transition={{ delay: 0.0 }}
+                            >
+                                <Link
+                                    href="/#services"
+                                    className="block p-4 -mx-4 text-[18px] font-semibold text-foreground hover:text-accent transition-colors border-b border-black/10 dark:border-white/10"
+                                    onClick={() => setMobileMenuOpen(false)}
+                                >
+                                    Services
+                                </Link>
+                            </motion.div>
+                            <motion.div
+                                initial={{ opacity: 0, x: -20 }}
+                                animate={{ opacity: 1, x: 0 }}
+                                transition={{ delay: 0.1 }}
+                            >
+                                <Link
+                                    href="/#about"
+                                    className="block p-4 -mx-4 text-[18px] font-semibold text-foreground hover:text-accent transition-colors border-b border-black/10 dark:border-white/10"
+                                    onClick={() => setMobileMenuOpen(false)}
+                                >
+                                    About
+                                </Link>
+                            </motion.div>
+
+                            <motion.div
+                                initial={{ opacity: 0, x: -20 }}
+                                animate={{ opacity: 1, x: 0 }}
+                                transition={{ delay: 0.2 }}
+                                className="py-2 mt-2"
+                            >
+                                <p className="text-sm font-bold text-muted-foreground mb-4 uppercase tracking-wider block">Top Destinations</p>
+                                <div className="flex flex-col gap-1">
+                                    {mobileTopDestinations.map((item, i) => (
+                                        <motion.div
+                                            key={item.href}
+                                            initial={{ opacity: 0, x: -20 }}
+                                            animate={{ opacity: 1, x: 0 }}
+                                            transition={{ delay: 0.2 + (i * 0.05) }}
+                                        >
+                                            <Link
+                                                href={item.href}
+                                                className="block p-3 -mx-3 text-[16px] font-medium text-foreground hover:text-accent transition-colors border-b border-black/5 dark:border-white/5"
+                                                onClick={() => setMobileMenuOpen(false)}
+                                            >
+                                                {item.name}
+                                            </Link>
+                                        </motion.div>
+                                    ))}
+                                </div>
+                                <motion.div
+                                    initial={{ opacity: 0, x: -20 }}
+                                    animate={{ opacity: 1, x: 0 }}
+                                    transition={{ delay: 0.2 + (mobileTopDestinations.length * 0.05) }}
+                                >
                                     <Link
-                                        key={item.href}
-                                        href={item.href}
-                                        className="text-sm p-3 -mx-2 rounded-lg hover:bg-muted hover:text-accent transition-colors"
+                                        href="/destinations"
+                                        className="text-sm font-bold text-accent mt-4 block p-3 -mx-3 hover:text-accent/80 transition-colors"
                                         onClick={() => setMobileMenuOpen(false)}
                                     >
-                                        {item.name}
+                                        View All Destinations →
                                     </Link>
-                                ))}
-                            </div>
-                            <Link
-                                href="/destinations"
-                                className="text-sm font-bold text-accent mt-4 block text-center hover:underline p-3 rounded-lg hover:bg-muted/50 transition-colors"
-                                onClick={() => setMobileMenuOpen(false)}
+                                </motion.div>
+                            </motion.div>
+
+                            <motion.div
+                                initial={{ opacity: 0, y: 10 }}
+                                animate={{ opacity: 1, y: 0 }}
+                                transition={{ delay: 0.5 }}
+                                className="mt-4"
                             >
-                                View All Destinations →
-                            </Link>
+                                <Button className="w-full py-6 text-[15px] font-bold shadow-md rounded-full bg-foreground text-background hover:opacity-90" size="lg" onClick={() => {
+                                    setMobileMenuOpen(false);
+                                    document.getElementById('booking-modal')?.classList.remove('hidden');
+                                }}>
+                                    Book Consultation
+                                </Button>
+                            </motion.div>
                         </div>
-                        <Button className="w-full mt-2 py-6 text-base shadow-md rounded-full" size="lg" onClick={() => {
-                            setMobileMenuOpen(false);
-                            document.getElementById('booking-modal')?.classList.remove('hidden');
-                        }}>
-                            Book Consultation
-                        </Button>
                     </motion.div>
                 )}
             </AnimatePresence>

@@ -150,15 +150,18 @@ export function BookingModal() {
         >
             <div
                 ref={modalRef}
-                className="bg-surface w-full max-w-lg rounded-2xl shadow-2xl border border-white/10 overflow-hidden flex flex-col max-h-[90vh] animate-in fade-in zoom-in-95 duration-200"
+                className="relative bg-white/80 dark:bg-[#0B1120]/80 backdrop-blur-2xl w-full max-w-lg rounded-2xl shadow-2xl border border-black/5 dark:border-white/10 overflow-hidden flex flex-col max-h-[90vh] animate-in fade-in zoom-in-95 duration-200"
             >
+                {/* Glowing Top Accent Line */}
+                <div className="absolute top-0 inset-x-0 h-px bg-gradient-to-r from-transparent via-accent/50 to-transparent" />
+
                 {/* Header */}
-                <div className="p-6 border-b border-border flex justify-between items-center bg-accent/5">
+                <div className="p-6 border-b border-black/5 dark:border-white/10 flex justify-between items-center bg-accent/5">
                     <div>
                         <h3 id="booking-modal-title" className="text-xl font-bold font-heading text-primary">
                             {isSuccess ? "Booking Confirmed" : "Book Your Free Consultation"}
                         </h3>
-                        {!isSuccess && <p className="text-sm text-muted-foreground">Let&apos;s plan your future together.</p>}
+                        {!isSuccess && <p className="text-sm text-foreground/70">Let&apos;s plan your future together.</p>}
                     </div>
                     <button
                         onClick={closeModal}
