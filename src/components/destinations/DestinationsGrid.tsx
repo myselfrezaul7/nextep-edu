@@ -1,9 +1,10 @@
 "use client";
 
-import { motion } from "framer-motion";
+import { motion, useMotionValue, useSpring, useTransform } from "framer-motion";
 import Link from "next/link";
 import Image from "next/image";
 import { ArrowRight } from "lucide-react";
+import { useState, useRef, useEffect } from "react";
 import { destinations } from "@/data/destinations";
 
 // Top 6 destinations to show on homepage
@@ -27,6 +28,88 @@ const item = {
     show: { opacity: 1, y: 0, transition: { type: "spring" as const, stiffness: 50 } }
 };
 
+function Card3D({ children, href }: { children: React.ReactNode, href: string }) {
+    const ref = useRef<HTMLDivElement>(null);
+    const [isHovered, setIsHovered] = useState(false);
+    const [isTouchDevice, setIsTouchDevice] = useState(false);
+
+    const x = useMotionValue(0);
+    const y = useMotionValue(0);
+
+    const mouseXSpring = useSpring(x, { stiffness: 300, damping: 20 });
+    const mouseYSpring = useSpring(y, { stiffness: 300, damping: 20 });
+
+    const rotateX = useTransform(mouseYSpring, [-0.5, 0.5], ["8deg", "-8deg"]);
+    const rotateY = useTransform(mouseXSpring, [-0.5, 0.5], ["-8deg", "8deg"]);
+
+    const glareX = useTransform(mouseXSpring, [-0.5, 0.5], [0, 100]);
+    const glareY = useTransform(mouseYSpring, [-0.5, 0.5], [0, 100]);
+
+    useEffect(() => {
+        setIsTouchDevice(window.matchMedia("(hover: none)").matches);
+    }, []);
+
+    const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
+        if (isTouchDevice || !ref.current) return;
+
+        const rect = ref.current.getBoundingClientRect();
+
+        const width = rect.width;
+        const height = rect.height;
+
+        const mouseX = e.clientX - rect.left;
+        const mouseY = e.clientY - rect.top;
+
+        const xPct = mouseX / width - 0.5;
+        const yPct = mouseY / height - 0.5;
+
+        x.set(xPct);
+        y.set(yPct);
+    };
+
+    const handleMouseLeave = () => {
+        setIsHovered(false);
+        x.set(0);
+        y.set(0);
+    };
+
+    return (
+        <motion.div
+            ref={ref}
+            onMouseMove={handleMouseMove}
+            onMouseEnter={() => setIsHovered(true)}
+            onMouseLeave={handleMouseLeave}
+            style={{
+                perspective: 1000,
+                transformStyle: "preserve-3d",
+            }}
+            className="h-full relative block"
+        >
+            <Link href={href} className="group block h-full outline-none">
+                <motion.div
+                    style={{
+                        rotateX: isTouchDevice ? 0 : rotateX,
+                        rotateY: isTouchDevice ? 0 : rotateY,
+                    }}
+                    className="relative h-full overflow-hidden rounded-2xl border border-border/30 bg-card/95 backdrop-blur-xl shadow-lg transition-all duration-300 transform-gpu group-hover:shadow-2xl group-active:scale-95 group-hover:z-10"
+                >
+                    {children}
+
+                    {/* Glare effect overlay */}
+                    {!isTouchDevice && (
+                        <motion.div
+                            className="pointer-events-none absolute inset-0 z-20 rounded-2xl opacity-0 transition-opacity duration-300 group-hover:opacity-100 mix-blend-overlay"
+                            style={{
+                                background: `radial-gradient(circle at ${glareX.get()}% ${glareY.get()}%, rgba(255, 255, 255, 0.3) 0%, transparent 60%)`,
+                            }}
+                        />
+                    )}
+                </motion.div>
+            </Link>
+        </motion.div>
+    );
+}
+
 export function DestinationsGrid({ featuredOnly = false }: { featuredOnly?: boolean }) {
     const displayedDestinations = featuredOnly
         ? topDestinations
@@ -41,46 +124,44 @@ export function DestinationsGrid({ featuredOnly = false }: { featuredOnly?: bool
                 className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8"
             >
                 {displayedDestinations.map((destination) => (
-                    <motion.div variants={item} key={destination.slug} className="h-full">
-                        <Link href={`/destinations/${destination.slug}`} className="group block h-full">
-                            <div className="relative h-full overflow-hidden rounded-2xl border border-border/30 bg-card/95 backdrop-blur-xl shadow-lg hover:shadow-2xl transition-all duration-500 hover:-translate-y-2">
-                                {/* Image Wrapper */}
-                                <div className="relative h-64 overflow-hidden">
-                                    <Image
-                                        src={destination.heroImage}
-                                        alt={destination.name}
-                                        fill
-                                        className="object-cover transition-transform duration-700 group-hover:scale-110"
-                                        sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-                                    />
-                                    <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent opacity-80 group-hover:opacity-60 transition-opacity" />
-                                    <div className="absolute bottom-6 left-6 text-white z-10">
-                                        <h3 className="text-2xl font-bold font-heading mb-1 flex items-center gap-2">
-                                            <span>{destination.flag}</span> {destination.name}
-                                        </h3>
-                                        <div className="flex items-center gap-2 text-sm font-medium text-white/90 opacity-0 group-hover:opacity-100 transform translate-y-4 group-hover:translate-y-0 transition-all duration-500">
-                                            Explore <ArrowRight className="w-4 h-4" />
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <div className="p-6">
-                                    <div className="space-y-4">
-                                        {destination.benefits.slice(0, 2).map((benefit, i) => (
-                                            <div key={i} className="flex items-start gap-3">
-                                                <div className="w-8 h-8 rounded-lg bg-accent/10 flex items-center justify-center shrink-0 text-accent">
-                                                    <benefit.icon className="w-4 h-4" />
-                                                </div>
-                                                <div>
-                                                    <h4 className="font-bold text-sm text-foreground">{benefit.title}</h4>
-                                                    <p className="text-xs text-muted-foreground line-clamp-2">{benefit.description}</p>
-                                                </div>
-                                            </div>
-                                        ))}
+                    <motion.div variants={item} key={destination.slug} className="h-full relative z-0 hover:z-10">
+                        <Card3D href={`/destinations/${destination.slug}`}>
+                            {/* Image Wrapper */}
+                            <div className="relative h-64 overflow-hidden">
+                                <Image
+                                    src={destination.heroImage}
+                                    alt={destination.name}
+                                    fill
+                                    className="object-cover transition-transform duration-700 group-hover:scale-110"
+                                    sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                                />
+                                <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent opacity-80 group-hover:opacity-60 transition-opacity" />
+                                <div className="absolute bottom-6 left-6 text-white z-10" style={{ transform: "translateZ(30px)" }}>
+                                    <h3 className="text-2xl font-bold font-heading mb-1 flex items-center gap-2">
+                                        <span>{destination.flag}</span> {destination.name}
+                                    </h3>
+                                    <div className="flex items-center gap-2 text-sm font-medium text-white/90 opacity-0 group-hover:opacity-100 transform translate-y-4 group-hover:translate-y-0 transition-all duration-500">
+                                        Explore <ArrowRight className="w-4 h-4" />
                                     </div>
                                 </div>
                             </div>
-                        </Link>
+
+                            <div className="p-6">
+                                <div className="space-y-4">
+                                    {destination.benefits.slice(0, 2).map((benefit, i) => (
+                                        <div key={i} className="flex items-start gap-3 transform-gpu" style={{ transform: "translateZ(20px)" }}>
+                                            <div className="w-8 h-8 rounded-lg bg-accent/10 flex items-center justify-center shrink-0 text-accent">
+                                                <benefit.icon className="w-4 h-4" />
+                                            </div>
+                                            <div>
+                                                <h4 className="font-bold text-sm text-foreground">{benefit.title}</h4>
+                                                <p className="text-xs text-muted-foreground line-clamp-2">{benefit.description}</p>
+                                            </div>
+                                        </div>
+                                    ))}
+                                </div>
+                            </div>
+                        </Card3D>
                     </motion.div>
                 ))}
             </motion.div>
