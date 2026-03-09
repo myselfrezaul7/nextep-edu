@@ -45,17 +45,17 @@ export function Header() {
     };
 
     return (
-        <nav
-            className={cn(
-                "fixed top-0 left-0 w-full z-50 transition-all duration-300 border-b border-transparent",
-                scrolled
-                    ? "bg-background/70 backdrop-blur-xl border-border/20 shadow-lg py-3"
-                    : "bg-transparent py-5"
-            )}
-        >
-            <div className="container mx-auto px-4 flex justify-between items-center">
+        <div className="fixed top-0 left-0 w-full z-50 flex justify-center mt-4 px-4 transition-all duration-300">
+            <nav
+                className={cn(
+                    "flex justify-between items-center w-full max-w-4xl px-6 py-3 transition-all duration-300",
+                    "rounded-full border backdrop-blur-xl shadow-[0_4px_30px_rgba(0,0,0,0.1)]",
+                    "bg-white/70 border-black/5 dark:bg-[#1E1E1E]/60 dark:border-white/10 dark:shadow-[0_4px_30px_rgba(0,0,0,0.3)]",
+                    "shadow-[inset_0_1px_0_rgba(255,255,255,0.8)] dark:shadow-[inset_0_1px_0_rgba(255,255,255,0.05)]"
+                )}
+            >
                 {/* Logo */}
-                <Link href="/" className="flex items-center gap-2 group" onClick={() => window.scrollTo({ top: 0, behavior: "instant" })}>
+                <Link href="/" className="flex items-center gap-2 group shrink-0" onClick={() => window.scrollTo({ top: 0, behavior: "instant" })}>
                     <div className="relative w-10 h-10 overflow-hidden rounded-lg">
                         <Image
                             src="/assets/logo.png"
@@ -119,7 +119,7 @@ export function Header() {
                         </div>
                     </div>
 
-                    <Button onClick={() => document.getElementById('booking-modal')?.classList.remove('hidden')}>
+                    <Button className="rounded-full px-6" onClick={() => document.getElementById('booking-modal')?.classList.remove('hidden')}>
                         Book Consultation
                     </Button>
 
@@ -153,17 +153,17 @@ export function Header() {
                         {mobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
                     </button>
                 </div>
-            </div>
+            </nav>
 
-            {/* Mobile Menu Content — now uses AnimatePresence for smooth slide/fade */}
+            {/* Mobile Menu Content */}
             <AnimatePresence>
                 {mobileMenuOpen && (
                     <motion.div
-                        initial={{ opacity: 0, y: -20 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        exit={{ opacity: 0, y: -20 }}
+                        initial={{ opacity: 0, y: -10, scale: 0.95 }}
+                        animate={{ opacity: 1, y: 0, scale: 1 }}
+                        exit={{ opacity: 0, y: -10, scale: 0.95 }}
                         transition={{ duration: 0.2, ease: "easeOut" }}
-                        className="md:hidden absolute top-full left-0 w-full bg-background/95 backdrop-blur-xl border-b border-border shadow-2xl p-6 flex flex-col gap-4"
+                        className="fixed top-[84px] left-4 right-4 md:hidden bg-white/85 dark:bg-[#1E1E1E]/85 backdrop-blur-xl border border-black/5 dark:border-white/10 rounded-2xl shadow-2xl p-6 flex flex-col gap-4 overflow-hidden z-40"
                     >
                         <Link
                             href="/#services"
@@ -201,7 +201,7 @@ export function Header() {
                                 View All Destinations →
                             </Link>
                         </div>
-                        <Button className="w-full mt-2 py-6 text-base shadow-md" size="lg" onClick={() => {
+                        <Button className="w-full mt-2 py-6 text-base shadow-md rounded-full" size="lg" onClick={() => {
                             setMobileMenuOpen(false);
                             document.getElementById('booking-modal')?.classList.remove('hidden');
                         }}>
@@ -210,6 +210,6 @@ export function Header() {
                     </motion.div>
                 )}
             </AnimatePresence>
-        </nav>
+        </div>
     );
 }
