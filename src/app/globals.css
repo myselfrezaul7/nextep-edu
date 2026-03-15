@@ -116,3 +116,9 @@ body {
 .hover\:pause:hover {
     animation-play-state: paused;
 }
+
+/* Portfolio Parity Glassmorphism */
+.glass-nav {
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+}

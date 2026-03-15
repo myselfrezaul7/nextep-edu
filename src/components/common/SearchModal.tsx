@@ -142,21 +142,13 @@ export function SearchModal() {
 
     return (
         <>
-            {/* Search Trigger Button - Modern Pill Design */}
+            {/* Search Trigger Button - Catwaala Minimal Style */}
             <button
                 onClick={() => setIsOpen(true)}
-                className="group relative flex items-center justify-between gap-3 w-10 lg:w-48 xl:w-56 h-10 px-0 lg:px-3 rounded-full bg-surface/50 dark:bg-card/50 hover:bg-surface dark:hover:bg-card border border-border/60 hover:border-accent/50 shadow-sm hover:shadow-md transition-all duration-300"
+                className="p-2 rounded-full text-foreground/80 hover:bg-black/5 dark:hover:bg-white/10 hover:text-accent transition-colors"
                 aria-label="Search destinations, services, and pages"
             >
-                <div className="flex items-center gap-2 justify-center w-full lg:w-auto lg:justify-start">
-                    <Search className="w-[18px] h-[18px] text-muted-foreground group-hover:text-accent transition-colors" />
-                    <span className="hidden lg:inline text-sm text-muted-foreground group-hover:text-foreground transition-colors font-sans">
-                        Search...
-                    </span>
-                </div>
-                <kbd className="hidden lg:flex items-center gap-1 px-1.5 py-0.5 text-[10px] font-semibold text-muted-foreground bg-background/80 rounded shadow-sm border border-border/50">
-                    <span className="text-[10px]">⌘</span>K
-                </kbd>
+                <Search className="w-5 h-5" />
             </button>
 
             {/* Premium Search Modal Overlay */}

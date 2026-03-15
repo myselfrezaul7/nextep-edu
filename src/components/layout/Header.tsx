@@ -62,7 +62,7 @@ export function Header() {
             <nav
                 className={cn(
                     "flex justify-between items-center w-full max-w-5xl px-4 md:px-6 py-3 transition-all duration-300",
-                    "rounded-full border backdrop-blur-[20px] shadow-[0_4px_30px_rgba(0,0,0,0.1)]",
+                    "rounded-full border glass-nav shadow-[0_4px_30px_rgba(0,0,0,0.1)]",
                     "bg-white/70 border-black/5",
                     "dark:bg-[rgba(30,30,30,0.6)] dark:border-[rgba(255,255,255,0.08)] dark:shadow-[0_4px_30px_rgba(0,0,0,0.3)]",
                     "shadow-[inset_0_1px_0_rgba(255,255,255,0.8)] dark:shadow-[inset_0_1px_0_rgba(255,255,255,0.05)]"
@@ -111,9 +111,9 @@ export function Header() {
                         <div
                             className={cn(
                                 "absolute top-full left-1/2 -translate-x-1/2 w-64 transition-all duration-200 origin-top mt-2 p-2 grid gap-1 overflow-hidden max-h-80 overflow-y-auto",
-                                "rounded-[24px] shadow-[0_4px_30px_rgba(0,0,0,0.15)] dark:shadow-[0_4px_30px_rgba(0,0,0,0.5)] border",
+                                "rounded-[24px] shadow-[0_4px_30px_rgba(0,0,0,0.15)] dark:shadow-[0_4px_30px_rgba(0,0,0,0.5)] border glass-nav",
                                 "bg-white/85 border-black/5",
-                                "dark:bg-[rgba(30,30,30,0.85)] dark:border-[rgba(255,255,255,0.08)] backdrop-blur-[20px]",
+                                "dark:bg-[rgba(30,30,30,0.85)] dark:border-[rgba(255,255,255,0.08)]",
                                 dropdownOpen ? "opacity-100 scale-100 visible" : "opacity-0 scale-95 invisible"
                             )}
                         >
@@ -177,7 +177,7 @@ export function Header() {
                         animate={{ opacity: 1, y: 0 }}
                         exit={{ opacity: 0, y: -20 }}
                         transition={{ duration: 0.3 }}
-                        className="fixed top-20 left-4 right-4 lg:hidden z-40 bg-white/85 dark:bg-[rgba(30,30,30,0.85)] backdrop-blur-[20px] shadow-2xl border border-black/5 dark:border-white/10 rounded-[24px] overflow-hidden"
+                        className="fixed top-20 left-4 right-4 lg:hidden z-40 bg-white/85 dark:bg-[rgba(30,30,30,0.85)] glass-nav shadow-2xl border border-black/5 dark:border-white/10 rounded-[24px] overflow-hidden"
                     >
                         <div className="p-6 flex flex-col gap-2">
                             <motion.div
