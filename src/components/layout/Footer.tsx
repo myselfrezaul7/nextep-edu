@@ -36,7 +36,7 @@ export function Footer() {
             <div className="h-[2px] bg-gradient-to-r from-transparent via-accent/50 to-transparent" />
 
             {/* Main Footer Content */}
-            <div className="bg-background/75 backdrop-blur-lg py-16 border-t border-border/30">
+            <div className="bg-white/60 dark:bg-white/5 backdrop-blur-xl py-16 border-t border-black/5 dark:border-white/10">
                 <div className="container mx-auto px-4">
                     {/* Brand */}
                     <div className="mb-12">

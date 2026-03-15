@@ -117,7 +117,7 @@ export function TestimonialCarousel() {
                             className="w-[300px] md:w-[450px] shrink-0"
                         >
                             {/* Glassmorphic Testimonial Card */}
-                            <div className="relative bg-surface/80 dark:bg-card/60 backdrop-blur-xl p-6 md:p-8 rounded-2xl border border-border/50 hover:border-accent/40 shadow-sm hover:shadow-xl hover:shadow-accent/5 transition-all duration-300 h-full flex flex-col group/card overflow-hidden">
+                            <div className="relative bg-white/70 dark:bg-white/5 backdrop-blur-xl p-6 md:p-8 rounded-2xl border border-black/5 dark:border-white/10 hover:border-accent/40 shadow-sm hover:shadow-xl hover:shadow-accent/5 transition-all duration-300 h-full flex flex-col group/card overflow-hidden">
 
                                 {/* Top Accent Glow on Hover */}
                                 <div className="absolute inset-x-0 top-0 h-1 bg-gradient-to-r from-transparent via-accent/60 to-transparent opacity-0 group-hover/card:opacity-100 transition-opacity duration-500" />

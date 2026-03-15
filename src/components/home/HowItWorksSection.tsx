@@ -89,7 +89,7 @@ export function HowItWorksSection() {
                                 <div className="hidden lg:block absolute top-12 left-[calc(100%+0.25rem)] w-[calc(100%-3rem)] border-t-2 border-dashed border-accent/20 z-0 pointer-events-none" />
                             )}
 
-                            <div className="relative bg-card/80 dark:bg-card/50 backdrop-blur-sm border border-border/40 rounded-2xl p-6 md:p-8 text-center hover:border-accent/40 hover:shadow-xl hover:shadow-accent/5 transition-all duration-300 h-full flex flex-col items-center overflow-hidden">
+                            <div className="relative bg-white/60 dark:bg-white/5 backdrop-blur-xl border border-black/5 dark:border-white/10 rounded-2xl p-6 md:p-8 text-center hover:bg-white/80 dark:hover:bg-white/10 hover:border-accent/40 hover:shadow-xl hover:shadow-accent/5 transition-all duration-300 h-full flex flex-col items-center overflow-hidden">
                                 {/* Top glow line on hover */}
                                 <div className="absolute inset-x-0 top-0 h-1 bg-gradient-to-r from-transparent via-accent/60 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
 

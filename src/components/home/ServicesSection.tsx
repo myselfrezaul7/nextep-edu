@@ -56,7 +56,7 @@ export function ServicesSection() {
                             whileInView={{ opacity: 1, y: 0 }}
                             viewport={{ once: true }}
                             transition={{ duration: 0.4, delay: i * 0.05 }}
-                            className="group relative bg-surface/50 dark:bg-card/50 backdrop-blur-sm border border-border/50 rounded-2xl p-6 hover:border-accent/40 hover:shadow-lg hover:shadow-accent/5 transition-all duration-300 flex flex-col"
+                            className="group relative bg-white/60 dark:bg-white/5 backdrop-blur-xl border border-black/5 dark:border-white/10 rounded-2xl p-6 hover:bg-white/80 dark:hover:bg-white/10 hover:border-accent/40 hover:shadow-lg hover:shadow-accent/5 transition-all duration-300 flex flex-col"
                         >
                             {/* Icon Container */}
                             <div className={`w-12 h-12 rounded-full flex items-center justify-center mb-6 bg-gradient-to-br ${item.colorClass}`}>
