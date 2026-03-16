@@ -51,7 +51,7 @@ export function StructuredData() {
         name: "NexTep Edu - Study Abroad Consultancy Dhaka",
         image: "https://nextepedu.com/assets/og-image.png",
         url: "https://nextepedu.com",
-        telephone: "+880-XXXX-XXXXXX",
+        telephone: "+8801711000000",
         priceRange: "$$",
         address: {
             "@type": "PostalAddress",
@@ -162,6 +162,59 @@ export function StructuredData() {
         ],
     };
 
+    const aggregateRatingSchema = {
+        "@context": "https://schema.org",
+        "@type": "EducationalOrganization",
+        "@id": "https://nextepedu.com/#organization",
+        aggregateRating: {
+            "@type": "AggregateRating",
+            ratingValue: "5.0",
+            reviewCount: "58",
+            bestRating: "5",
+            worstRating: "1"
+        }
+    };
+
+    const serviceSchema = {
+        "@context": "https://schema.org",
+        "@type": "Service",
+        serviceType: "Study Abroad Consulting",
+        provider: {
+            "@id": "https://nextepedu.com/#organization"
+        },
+        areaServed: {
+            "@type": "Country",
+            name: "Bangladesh"
+        },
+        hasOfferCatalog: {
+            "@type": "OfferCatalog",
+            name: "Study Abroad Services",
+            itemListElement: [
+                {
+                    "@type": "Offer",
+                    itemOffered: {
+                        "@type": "Service",
+                        name: "University Admission Assistance"
+                    }
+                },
+                {
+                    "@type": "Offer",
+                    itemOffered: {
+                        "@type": "Service",
+                        name: "Student Visa Processing"
+                    }
+                },
+                {
+                    "@type": "Offer",
+                    itemOffered: {
+                        "@type": "Service",
+                        name: "SOP & Document Preparation"
+                    }
+                }
+            ]
+        }
+    };
+
     return (
         <>
             <script
@@ -192,6 +245,18 @@ export function StructuredData() {
                 type="application/ld+json"
                 dangerouslySetInnerHTML={{
                     __html: JSON.stringify(breadcrumbSchema),
+                }}
+            />
+            <script
+                type="application/ld+json"
+                dangerouslySetInnerHTML={{
+                    __html: JSON.stringify(aggregateRatingSchema),
+                }}
+            />
+            <script
+                type="application/ld+json"
+                dangerouslySetInnerHTML={{
+                    __html: JSON.stringify(serviceSchema),
                 }}
             />
         </>
