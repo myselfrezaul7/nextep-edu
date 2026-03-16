@@ -64,10 +64,10 @@ export function Header() {
             <nav
                 className={cn(
                     "flex justify-between items-center w-full max-w-5xl px-4 md:px-6 py-3 transition-all duration-300",
-                    "rounded-full border glass-nav shadow-[0_4px_30px_rgba(0,0,0,0.1)]",
-                    "bg-white/70 border-black/5",
-                    "dark:bg-[rgba(30,30,30,0.6)] dark:border-[rgba(255,255,255,0.08)] dark:shadow-[0_4px_30px_rgba(0,0,0,0.3)]",
-                    "shadow-[inset_0_1px_0_rgba(255,255,255,0.8)] dark:shadow-[inset_0_1px_0_rgba(255,255,255,0.05)]"
+                    "rounded-full border glass-nav",
+                    mounted && currentTheme === "dark"
+                        ? "bg-[rgba(15,23,42,0.85)] border-white/10 shadow-[0_4px_30px_rgba(0,0,0,0.3)] shadow-[inset_0_1px_0_rgba(255,255,255,0.05)]"
+                        : "bg-white/70 border-black/5 shadow-[0_4px_30px_rgba(0,0,0,0.1)] shadow-[inset_0_1px_0_rgba(255,255,255,0.8)]"
                 )}
             >
                 {/* Logo */}

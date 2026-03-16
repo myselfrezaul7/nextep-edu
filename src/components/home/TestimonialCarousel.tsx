@@ -1,7 +1,10 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { Star, Quote } from "lucide-react";
+import { Star, Quote, ChevronLeft, ChevronRight, Play } from "lucide-react";
+import { useTheme } from "next-themes";
+import { useState, useEffect, useRef } from "react";
+import { cn } from "@/lib/utils";
 
 const testimonials = [
     {
@@ -63,6 +66,18 @@ const testimonials = [
 ];
 
 export function TestimonialCarousel() {
+    const [mounted, setMounted] = useState(false);
+    const [isHovered, setIsHovered] = useState(false);
+    const scrollRef = useRef<HTMLDivElement>(null);
+    const { theme, systemTheme } = useTheme();
+
+    const currentTheme = theme === "system" ? systemTheme : theme;
+
+    useEffect(() => {
+        setMounted(true);
+    }, []);
+
+    const [scrollPosition, setScrollPosition] = useState(0);
     return (
         <section id="stories" className="py-16 md:py-28 bg-surface dark:bg-card/30 relative overflow-hidden">
             {/* Soft Background Gradients */}
@@ -117,7 +132,12 @@ export function TestimonialCarousel() {
                             className="w-[300px] md:w-[450px] shrink-0"
                         >
                             {/* Glassmorphic Testimonial Card */}
-                            <div className="relative bg-white/70 dark:bg-white/5 backdrop-blur-xl p-6 md:p-8 rounded-2xl border border-black/5 dark:border-white/10 hover:border-accent/40 shadow-sm hover:shadow-xl hover:shadow-accent/5 transition-all duration-300 h-full flex flex-col group/card overflow-hidden">
+                            <div className={cn(
+                                "relative backdrop-blur-xl p-6 md:p-8 rounded-2xl border hover:border-accent/40 shadow-sm hover:shadow-xl transition-all duration-300 h-full flex flex-col group/card overflow-hidden",
+                                mounted && currentTheme === "dark"
+                                    ? "bg-[rgba(15,23,42,0.85)] border-white/10"
+                                    : "bg-white/70 border-black/5"
+                            )}>
 
                                 {/* Top Accent Glow on Hover */}
                                 <div className="absolute inset-x-0 top-0 h-1 bg-gradient-to-r from-transparent via-accent/60 to-transparent opacity-0 group-hover/card:opacity-100 transition-opacity duration-500" />
