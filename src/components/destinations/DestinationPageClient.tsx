@@ -5,6 +5,9 @@ import Image from "next/image";
 import Link from "next/link";
 import { ArrowLeft, ArrowRight, GraduationCap, CheckCircle, Globe2, Trophy, Clock, Users, BookOpen, Wallet, Sun, Coffee, MapPin, Landmark, Train, Building2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { useTheme } from "next-themes";
+import { useEffect, useState } from "react";
+import { cn } from "@/lib/utils";
 
 interface SerializedDestination {
     slug: string;
@@ -82,6 +85,15 @@ const iconMap: Record<string, React.ComponentType<{ className?: string }>> = {
 };
 
 export function DestinationPageClient({ destination, relatedDestinations = [] }: DestinationPageClientProps) {
+    const { theme, systemTheme } = useTheme();
+    const [mounted, setMounted] = useState(false);
+
+    useEffect(() => {
+        setMounted(true);
+    }, []);
+
+    const currentTheme = theme === "system" ? systemTheme : theme;
+
     return (
         <article className="min-h-screen">
             {/* Hero Section */}
@@ -152,13 +164,23 @@ export function DestinationPageClient({ destination, relatedDestinations = [] }:
                                     whileInView={{ opacity: 1, y: 0 }}
                                     viewport={{ once: true }}
                                     transition={{ delay: index * 0.1 }}
-                                    className="bg-white/60 dark:bg-[rgba(15,23,42,0.85)] backdrop-blur-xl p-6 rounded-2xl border border-black/5 dark:border-white/10 hover:border-accent/30 shadow-lg transition-all duration-300"
+                                    className={cn(
+                                        "backdrop-blur-xl p-6 rounded-2xl border hover:border-accent/30 shadow-lg transition-all duration-300",
+                                        mounted && currentTheme === "dark"
+                                            ? "bg-[rgba(15,23,42,0.85)] border-white/10"
+                                            : "bg-white/60 border-black/5"
+                                    )}
                                 >
                                     <div className="w-12 h-12 rounded-xl bg-accent/10 flex items-center justify-center text-accent mb-4">
                                         <BenefitIcon className="w-6 h-6" />
                                     </div>
                                     <h3 className="text-lg font-bold text-primary mb-2">{benefit.title}</h3>
-                                    <p className="text-muted-foreground dark:text-white/70 text-sm">{benefit.description}</p>
+                                    <p className={cn(
+                                        "text-sm",
+                                        mounted && currentTheme === "dark" ? "text-white/70" : "text-muted-foreground"
+                                    )}>
+                                        {benefit.description}
+                                    </p>
                                 </motion.div>
                             );
                         })}
@@ -191,7 +213,12 @@ export function DestinationPageClient({ destination, relatedDestinations = [] }:
                                 whileInView={{ opacity: 1, x: 0 }}
                                 viewport={{ once: true }}
                                 transition={{ delay: index * 0.05 }}
-                                className="flex items-center gap-3 p-4 bg-white/60 dark:bg-[rgba(15,23,42,0.85)] backdrop-blur-xl rounded-xl border border-black/5 dark:border-white/10"
+                                className={cn(
+                                    "flex items-center gap-3 p-4 backdrop-blur-xl rounded-xl border",
+                                    mounted && currentTheme === "dark"
+                                        ? "bg-[rgba(15,23,42,0.85)] border-white/10"
+                                        : "bg-white/60 border-black/5"
+                                )}
                             >
                                 <div className="w-10 h-10 rounded-lg bg-accent/10 flex items-center justify-center text-accent shrink-0">
                                     <GraduationCap className="w-5 h-5" />
