@@ -126,8 +126,8 @@ export function DestinationsGrid({ featuredOnly = false }: { featuredOnly?: bool
                 {displayedDestinations.map((destination) => (
                     <motion.div variants={item} key={destination.slug} className="h-full relative z-0 hover:z-10">
                         <Card3D href={`/destinations/${destination.slug}`}>
-                            {/* Image Wrapper with Loading Skeleton */}
-                            <div className="relative h-64 overflow-hidden bg-black/5 dark:bg-white/5 animate-pulse">
+                            {/* Image Wrapper with Loading Skeleton Background color */}
+                            <div className="relative h-64 overflow-hidden bg-black/5 dark:bg-white/5">
                                 <Image
                                     src={destination.heroImage}
                                     alt={destination.name}
