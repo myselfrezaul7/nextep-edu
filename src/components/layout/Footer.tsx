@@ -2,10 +2,22 @@
 
 import Link from "next/link";
 import Image from "next/image";
-import { Facebook, Instagram, Phone, Mail, MapPin } from "lucide-react";
+import { Mail, Phone, MapPin, Facebook, Instagram, Linkedin, Twitter, ArrowRight, Heart } from "lucide-react";
+import { useTheme } from "next-themes";
+import { useState, useEffect } from "react";
+import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 
 export function Footer() {
+    const { theme, systemTheme } = useTheme();
+    const [mounted, setMounted] = useState(false);
+    const currentTheme = theme === "system" ? systemTheme : theme;
+
+    useEffect(() => {
+        setMounted(true);
+    }, []);
+
+    const currentYear = new Date().getFullYear();
     return (
         <footer className="relative z-10 bg-background transition-colors duration-300">
             {/* CTA Banner */}
@@ -36,12 +48,18 @@ export function Footer() {
             <div className="h-[2px] bg-gradient-to-r from-transparent via-accent/50 to-transparent" />
 
             {/* Main Footer Content */}
-            <div className="bg-white/60 dark:bg-white/5 backdrop-blur-xl py-16 border-t border-black/5 dark:border-white/10">
+            <div className={cn(
+                "backdrop-blur-xl py-16 border-t",
+                mounted && currentTheme === "dark" ? "bg-[rgba(15,23,42,0.85)] border-white/10" : "bg-white/60 border-black/5"
+            )}>
                 <div className="container mx-auto px-4">
                     {/* Brand */}
                     <div className="mb-12">
                         <div className="flex items-center gap-2 mb-4">
-                            <div className="relative w-8 h-8 rounded-md overflow-hidden bg-white/50 dark:bg-white/10 p-0.5 border border-black/5 dark:border-white/10">
+                            <div className={cn(
+                                "relative w-8 h-8 rounded-md overflow-hidden p-0.5 border",
+                                mounted && currentTheme === "dark" ? "bg-white/10 border-white/10" : "bg-white/50 border-black/5"
+                            )}>
                                 <Image src="/assets/logo.png" alt="Logo" fill className="object-contain" />
                             </div>
                             <span className="font-heading font-bold text-xl text-foreground">NexTep Edu</span>

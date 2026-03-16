@@ -10,9 +10,19 @@ import {
     Globe,
     Landmark
 } from "lucide-react";
+import { useTheme } from "next-themes";
+import { useState, useEffect } from "react";
+import { cn } from "@/lib/utils";
 import { motion } from "framer-motion";
 
 export function ServicesSection() {
+    const { theme, systemTheme } = useTheme();
+    const [mounted, setMounted] = useState(false);
+    const currentTheme = theme === "system" ? systemTheme : theme;
+
+    useEffect(() => {
+        setMounted(true);
+    }, []);
     return (
         <section id="services" className="py-24 bg-surface dark:bg-card relative overflow-hidden">
             {/* Decorative background elements */}
@@ -56,7 +66,12 @@ export function ServicesSection() {
                             whileInView={{ opacity: 1, y: 0 }}
                             viewport={{ once: true }}
                             transition={{ duration: 0.4, delay: i * 0.05 }}
-                            className="group relative bg-white/60 dark:bg-white/5 backdrop-blur-xl border border-black/5 dark:border-white/10 rounded-2xl p-6 hover:bg-white/80 dark:hover:bg-white/10 hover:border-accent/40 hover:shadow-lg hover:shadow-accent/5 transition-all duration-300 flex flex-col"
+                            className={cn(
+                                "group relative backdrop-blur-xl border rounded-2xl p-6 hover:border-accent/40 shadow hover:shadow-lg hover:shadow-accent/5 transition-all duration-300 flex flex-col",
+                                mounted && currentTheme === "dark"
+                                    ? "bg-[rgba(15,23,42,0.85)] border-white/10 hover:bg-[rgba(15,23,42,0.95)]"
+                                    : "bg-white/60 border-black/5 hover:bg-white/80"
+                            )}
                         >
                             {/* Icon Container */}
                             <div className={`w-12 h-12 rounded-full flex items-center justify-center mb-6 bg-gradient-to-br ${item.colorClass}`}>
@@ -67,7 +82,10 @@ export function ServicesSection() {
                             <h3 className="font-heading font-semibold text-xl text-primary mb-3">
                                 {item.title}
                             </h3>
-                            <p className="font-sans text-muted-foreground text-sm leading-relaxed flex-grow">
+                            <p className={cn(
+                                "font-sans text-sm leading-relaxed flex-grow",
+                                mounted && currentTheme === "dark" ? "text-white/70" : "text-muted-foreground"
+                            )}>
                                 {item.description}
                             </p>
 

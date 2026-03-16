@@ -5,6 +5,8 @@ import Link from "next/link";
 import Image from "next/image";
 import { ArrowRight } from "lucide-react";
 import { useState, useRef, useEffect } from "react";
+import { useTheme } from "next-themes";
+import { cn } from "@/lib/utils";
 import { destinations } from "@/data/destinations";
 
 // Top 6 destinations to show on homepage
@@ -32,6 +34,10 @@ function Card3D({ children, href }: { children: React.ReactNode, href: string })
     const ref = useRef<HTMLDivElement>(null);
     const [isHovered, setIsHovered] = useState(false);
     const [isTouchDevice, setIsTouchDevice] = useState(false);
+    const { theme, systemTheme } = useTheme();
+    const [mounted, setMounted] = useState(false);
+
+    const currentTheme = theme === "system" ? systemTheme : theme;
 
     const x = useMotionValue(0);
     const y = useMotionValue(0);
@@ -46,6 +52,7 @@ function Card3D({ children, href }: { children: React.ReactNode, href: string })
     const glareY = useTransform(mouseYSpring, [-0.5, 0.5], [0, 100]);
 
     useEffect(() => {
+        setMounted(true);
         setIsTouchDevice(window.matchMedia("(hover: none)").matches);
     }, []);
 
@@ -91,7 +98,10 @@ function Card3D({ children, href }: { children: React.ReactNode, href: string })
                         rotateX: isTouchDevice ? 0 : rotateX,
                         rotateY: isTouchDevice ? 0 : rotateY,
                     }}
-                    className="relative h-full overflow-hidden rounded-2xl border border-black/5 dark:border-white/10 bg-white/60 dark:bg-white/5 backdrop-blur-xl shadow-lg transition-all duration-300 transform-gpu group-hover:shadow-2xl group-active:scale-95 group-hover:z-10"
+                    className={cn(
+                        "relative h-full overflow-hidden rounded-2xl border backdrop-blur-xl shadow-lg transition-all duration-300 transform-gpu group-hover:shadow-2xl group-active:scale-95 group-hover:z-10",
+                        mounted && currentTheme === "dark" ? "bg-[rgba(15,23,42,0.85)] border-white/10" : "bg-white/60 border-black/5"
+                    )}
                 >
                     {children}
 
@@ -111,6 +121,13 @@ function Card3D({ children, href }: { children: React.ReactNode, href: string })
 }
 
 export function DestinationsGrid({ featuredOnly = false }: { featuredOnly?: boolean }) {
+    const { theme, systemTheme } = useTheme();
+    const [mounted, setMounted] = useState(false);
+    const currentTheme = theme === "system" ? systemTheme : theme;
+
+    useEffect(() => {
+        setMounted(true);
+    }, []);
     const displayedDestinations = featuredOnly
         ? topDestinations
         : Object.values(destinations);
@@ -155,7 +172,10 @@ export function DestinationsGrid({ featuredOnly = false }: { featuredOnly?: bool
                                             </div>
                                             <div>
                                                 <h4 className="font-bold text-sm text-foreground">{benefit.title}</h4>
-                                                <p className="text-xs text-muted-foreground line-clamp-2">{benefit.description}</p>
+                                                <p className={cn(
+                                                    "text-xs line-clamp-2",
+                                                    mounted && currentTheme === "dark" ? "text-white/70" : "text-muted-foreground"
+                                                )}>{benefit.description}</p>
                                             </div>
                                         </div>
                                     ))}

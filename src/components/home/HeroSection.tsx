@@ -3,10 +3,21 @@
 import { motion } from "framer-motion";
 import Link from "next/link";
 import Image from "next/image";
-import { Plane, GraduationCap, Globe2 } from "lucide-react";
+import { ArrowRight, Sparkles, GraduationCap, Plane, Globe2 } from "lucide-react";
+import { useTheme } from "next-themes";
+import { useState, useEffect } from "react";
+import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 
 export function HeroSection() {
+    const { theme, systemTheme } = useTheme();
+    const [mounted, setMounted] = useState(false);
+    const currentTheme = theme === "system" ? systemTheme : theme;
+
+    useEffect(() => {
+        setMounted(true);
+    }, []);
+
     return (
         <section className="relative min-h-[90vh] flex items-center overflow-hidden py-16 md:py-32">
             {/* Background Blur Effect */}
@@ -103,7 +114,10 @@ export function HeroSection() {
                     }}
                     className="relative group perspective-1000"
                 >
-                    <div className="relative rounded-2xl overflow-hidden shadow-2xl transform transition-transform duration-500 hover:rotate-y-0 -rotate-y-6 bg-white p-2 border border-white/20">
+                    <div className={cn(
+                        "relative rounded-2xl overflow-hidden shadow-2xl transform transition-transform duration-500 hover:rotate-y-0 -rotate-y-6 p-2 border",
+                        mounted && currentTheme === "dark" ? "bg-[rgba(15,23,42,0.85)] border-white/10" : "bg-white/80 border-white/20"
+                    )}>
                         <Image
                             src="/assets/hero-library.png"
                             alt="Students studying in a modern library"

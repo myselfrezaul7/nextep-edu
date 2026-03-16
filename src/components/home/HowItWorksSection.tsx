@@ -2,6 +2,9 @@
 
 import { motion } from "framer-motion";
 import { PhoneCall, ClipboardList, SendHorizonal, PlaneTakeoff } from "lucide-react";
+import { useTheme } from "next-themes";
+import { useState, useEffect } from "react";
+import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 
 const steps = [
@@ -32,6 +35,14 @@ const steps = [
 ];
 
 export function HowItWorksSection() {
+    const { theme, systemTheme } = useTheme();
+    const [mounted, setMounted] = useState(false);
+    const currentTheme = theme === "system" ? systemTheme : theme;
+
+    useEffect(() => {
+        setMounted(true);
+    }, []);
+
     return (
         <section className="py-16 md:py-28 bg-background relative overflow-hidden">
             {/* Subtle background accents */}
@@ -89,7 +100,12 @@ export function HowItWorksSection() {
                                 <div className="hidden lg:block absolute top-12 left-[calc(100%+0.25rem)] w-[calc(100%-3rem)] border-t-2 border-dashed border-accent/20 z-0 pointer-events-none" />
                             )}
 
-                            <div className="relative bg-white/60 dark:bg-white/5 backdrop-blur-xl border border-black/5 dark:border-white/10 rounded-2xl p-6 md:p-8 text-center hover:bg-white/80 dark:hover:bg-white/10 hover:border-accent/40 hover:shadow-xl hover:shadow-accent/5 transition-all duration-300 h-full flex flex-col items-center overflow-hidden">
+                            <div className={cn(
+                                "relative backdrop-blur-xl border rounded-2xl p-6 md:p-8 text-center hover:border-accent/40 shadow hover:shadow-xl transition-all duration-300 h-full flex flex-col items-center overflow-hidden",
+                                mounted && currentTheme === "dark"
+                                    ? "bg-[rgba(15,23,42,0.85)] border-white/10 hover:bg-white/10"
+                                    : "bg-white/60 border-black/5 hover:bg-white/80"
+                            )}>
                                 {/* Top glow line on hover */}
                                 <div className="absolute inset-x-0 top-0 h-1 bg-gradient-to-r from-transparent via-accent/60 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
 
