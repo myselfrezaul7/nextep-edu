@@ -1,8 +1,10 @@
 "use client";
 
 import { motion, useInView } from "framer-motion";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, memo } from "react";
 import { CheckCircle } from "lucide-react";
+import { useTheme } from "next-themes";
+import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 
 const features = [
@@ -34,7 +36,7 @@ const stats = [
     { value: 98, suffix: "%", label: "Visa Success Rate" },
 ];
 
-function AnimatedCounter({ value, suffix }: { value: number; suffix: string }) {
+const AnimatedCounter = memo(function AnimatedCounter({ value, suffix }: { value: number; suffix: string }) {
     const [display, setDisplay] = useState(0);
     const ref = useRef<HTMLSpanElement>(null);
     const isInView = useInView(ref, { once: true, amount: 0.5 });
@@ -66,7 +68,7 @@ function AnimatedCounter({ value, suffix }: { value: number; suffix: string }) {
             {display}{suffix}
         </span>
     );
-}
+});
 
 // Simplified world map dots representing key destination cities
 function WorldMapDecor() {
@@ -126,6 +128,15 @@ function WorldMapDecor() {
 }
 
 export function AboutSection() {
+    const { theme, systemTheme } = useTheme();
+    const [mounted, setMounted] = useState(false);
+    const currentTheme = theme === "system" ? systemTheme : theme;
+    const isDark = mounted && currentTheme === "dark";
+
+    useEffect(() => {
+        setMounted(true);
+    }, []);
+
     return (
         <section id="about" className="py-16 md:py-24 bg-background overflow-hidden">
             <div className="container mx-auto px-4 grid lg:grid-cols-2 gap-12 md:gap-16 items-center">
@@ -137,7 +148,7 @@ export function AboutSection() {
                     transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
                 >
                     <h2 className="text-3xl md:text-5xl font-bold font-heading mb-6 text-primary">Why Students Trust Us</h2>
-                    <p className="text-lg text-muted-foreground mb-8 leading-relaxed">
+                    <p className={cn("text-lg mb-8 leading-relaxed", isDark ? "text-white/70" : "text-muted-foreground")}>
                         We&apos;ve helped hundreds of Bangladeshi students achieve their dreams of studying abroad. Our team combines personal experience with professional expertise.
                     </p>
 
@@ -180,12 +191,17 @@ export function AboutSection() {
                                 whileInView={{ opacity: 1, x: 0 }}
                                 viewport={{ once: true }}
                                 transition={{ delay: index * 0.12, duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
-                                className="relative bg-white/60 dark:bg-white/5 backdrop-blur-xl p-8 rounded-2xl shadow-lg border border-black/5 dark:border-white/10 text-center hover:bg-white/80 dark:hover:bg-white/10 hover:border-accent hover:shadow-xl hover:shadow-accent/5 transition-all duration-500 ease-out overflow-hidden"
+                                className={cn(
+                                    "relative backdrop-blur-xl p-8 rounded-2xl shadow-lg border text-center hover:border-accent hover:shadow-xl hover:shadow-accent/5 transition-all duration-500 ease-out overflow-hidden",
+                                    isDark
+                                        ? "bg-[rgba(15,23,42,0.85)] border-white/10 hover:bg-[rgba(15,23,42,0.95)]"
+                                        : "bg-white/60 border-black/5 hover:bg-white/80"
+                                )}
                             >
-                                <h3 className="text-4xl md:text-5xl font-bold text-accent mb-2">
+                                <h3 className="text-4xl md:text-5xl font-bold text-accent mb-2" style={{ willChange: 'contents' }}>
                                     <AnimatedCounter value={stat.value} suffix={stat.suffix} />
                                 </h3>
-                                <p className="font-medium text-muted-foreground">{stat.label}</p>
+                                <p className={cn("font-medium", isDark ? "text-white/70" : "text-muted-foreground")}>{stat.label}</p>
                             </motion.div>
                         ))}
                     </div>
