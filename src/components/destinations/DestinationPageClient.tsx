@@ -152,13 +152,13 @@ export function DestinationPageClient({ destination, relatedDestinations = [] }:
                                     whileInView={{ opacity: 1, y: 0 }}
                                     viewport={{ once: true }}
                                     transition={{ delay: index * 0.1 }}
-                                    className="bg-white/60 dark:bg-white/5 backdrop-blur-xl p-6 rounded-2xl border border-black/5 dark:border-white/10 hover:border-accent/30 shadow-lg transition-all duration-300"
+                                    className="bg-white/60 dark:bg-[rgba(15,23,42,0.85)] backdrop-blur-xl p-6 rounded-2xl border border-black/5 dark:border-white/10 hover:border-accent/30 shadow-lg transition-all duration-300"
                                 >
                                     <div className="w-12 h-12 rounded-xl bg-accent/10 flex items-center justify-center text-accent mb-4">
                                         <BenefitIcon className="w-6 h-6" />
                                     </div>
                                     <h3 className="text-lg font-bold text-primary mb-2">{benefit.title}</h3>
-                                    <p className="text-muted-foreground text-sm">{benefit.description}</p>
+                                    <p className="text-muted-foreground dark:text-white/70 text-sm">{benefit.description}</p>
                                 </motion.div>
                             );
                         })}
@@ -191,7 +191,7 @@ export function DestinationPageClient({ destination, relatedDestinations = [] }:
                                 whileInView={{ opacity: 1, x: 0 }}
                                 viewport={{ once: true }}
                                 transition={{ delay: index * 0.05 }}
-                                className="flex items-center gap-3 p-4 bg-white/60 dark:bg-white/5 backdrop-blur-xl rounded-xl border border-black/5 dark:border-white/10"
+                                className="flex items-center gap-3 p-4 bg-white/60 dark:bg-[rgba(15,23,42,0.85)] backdrop-blur-xl rounded-xl border border-black/5 dark:border-white/10"
                             >
                                 <div className="w-10 h-10 rounded-lg bg-accent/10 flex items-center justify-center text-accent shrink-0">
                                     <GraduationCap className="w-5 h-5" />
