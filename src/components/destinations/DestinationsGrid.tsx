@@ -91,7 +91,7 @@ function Card3D({ children, href }: { children: React.ReactNode, href: string })
                         rotateX: isTouchDevice ? 0 : rotateX,
                         rotateY: isTouchDevice ? 0 : rotateY,
                     }}
-                    className="relative h-full overflow-hidden rounded-2xl border border-border/30 bg-card/95 backdrop-blur-xl shadow-lg transition-all duration-300 transform-gpu group-hover:shadow-2xl group-active:scale-95 group-hover:z-10"
+                    className="relative h-full overflow-hidden rounded-2xl border border-black/5 dark:border-white/10 bg-white/60 dark:bg-white/5 backdrop-blur-xl shadow-lg transition-all duration-300 transform-gpu group-hover:shadow-2xl group-active:scale-95 group-hover:z-10"
                 >
                     {children}
 
@@ -126,8 +126,8 @@ export function DestinationsGrid({ featuredOnly = false }: { featuredOnly?: bool
                 {displayedDestinations.map((destination) => (
                     <motion.div variants={item} key={destination.slug} className="h-full relative z-0 hover:z-10">
                         <Card3D href={`/destinations/${destination.slug}`}>
-                            {/* Image Wrapper */}
-                            <div className="relative h-64 overflow-hidden">
+                            {/* Image Wrapper with Loading Skeleton */}
+                            <div className="relative h-64 overflow-hidden bg-black/5 dark:bg-white/5 animate-pulse">
                                 <Image
                                     src={destination.heroImage}
                                     alt={destination.name}

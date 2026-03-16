@@ -29,8 +29,10 @@ export function Header() {
     const [scrolled, setScrolled] = useState(false);
     const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
     const [dropdownOpen, setDropdownOpen] = useState(false);
-    const { theme, setTheme } = useTheme();
+    const { theme, setTheme, systemTheme } = useTheme();
     const [mounted, setMounted] = useState(false);
+
+    const currentTheme = theme === "system" ? systemTheme : theme;
 
     useEffect(() => {
         setMounted(true);
@@ -177,7 +179,10 @@ export function Header() {
                         animate={{ opacity: 1, y: 0 }}
                         exit={{ opacity: 0, y: -20 }}
                         transition={{ duration: 0.3 }}
-                        className="fixed top-20 left-4 right-4 lg:hidden z-40 bg-white/85 dark:bg-[rgba(30,30,30,0.85)] glass-nav shadow-2xl border border-black/5 dark:border-white/10 rounded-[24px] overflow-hidden"
+                        className={cn(
+                            "fixed top-20 left-4 right-4 lg:hidden z-40 glass-nav shadow-2xl rounded-[24px] overflow-hidden border border-black/5 dark:border-white/10",
+                            mounted && currentTheme === "dark" ? "bg-[rgba(30,30,30,0.85)]" : "bg-white/85"
+                        )}
                     >
                         <div className="p-6 flex flex-col gap-2">
                             <motion.div

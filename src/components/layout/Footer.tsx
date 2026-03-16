@@ -41,7 +41,7 @@ export function Footer() {
                     {/* Brand */}
                     <div className="mb-12">
                         <div className="flex items-center gap-2 mb-4">
-                            <div className="relative w-8 h-8 rounded-md overflow-hidden bg-white/50 p-0.5 border border-gray-200 dark:border-transparent">
+                            <div className="relative w-8 h-8 rounded-md overflow-hidden bg-white/50 dark:bg-white/10 p-0.5 border border-black/5 dark:border-white/10">
                                 <Image src="/assets/logo.png" alt="Logo" fill className="object-contain" />
                             </div>
                             <span className="font-heading font-bold text-xl text-foreground">NexTep Edu</span>
