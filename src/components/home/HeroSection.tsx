@@ -59,23 +59,27 @@ export function HeroSection() {
                         transition={{ duration: 0.9, delay: 0.35, ease: [0.22, 1, 0.36, 1] }}
                         className="flex flex-col sm:flex-row flex-wrap gap-4 pt-4"
                     >
-                        <Button
-                            size="lg"
-                            className="rounded-full text-base w-full sm:w-auto"
-                            onClick={() => document.getElementById('booking-modal')?.classList.remove('hidden')}
-                        >
-                            Let&apos;s Talk
-                        </Button>
-                        <Button
-                            size="lg"
-                            variant="outline"
-                            className="rounded-full text-base w-full sm:w-auto"
-                            asChild
-                        >
-                            <Link href="/#services">
-                                See Our Work
-                            </Link>
-                        </Button>
+                        <motion.div whileTap={{ scale: 0.95 }} className="w-full sm:w-auto">
+                            <Button
+                                size="lg"
+                                className="rounded-full text-base w-full sm:w-auto"
+                                onClick={() => document.getElementById('booking-modal')?.classList.remove('hidden')}
+                            >
+                                Let&apos;s Talk
+                            </Button>
+                        </motion.div>
+                        <motion.div whileTap={{ scale: 0.95 }} className="w-full sm:w-auto">
+                            <Button
+                                size="lg"
+                                variant="outline"
+                                className="rounded-full text-base w-full sm:w-auto"
+                                asChild
+                            >
+                                <Link href="/#services">
+                                    See Our Work
+                                </Link>
+                            </Button>
+                        </motion.div>
                     </motion.div>
 
                     <motion.div

@@ -170,12 +170,15 @@ export function AboutSection() {
                             </motion.li>
                         ))}
                     </motion.ul>
-                    <Button
-                        size="lg"
-                        onClick={() => document.getElementById('booking-modal')?.classList.remove('hidden')}
-                    >
-                        Chat With Us
-                    </Button>
+                    <motion.div whileTap={{ scale: 0.95 }} className="inline-block w-full sm:w-auto">
+                        <Button
+                            size="lg"
+                            className="w-full"
+                            onClick={() => document.getElementById('booking-modal')?.classList.remove('hidden')}
+                        >
+                            Chat With Us
+                        </Button>
+                    </motion.div>
                 </motion.div>
 
                 {/* Stats Grid with World Map Background */}
@@ -190,6 +193,7 @@ export function AboutSection() {
                                 initial={{ opacity: 0, x: 50 }}
                                 whileInView={{ opacity: 1, x: 0 }}
                                 viewport={{ once: true }}
+                                whileTap={{ scale: 0.97 }}
                                 transition={{ delay: index * 0.12, duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
                                 className={cn(
                                     "relative backdrop-blur-xl p-8 rounded-2xl shadow-lg border text-center hover:border-accent hover:shadow-xl hover:shadow-accent/5 transition-all duration-500 ease-out overflow-hidden",

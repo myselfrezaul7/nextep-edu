@@ -52,7 +52,10 @@ export function ServicesSection() {
                         whileInView={{ opacity: 1, y: 0 }}
                         viewport={{ once: true }}
                         transition={{ delay: 0.1, duration: 0.6 }}
-                        className="text-lg text-muted-foreground"
+                        className={cn(
+                            "text-lg",
+                            mounted && currentTheme === "dark" ? "text-white/70" : "text-muted-foreground"
+                        )}
                     >
                         Detailed SOPs, visa support, scholarship hunting—we handle the gritty details so you can focus on packing your bags.
                     </motion.p>
@@ -65,6 +68,7 @@ export function ServicesSection() {
                             initial={{ opacity: 0, y: 20 }}
                             whileInView={{ opacity: 1, y: 0 }}
                             viewport={{ once: true }}
+                            whileTap={{ scale: 0.97 }}
                             transition={{ duration: 0.4, delay: i * 0.05 }}
                             className={cn(
                                 "group relative backdrop-blur-xl border rounded-2xl p-6 hover:border-accent/40 shadow hover:shadow-lg hover:shadow-accent/5 transition-all duration-300 flex flex-col",
