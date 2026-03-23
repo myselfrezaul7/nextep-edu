@@ -92,6 +92,7 @@ export function HowItWorksSection() {
                             initial={{ opacity: 0, y: 30 }}
                             whileInView={{ opacity: 1, y: 0 }}
                             viewport={{ once: true }}
+                            whileTap={{ scale: 0.97 }}
                             transition={{ duration: 0.5, delay: i * 0.12 }}
                             className="relative group"
                         >
@@ -123,7 +124,10 @@ export function HowItWorksSection() {
                                 <h3 className="font-heading font-bold text-xl text-primary mb-3">
                                     {step.title}
                                 </h3>
-                                <p className="text-sm text-muted-foreground leading-relaxed flex-grow">
+                                <p className={cn(
+                                    "text-sm leading-relaxed flex-grow",
+                                    mounted && currentTheme === "dark" ? "text-white/70" : "text-muted-foreground"
+                                )}>
                                     {step.description}
                                 </p>
                             </div>

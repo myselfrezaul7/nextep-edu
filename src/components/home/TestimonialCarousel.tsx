@@ -1,6 +1,6 @@
 "use client";
 
-import { motion } from "framer-motion";
+import { motion, useAnimationControls } from "framer-motion";
 import { Star, Quote, ChevronLeft, ChevronRight, Play } from "lucide-react";
 import { useTheme } from "next-themes";
 import { useState, useEffect, useRef } from "react";
@@ -73,13 +73,27 @@ export function TestimonialCarousel() {
 
     const currentTheme = theme === "system" ? systemTheme : theme;
 
+    const [isMobile, setIsMobile] = useState(false);
+    const [dragConstraints, setDragConstraints] = useState(0);
+
     useEffect(() => {
         setMounted(true);
+        const checkMobile = () => setIsMobile(window.innerWidth < 768);
+        checkMobile();
+        window.addEventListener('resize', checkMobile);
+        return () => window.removeEventListener('resize', checkMobile);
     }, []);
 
-    const [scrollPosition, setScrollPosition] = useState(0);
+    useEffect(() => {
+        if (scrollRef.current && isMobile) {
+            setDragConstraints(scrollRef.current.scrollWidth - scrollRef.current.offsetWidth);
+        }
+    }, [isMobile]);
     return (
-        <section id="stories" className="py-16 md:py-28 bg-surface dark:bg-card/30 relative overflow-hidden">
+        <section id="stories" className={cn(
+            "py-16 md:py-28 relative overflow-hidden",
+            mounted && currentTheme === "dark" ? "bg-[rgba(15,23,42,0.3)]" : "bg-surface"
+        )}>
             {/* Soft Background Gradients */}
             <div className="absolute inset-0 bg-[radial-gradient(circle_at_20%_80%,_rgba(212,175,55,0.05)_0%,_transparent_50%),_radial-gradient(circle_at_80%_20%,_rgba(212,175,55,0.05)_0%,_transparent_50%)] pointer-events-none" />
 
@@ -117,19 +131,39 @@ export function TestimonialCarousel() {
             </div>
 
             {/* Marquee Container */}
-            <div className="relative w-full overflow-hidden flex flex-col gap-6 select-none group">
-
+            <div 
+                className="relative w-full overflow-hidden flex flex-col gap-6 select-none group cursor-grab active:cursor-grabbing"
+                ref={scrollRef}
+            >
                 {/* Edge Fades for smooth entry/exit */}
-                <div className="absolute left-0 top-0 bottom-0 w-8 md:w-32 bg-gradient-to-r from-surface dark:from-card to-transparent z-10 pointer-events-none" />
-                <div className="absolute right-0 top-0 bottom-0 w-8 md:w-32 bg-gradient-to-l from-surface dark:from-card to-transparent z-10 pointer-events-none" />
+                <div className={cn(
+                    "absolute left-0 top-0 bottom-0 w-8 md:w-32 z-10 pointer-events-none bg-gradient-to-r to-transparent",
+                    mounted && currentTheme === "dark" ? "from-[#0f172a]" : "from-surface"
+                )} />
+                <div className={cn(
+                    "absolute right-0 top-0 bottom-0 w-8 md:w-32 z-10 pointer-events-none bg-gradient-to-l to-transparent",
+                    mounted && currentTheme === "dark" ? "from-[#0f172a]" : "from-surface"
+                )} />
 
-                {/* Infinite Scrolling Track */}
-                <div className="flex w-max animate-marquee hover:pause gap-6 px-4 md:px-0">
-                    {/* Duplicate the array 3 times to ensure the screen is always filled */}
+                {/* Infinite Scrolling Track (Desktop) / Drag Track (Mobile) */}
+                <motion.div 
+                    drag={isMobile ? "x" : false}
+                    dragConstraints={{ right: 0, left: -dragConstraints }}
+                    dragElastic={0.1}
+                    className={cn(
+                        "flex w-max gap-6 px-4 md:px-0",
+                        !isMobile && "animate-marquee hover:pause"
+                    )}
+                >
+                    {/* Duplicate the array 3 times to ensure the screen is always filled (only hide on mobile to bound drag) */}
                     {[...testimonials, ...testimonials, ...testimonials].map((story, i) => (
-                        <div
+                        <motion.div
+                            whileTap={{ scale: 0.97 }}
                             key={i}
-                            className="w-[300px] md:w-[450px] shrink-0"
+                            className={cn(
+                                "w-[300px] md:w-[450px] shrink-0",
+                                isMobile && i >= testimonials.length && "hidden"
+                            )}
                         >
                             {/* Glassmorphic Testimonial Card */}
                             <div className={cn(
@@ -155,7 +189,10 @@ export function TestimonialCarousel() {
                                 </div>
 
                                 {/* Testimonial Text */}
-                                <p className="text-muted-foreground italic mb-8 flex-grow leading-relaxed text-sm md:text-base">
+                                <p className={cn(
+                                    "italic mb-8 flex-grow leading-relaxed text-sm md:text-base",
+                                    mounted && currentTheme === "dark" ? "text-white/70" : "text-muted-foreground"
+                                )}>
                                     "{story.text}"
                                 </p>
 
@@ -176,9 +213,9 @@ export function TestimonialCarousel() {
                                     </div>
                                 </div>
                             </div>
-                        </div>
+                        </motion.div>
                     ))}
-                </div>
+                </motion.div>
             </div>
         </section>
     );

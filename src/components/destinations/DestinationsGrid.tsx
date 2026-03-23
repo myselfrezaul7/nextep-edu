@@ -94,6 +94,7 @@ function Card3D({ children, href }: { children: React.ReactNode, href: string })
         >
             <Link href={href} className="group block h-full outline-none">
                 <motion.div
+                    whileTap={{ scale: 0.97 }}
                     style={{
                         rotateX: isTouchDevice ? 0 : rotateX,
                         rotateY: isTouchDevice ? 0 : rotateY,
@@ -192,6 +193,7 @@ export function DestinationsGrid({ featuredOnly = false }: { featuredOnly?: bool
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ delay: 0.8, duration: 0.5 }}
+                    whileTap={{ scale: 0.95 }}
                     className="text-center mt-12"
                 >
                     <Link
