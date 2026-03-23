@@ -4,8 +4,8 @@ import { useState, useEffect } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { useTheme } from "next-themes";
-import { Menu, X, Moon, Sun, ChevronDown } from "lucide-react";
-import { motion, AnimatePresence } from "framer-motion";
+import { Search, Moon, Sun, ChevronDown } from "lucide-react";
+import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { SearchModal } from "@/components/common/SearchModal";
@@ -27,7 +27,6 @@ const mobileTopDestinations = MOBILE_TOP_SLUGS
 
 export function Header() {
     const [scrolled, setScrolled] = useState(false);
-    const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
     const [dropdownOpen, setDropdownOpen] = useState(false);
     const { theme, setTheme, systemTheme } = useTheme();
     const [mounted, setMounted] = useState(false);
@@ -42,18 +41,6 @@ export function Header() {
         window.addEventListener("scroll", handleScroll);
         return () => window.removeEventListener("scroll", handleScroll);
     }, []);
-
-    // Prevent body scroll when mobile menu is open
-    useEffect(() => {
-        if (mobileMenuOpen) {
-            document.body.style.overflow = 'hidden';
-        } else {
-            document.body.style.overflow = '';
-        }
-        return () => {
-            document.body.style.overflow = '';
-        };
-    }, [mobileMenuOpen]);
 
     const toggleTheme = () => {
         setTheme(theme === "dark" ? "light" : "dark");
@@ -150,8 +137,8 @@ export function Header() {
                     </button>
                 </div>
 
-                {/* Mobile Menu Toggle */}
-                <div className="flex items-center gap-4 lg:hidden">
+                {/* Mobile Icons (Logo, Search, Theme) */}
+                <div className="flex items-center gap-3 lg:hidden">
                     <SearchModal />
                     <button
                         onClick={toggleTheme}
@@ -160,115 +147,8 @@ export function Header() {
                     >
                         {mounted && theme === 'dark' ? <Sun className="w-5 h-5" /> : <Moon className="w-5 h-5" />}
                     </button>
-                    <button
-                        onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-                        className="p-2 text-primary"
-                        aria-label={mobileMenuOpen ? "Close menu" : "Open menu"}
-                        aria-expanded={mobileMenuOpen}
-                    >
-                        {mobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
-                    </button>
                 </div>
             </nav>
-
-            {/* Mobile Menu Content — Portfolio Style */}
-            <AnimatePresence>
-                {mobileMenuOpen && (
-                    <motion.div
-                        initial={{ opacity: 0, y: -20 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        exit={{ opacity: 0, y: -20 }}
-                        transition={{ duration: 0.3 }}
-                        className={cn(
-                            "fixed top-20 left-4 right-4 lg:hidden z-40 glass-nav shadow-2xl rounded-[24px] overflow-hidden border border-black/5 dark:border-white/10",
-                            mounted && currentTheme === "dark" ? "bg-[rgba(30,30,30,0.85)]" : "bg-white/85"
-                        )}
-                    >
-                        <div className="p-6 flex flex-col gap-2">
-                            <motion.div
-                                initial={{ opacity: 0, x: -20 }}
-                                animate={{ opacity: 1, x: 0 }}
-                                transition={{ delay: 0.0 }}
-                            >
-                                <Link
-                                    href="/#services"
-                                    className="block p-4 -mx-4 text-[18px] font-semibold text-foreground hover:text-accent transition-colors border-b border-black/10 dark:border-white/10"
-                                    onClick={() => setMobileMenuOpen(false)}
-                                >
-                                    Services
-                                </Link>
-                            </motion.div>
-                            <motion.div
-                                initial={{ opacity: 0, x: -20 }}
-                                animate={{ opacity: 1, x: 0 }}
-                                transition={{ delay: 0.1 }}
-                            >
-                                <Link
-                                    href="/#about"
-                                    className="block p-4 -mx-4 text-[18px] font-semibold text-foreground hover:text-accent transition-colors border-b border-black/10 dark:border-white/10"
-                                    onClick={() => setMobileMenuOpen(false)}
-                                >
-                                    About
-                                </Link>
-                            </motion.div>
-
-                            <motion.div
-                                initial={{ opacity: 0, x: -20 }}
-                                animate={{ opacity: 1, x: 0 }}
-                                transition={{ delay: 0.2 }}
-                                className="py-2 mt-2"
-                            >
-                                <p className="text-sm font-bold text-muted-foreground mb-4 uppercase tracking-wider block">Top Destinations</p>
-                                <div className="flex flex-col gap-1">
-                                    {mobileTopDestinations.map((item, i) => (
-                                        <motion.div
-                                            key={item.href}
-                                            initial={{ opacity: 0, x: -20 }}
-                                            animate={{ opacity: 1, x: 0 }}
-                                            transition={{ delay: 0.2 + (i * 0.05) }}
-                                        >
-                                            <Link
-                                                href={item.href}
-                                                className="block p-3 -mx-3 text-[16px] font-medium text-foreground hover:text-accent transition-colors border-b border-black/5 dark:border-white/5"
-                                                onClick={() => setMobileMenuOpen(false)}
-                                            >
-                                                {item.name}
-                                            </Link>
-                                        </motion.div>
-                                    ))}
-                                </div>
-                                <motion.div
-                                    initial={{ opacity: 0, x: -20 }}
-                                    animate={{ opacity: 1, x: 0 }}
-                                    transition={{ delay: 0.2 + (mobileTopDestinations.length * 0.05) }}
-                                >
-                                    <Link
-                                        href="/destinations"
-                                        className="text-sm font-bold text-accent mt-4 block p-3 -mx-3 hover:text-accent/80 transition-colors"
-                                        onClick={() => setMobileMenuOpen(false)}
-                                    >
-                                        View All Destinations →
-                                    </Link>
-                                </motion.div>
-                            </motion.div>
-
-                            <motion.div
-                                initial={{ opacity: 0, y: 10 }}
-                                animate={{ opacity: 1, y: 0 }}
-                                transition={{ delay: 0.5 }}
-                                className="mt-4"
-                            >
-                                <Button className="w-full py-6 text-[15px] font-bold shadow-md rounded-full bg-foreground text-background hover:opacity-90" size="lg" onClick={() => {
-                                    setMobileMenuOpen(false);
-                                    document.getElementById('booking-modal')?.classList.remove('hidden');
-                                }}>
-                                    Book Consultation
-                                </Button>
-                            </motion.div>
-                        </div>
-                    </motion.div>
-                )}
-            </AnimatePresence>
         </div>
     );
 }
