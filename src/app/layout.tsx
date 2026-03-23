@@ -3,6 +3,7 @@ import { IBM_Plex_Sans, Playfair_Display } from "next/font/google";
 import { ThemeProvider } from "@/components/theme-provider";
 import { Header } from "@/components/layout/Header";
 import { Footer } from "@/components/layout/Footer";
+import { MobileTabBar } from "@/components/layout/MobileTabBar";
 import { StructuredData } from "@/components/common/structured-data";
 import { BookingModal } from "@/components/common/BookingModal";
 import { WhatsAppFAB } from "@/components/common/WhatsAppFAB";
@@ -160,12 +161,13 @@ export default function RootLayout({
                     <ScrollProgress />
                     <div className="flex flex-col min-h-screen">
                         <Header />
-                        <main className="flex-grow pt-20">
+                        <main className="flex-grow pt-20 pb-24 md:pb-0">
                             <ErrorBoundary>
                                 <PageTransition>{children}</PageTransition>
                             </ErrorBoundary>
                         </main>
                         <Footer />
+                        <MobileTabBar />
                     </div>
                     <BookingModal />
                     <WhatsAppFAB />
