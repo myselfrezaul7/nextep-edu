@@ -100,9 +100,10 @@ export function Header() {
                         <div
                             className={cn(
                                 "absolute top-full left-1/2 -translate-x-1/2 w-64 transition-all duration-200 origin-top mt-2 p-2 grid gap-1 overflow-hidden max-h-80 overflow-y-auto",
-                                "rounded-[24px] shadow-[0_4px_30px_rgba(0,0,0,0.15)] dark:shadow-[0_4px_30px_rgba(0,0,0,0.5)] border glass-nav",
-                                "bg-white/85 border-black/5",
-                                "dark:bg-[rgba(30,30,30,0.85)] dark:border-[rgba(255,255,255,0.08)]",
+                                "rounded-[24px] border glass-nav",
+                                mounted && currentTheme === "dark" 
+                                    ? "bg-[rgba(30,30,30,0.85)] border-[rgba(255,255,255,0.08)] shadow-[0_4px_30px_rgba(0,0,0,0.5)]" 
+                                    : "bg-white/85 border-black/5 shadow-[0_4px_30px_rgba(0,0,0,0.15)]",
                                 dropdownOpen ? "opacity-100 scale-100 visible" : "opacity-0 scale-95 invisible"
                             )}
                         >
@@ -110,13 +111,24 @@ export function Header() {
                                 <Link
                                     key={item.name}
                                     href={item.href}
-                                    className="block px-4 py-2.5 text-[15px] font-medium text-foreground rounded-[12px] hover:bg-black/5 dark:hover:bg-white/10 hover:text-accent transition-colors"
+                                    className={cn(
+                                        "block px-4 py-2.5 text-[15px] font-medium text-foreground rounded-[12px] hover:text-accent transition-colors",
+                                        mounted && currentTheme === "dark" ? "hover:bg-white/10" : "hover:bg-black/5"
+                                    )}
                                 >
                                     <span className="mr-2 text-base">{item.flag}</span>
                                     {item.name}
                                 </Link>
                             ))}
-                            <Link href="/destinations" className="block px-4 py-2 text-xs font-bold text-accent text-center border-t border-black/10 dark:border-white/10 mt-1 pt-2 hover:bg-black/5 dark:hover:bg-white/10 rounded-lg transition-colors">
+                            <Link 
+                                href="/destinations" 
+                                className={cn(
+                                    "block px-4 py-2 text-xs font-bold text-accent text-center border-t mt-1 pt-2 rounded-lg transition-colors",
+                                    mounted && currentTheme === "dark" 
+                                        ? "border-white/10 hover:bg-white/10" 
+                                        : "border-black/10 hover:bg-black/5"
+                                )}
+                            >
                                 View All Destinations
                             </Link>
                         </div>
@@ -128,25 +140,28 @@ export function Header() {
 
                     <SearchModal />
 
-                    <button
+                    <motion.button
+                        whileTap={{ scale: 0.9 }}
                         onClick={toggleTheme}
-                        className="p-2 rounded-full hover:bg-muted transition-colors text-primary"
+                        className="p-2 w-11 h-11 md:w-auto md:h-auto flex items-center justify-center rounded-full hover:bg-muted transition-colors text-primary shrink-0"
                         aria-label="Toggle Theme"
                     >
                         {mounted && theme === 'dark' ? <Sun className="w-5 h-5" /> : <Moon className="w-5 h-5" />}
-                    </button>
+                    </motion.button>
                 </div>
 
                 {/* Mobile Icons (Logo, Search, Theme) */}
-                <div className="flex items-center gap-3 lg:hidden">
+                <div className="flex items-center gap-1.5 lg:hidden">
                     <SearchModal />
-                    <button
+                    <div className="w-[1px] h-5 bg-border/60 mx-1" />
+                    <motion.button
+                        whileTap={{ scale: 0.9 }}
                         onClick={toggleTheme}
-                        className="p-2 rounded-full hover:bg-muted transition-colors text-primary"
+                        className="p-2 w-11 h-11 flex items-center justify-center rounded-full hover:bg-muted transition-colors text-primary shrink-0"
                         aria-label="Toggle theme"
                     >
                         {mounted && theme === 'dark' ? <Sun className="w-5 h-5" /> : <Moon className="w-5 h-5" />}
-                    </button>
+                    </motion.button>
                 </div>
             </nav>
         </div>
