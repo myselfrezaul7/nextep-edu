@@ -333,7 +333,7 @@ export function DestinationPageClient({ destination, relatedDestinations = [] }:
                             <div className="flex flex-col sm:flex-row gap-4 justify-center">
                                 <Button
                                     size="lg"
-                                    className="rounded-full bg-accent hover:bg-accent/90 text-slate-900 font-bold shadow-lg"
+                                    className="rounded-full font-bold"
                                     onClick={() => document.getElementById('booking-modal')?.classList.remove('hidden')}
                                 >
                                     Book Free Consultation

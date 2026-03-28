@@ -55,7 +55,7 @@ export function Footer() {
                         <motion.div whileTap={{ scale: 0.95 }} className="inline-block">
                             <Button
                                 size="lg"
-                                className="rounded-full bg-accent text-accent-foreground hover:bg-accent/90 font-bold text-base px-8 shadow-lg"
+                                className="rounded-full font-bold text-base px-8"
                                 onClick={() => document.getElementById('booking-modal')?.classList.remove('hidden')}
                             >
                                 Book Free Consultation
