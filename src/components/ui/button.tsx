@@ -4,15 +4,15 @@ import { cva, type VariantProps } from "class-variance-authority"
 import { cn } from "@/lib/utils"
 
 const buttonVariants = cva(
-    "inline-flex items-center justify-center whitespace-nowrap rounded-full text-sm font-medium ring-offset-background transition-all duration-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50",
+    "inline-flex glass-nav items-center justify-center whitespace-nowrap rounded-full text-sm font-semibold ring-offset-background transition-all duration-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 border",
     {
         variants: {
             variant: {
-                default: "bg-accent/20 backdrop-blur-xl saturate-150 border border-white/30 dark:border-white/15 text-accent-foreground dark:text-white font-semibold shadow-[0_8px_32px_rgba(0,0,0,0.08),inset_0_1px_0_rgba(255,255,255,0.4)] dark:shadow-[0_8px_32px_rgba(0,0,0,0.3),inset_0_1px_0_rgba(255,255,255,0.1)] hover:bg-accent/30 hover:border-white/50 dark:hover:border-white/25 hover:shadow-[0_8px_32px_rgba(212,175,55,0.15),inset_0_1px_0_rgba(255,255,255,0.5)] hover:-translate-y-0.5 active:translate-y-0",
+                default: "bg-white/70 dark:bg-[rgba(15,23,42,0.8)] border-accent/40 dark:border-accent/30 text-accent-foreground dark:text-white shadow-[0_4px_30px_rgba(0,0,0,0.08),inset_0_1px_0_rgba(255,255,255,0.8)] dark:shadow-[0_4px_30px_rgba(0,0,0,0.3),inset_0_1px_0_rgba(255,255,255,0.05)] hover:border-accent/60 dark:hover:border-accent/50 hover:shadow-[0_4px_30px_rgba(212,175,55,0.12),inset_0_1px_0_rgba(255,255,255,0.9)] hover:-translate-y-0.5 active:translate-y-0",
                 destructive:
                     "bg-destructive text-destructive-foreground hover:bg-destructive/90",
                 outline:
-                    "bg-white/10 dark:bg-white/5 backdrop-blur-xl saturate-150 border border-white/25 dark:border-white/10 text-foreground dark:text-white/90 shadow-[0_4px_16px_rgba(0,0,0,0.06),inset_0_1px_0_rgba(255,255,255,0.3)] dark:shadow-[0_4px_16px_rgba(0,0,0,0.2),inset_0_1px_0_rgba(255,255,255,0.08)] hover:bg-white/20 dark:hover:bg-white/10 hover:border-white/40 dark:hover:border-white/20 hover:-translate-y-0.5 active:translate-y-0",
+                    "bg-white/50 dark:bg-white/8 border-black/10 dark:border-white/10 text-foreground dark:text-white/90 shadow-[0_4px_16px_rgba(0,0,0,0.04),inset_0_1px_0_rgba(255,255,255,0.6)] dark:shadow-[0_4px_16px_rgba(0,0,0,0.2),inset_0_1px_0_rgba(255,255,255,0.05)] hover:bg-white/60 dark:hover:bg-white/12 hover:border-black/15 dark:hover:border-white/15 hover:-translate-y-0.5 active:translate-y-0",
                 secondary:
                     "bg-secondary text-secondary-foreground hover:bg-secondary/80",
                 ghost: "hover:bg-accent/10 hover:text-accent",
@@ -20,8 +20,8 @@ const buttonVariants = cva(
             },
             size: {
                 default: "h-10 px-6 py-2",
-                sm: "h-9 rounded-md px-3",
-                lg: "h-11 rounded-md px-8",
+                sm: "h-9 px-4",
+                lg: "h-12 px-8",
                 icon: "h-10 w-10",
             },
         },
