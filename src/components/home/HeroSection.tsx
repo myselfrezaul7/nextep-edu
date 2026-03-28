@@ -30,7 +30,7 @@ export function HeroSection() {
                         initial={{ opacity: 0, y: 30 }}
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ duration: 1, ease: [0.22, 1, 0.36, 1] }}
-                        className="text-4xl md:text-6xl font-bold font-heading text-primary leading-tight"
+                        className="text-3xl md:text-6xl font-bold font-heading text-primary leading-tight"
                     >
                         Your Bridge to <span className="text-accent">Global Education</span>
                     </motion.h1>
@@ -39,7 +39,7 @@ export function HeroSection() {
                         initial={{ opacity: 0, y: 20 }}
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ duration: 0.9, delay: 0.15, ease: [0.22, 1, 0.36, 1] }}
-                        className="text-xl md:text-2xl font-medium italic text-accent"
+                        className="text-lg md:text-2xl font-medium italic text-accent"
                     >
                         Dream it. Plan it. Achieve it.
                     </motion.p>
@@ -88,7 +88,7 @@ export function HeroSection() {
                         transition={{ duration: 0.9, delay: 0.45, ease: [0.22, 1, 0.36, 1] }}
                         className="pt-6"
                     >
-                        <div className="flex items-center gap-4 text-sm text-muted-foreground bg-surface/50 dark:bg-card/50 px-4 py-2 rounded-full w-fit border border-border/50 backdrop-blur-sm">
+                        <div className="flex flex-wrap items-center gap-4 text-sm text-muted-foreground bg-surface/50 dark:bg-card/50 px-4 py-2 rounded-full w-fit border border-border/50 backdrop-blur-sm">
                             <div className="flex -space-x-2">
                                 <div className="w-8 h-8 rounded-full border-2 border-background bg-blue-100 flex items-center justify-center text-xs font-bold text-blue-800">TH</div>
                                 <div className="w-8 h-8 rounded-full border-2 border-background bg-green-100 flex items-center justify-center text-xs font-bold text-green-800">NJ</div>
@@ -136,7 +136,7 @@ export function HeroSection() {
                     <motion.div
                         animate={{ y: [0, -15, 0], rotate: [0, 5, 0] }}
                         transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
-                        className="absolute -top-6 -right-6 bg-accent/20 backdrop-blur-md p-4 rounded-full border border-accent/20 shadow-lg text-accent"
+                        className="hidden md:block absolute -top-6 -right-6 bg-accent/20 backdrop-blur-md p-4 rounded-full border border-accent/20 shadow-lg text-accent"
                     >
                         <Plane className="w-8 h-8" />
                     </motion.div>
@@ -144,7 +144,7 @@ export function HeroSection() {
                     <motion.div
                         animate={{ y: [0, 20, 0], rotate: [0, -10, 0] }}
                         transition={{ duration: 5, repeat: Infinity, ease: "easeInOut", delay: 1 }}
-                        className="absolute top-1/2 -left-8 bg-blue-500/20 backdrop-blur-md p-4 rounded-full border border-blue-500/20 shadow-lg text-blue-500"
+                        className="hidden md:block absolute top-1/2 -left-8 bg-blue-500/20 backdrop-blur-md p-4 rounded-full border border-blue-500/20 shadow-lg text-blue-500"
                     >
                         <GraduationCap className="w-8 h-8" />
                     </motion.div>
@@ -152,7 +152,7 @@ export function HeroSection() {
                     <motion.div
                         animate={{ y: [0, -10, 0], rotate: [0, 15, 0] }}
                         transition={{ duration: 6, repeat: Infinity, ease: "easeInOut", delay: 2 }}
-                        className="absolute -bottom-6 right-10 bg-green-500/20 backdrop-blur-md p-3 rounded-full border border-green-500/20 shadow-lg text-green-500"
+                        className="hidden md:block absolute -bottom-6 right-10 bg-green-500/20 backdrop-blur-md p-3 rounded-full border border-green-500/20 shadow-lg text-green-500"
                     >
                         <Globe2 className="w-6 h-6" />
                     </motion.div>

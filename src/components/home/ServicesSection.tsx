@@ -61,7 +61,7 @@ export function ServicesSection() {
                     </motion.p>
                 </div>
 
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 max-w-7xl mx-auto">
+                <div className="flex md:grid md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6 max-w-7xl mx-auto overflow-x-auto md:overflow-visible snap-x snap-mandatory pb-4 md:pb-0 -mx-4 px-4 md:mx-auto md:px-0 scrollbar-hide">
                     {items.map((item, i) => (
                         <motion.div
                             key={i}
@@ -71,7 +71,7 @@ export function ServicesSection() {
                             whileTap={{ scale: 0.97 }}
                             transition={{ duration: 0.4, delay: i * 0.05 }}
                             className={cn(
-                                "group relative backdrop-blur-xl border rounded-2xl p-6 hover:border-accent/40 shadow hover:shadow-lg hover:shadow-accent/5 transition-all duration-300 flex flex-col",
+                                "group relative backdrop-blur-xl border rounded-2xl p-6 hover:border-accent/40 shadow hover:shadow-lg hover:shadow-accent/5 transition-all duration-300 flex flex-col min-w-[280px] md:min-w-0 snap-center shrink-0 md:shrink",
                                 mounted && currentTheme === "dark"
                                     ? "bg-[rgba(15,23,42,0.85)] border-white/10 hover:bg-[rgba(15,23,42,0.95)]"
                                     : "bg-white/60 border-black/5 hover:bg-white/80"

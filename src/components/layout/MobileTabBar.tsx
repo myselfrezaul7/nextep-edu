@@ -107,11 +107,11 @@ export function MobileTabBar() {
             animate={{ y: 0 }}
             transition={{ type: "spring", bounce: 0, duration: 0.5 }}
             className={cn(
-                "fixed bottom-0 left-0 right-0 z-50 md:hidden",
-                "pb-safe pt-2 px-4 rounded-t-2xl border-t glass-nav transition-all duration-300",
+                "fixed bottom-3 left-3 right-3 z-50 md:hidden",
+                "pb-safe pt-2 px-4 rounded-[1.75rem] border glass-nav transition-all duration-300",
                 isDark
-                    ? "bg-[rgba(15,23,42,0.85)] border-white/10 shadow-[0_-4px_30px_rgba(0,0,0,0.3)]"
-                    : "bg-white/85 border-black/5 shadow-[0_-4px_30px_rgba(0,0,0,0.1)]"
+                    ? "bg-[rgba(15,23,42,0.85)] border-white/10 shadow-[0_4px_30px_rgba(0,0,0,0.3)]"
+                    : "bg-white/85 border-black/5 shadow-[0_4px_30px_rgba(0,0,0,0.1)]"
             )}
             style={{ paddingBottom: 'env(safe-area-inset-bottom)' }}
         >

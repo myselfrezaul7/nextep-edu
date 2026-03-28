@@ -186,7 +186,7 @@ export function AboutSection() {
                     {/* World Map Decoration */}
                     <WorldMapDecor />
 
-                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-1 gap-6 relative z-10">
+                    <div className="grid grid-cols-3 lg:grid-cols-1 gap-3 md:gap-6 relative z-10">
                         {stats.map((stat, index) => (
                             <motion.div
                                 key={stat.label}
@@ -196,16 +196,16 @@ export function AboutSection() {
                                 whileTap={{ scale: 0.97 }}
                                 transition={{ delay: index * 0.12, duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
                                 className={cn(
-                                    "relative backdrop-blur-xl p-8 rounded-2xl shadow-lg border text-center hover:border-accent hover:shadow-xl hover:shadow-accent/5 transition-all duration-500 ease-out overflow-hidden",
+                                    "relative backdrop-blur-xl p-4 md:p-8 rounded-2xl shadow-lg border text-center hover:border-accent hover:shadow-xl hover:shadow-accent/5 transition-all duration-500 ease-out overflow-hidden",
                                     isDark
                                         ? "bg-[rgba(15,23,42,0.85)] border-white/10 hover:bg-[rgba(15,23,42,0.95)]"
                                         : "bg-white/60 border-black/5 hover:bg-white/80"
                                 )}
                             >
-                                <h3 className="text-4xl md:text-5xl font-bold text-accent mb-2" style={{ willChange: 'contents' }}>
+                                <h3 className="text-2xl md:text-5xl font-bold text-accent mb-1 md:mb-2" style={{ willChange: 'contents' }}>
                                     <AnimatedCounter value={stat.value} suffix={stat.suffix} />
                                 </h3>
-                                <p className={cn("font-medium", isDark ? "text-white/70" : "text-muted-foreground")}>{stat.label}</p>
+                                <p className={cn("font-medium text-xs md:text-base", isDark ? "text-white/70" : "text-muted-foreground")}>{stat.label}</p>
                             </motion.div>
                         ))}
                     </div>
