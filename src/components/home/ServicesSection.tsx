@@ -71,7 +71,7 @@ export function ServicesSection() {
                             whileTap={{ scale: 0.97 }}
                             transition={{ duration: 0.4, delay: i * 0.05 }}
                             className={cn(
-                                "group relative backdrop-blur-xl border rounded-2xl p-6 hover:border-accent/40 shadow hover:shadow-lg hover:shadow-accent/5 transition-all duration-300 flex flex-col min-w-[280px] md:min-w-0 snap-center shrink-0 md:shrink",
+                                "group relative backdrop-blur-xl border rounded-2xl p-6 hover:border-accent/40 shadow hover:shadow-lg hover:shadow-accent/5 transition-all duration-300 flex flex-col min-w-[75vw] sm:min-w-[280px] md:min-w-0 snap-center shrink-0 md:shrink",
                                 mounted && currentTheme === "dark"
                                     ? "bg-[rgba(15,23,42,0.85)] border-white/10 hover:bg-[rgba(15,23,42,0.95)]"
                                     : "bg-white/60 border-black/5 hover:bg-white/80"
@@ -87,7 +87,7 @@ export function ServicesSection() {
                                 {item.title}
                             </h3>
                             <p className={cn(
-                                "font-sans text-sm leading-relaxed flex-grow",
+                                "font-sans text-sm leading-relaxed flex-grow line-clamp-3 md:line-clamp-none",
                                 mounted && currentTheme === "dark" ? "text-white/70" : "text-muted-foreground"
                             )}>
                                 {item.description}

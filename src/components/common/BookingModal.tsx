@@ -351,7 +351,7 @@ export function BookingModal() {
                                                             <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
                                                             <span>Booking...</span>
                                                         </>
-                                                    ) : "Confirm Booking ✨"}
+                                                    ) : "Confirm Booking"}
                                                 </Button>
                                             </motion.div>
                                         </div>
