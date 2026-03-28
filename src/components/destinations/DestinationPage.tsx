@@ -158,7 +158,7 @@ export function DestinationPage({ destination }: DestinationPageProps) {
                                 <Button
                                     size="lg"
                                     className="rounded-full font-bold"
-                                    onClick={() => document.getElementById('booking-modal')?.classList.remove('hidden')}
+                                    onClick={() => window.dispatchEvent(new CustomEvent('open-booking-modal'))}
                                 >
                                     Book Free Consultation
                                 </Button>

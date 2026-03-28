@@ -8,11 +8,11 @@ const buttonVariants = cva(
     {
         variants: {
             variant: {
-                default: "bg-gradient-to-r from-amber-500 via-accent to-yellow-400 text-accent-foreground shadow-lg shadow-accent/25 hover:shadow-xl hover:shadow-accent/35 transform hover:-translate-y-0.5 active:translate-y-0 border border-white/20",
+                default: "bg-accent/20 backdrop-blur-xl saturate-150 border border-white/30 dark:border-white/15 text-accent-foreground dark:text-white font-semibold shadow-[0_8px_32px_rgba(0,0,0,0.08),inset_0_1px_0_rgba(255,255,255,0.4)] dark:shadow-[0_8px_32px_rgba(0,0,0,0.3),inset_0_1px_0_rgba(255,255,255,0.1)] hover:bg-accent/30 hover:border-white/50 dark:hover:border-white/25 hover:shadow-[0_8px_32px_rgba(212,175,55,0.15),inset_0_1px_0_rgba(255,255,255,0.5)] hover:-translate-y-0.5 active:translate-y-0",
                 destructive:
                     "bg-destructive text-destructive-foreground hover:bg-destructive/90",
                 outline:
-                    "border border-accent/30 text-accent backdrop-blur-md bg-white/10 dark:bg-white/5 hover:bg-accent/15 hover:border-accent/50 shadow-sm hover:shadow-md hover:shadow-accent/10",
+                    "bg-white/10 dark:bg-white/5 backdrop-blur-xl saturate-150 border border-white/25 dark:border-white/10 text-foreground dark:text-white/90 shadow-[0_4px_16px_rgba(0,0,0,0.06),inset_0_1px_0_rgba(255,255,255,0.3)] dark:shadow-[0_4px_16px_rgba(0,0,0,0.2),inset_0_1px_0_rgba(255,255,255,0.08)] hover:bg-white/20 dark:hover:bg-white/10 hover:border-white/40 dark:hover:border-white/20 hover:-translate-y-0.5 active:translate-y-0",
                 secondary:
                     "bg-secondary text-secondary-foreground hover:bg-secondary/80",
                 ghost: "hover:bg-accent/10 hover:text-accent",

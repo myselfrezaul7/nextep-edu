@@ -174,7 +174,7 @@ export function AboutSection() {
                         <Button
                             size="lg"
                             className="w-full"
-                            onClick={() => document.getElementById('booking-modal')?.classList.remove('hidden')}
+                            onClick={() => window.dispatchEvent(new CustomEvent('open-booking-modal'))}
                         >
                             Chat With Us
                         </Button>

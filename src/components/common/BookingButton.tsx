@@ -13,13 +13,12 @@ interface BookingButtonProps {
 export function BookingButton({ children, className, variant = "default", size = "default" }: BookingButtonProps) {
     return (
         <div className="relative group inline-block">
-            {/* Glow Effect Layer */}
-            <div className="absolute -inset-1 bg-gradient-to-r from-accent via-primary to-accent rounded-lg blur opacity-25 group-hover:opacity-75 transition duration-1000 group-hover:duration-200 animate-tilt"></div>
+            {/* Liquid Glass buttons have built-in luminous edges — no glow wrapper needed */}
             <Button
                 variant={variant}
                 size={size}
                 className={`relative ${className}`}
-                onClick={() => document.getElementById('booking-modal')?.classList.remove('hidden')}
+                onClick={() => window.dispatchEvent(new CustomEvent('open-booking-modal'))}
             >
                 {children}
             </Button>
