@@ -161,7 +161,7 @@ export function TestimonialCarousel() {
                             whileTap={{ scale: 0.97 }}
                             key={i}
                             className={cn(
-                                "w-[300px] md:w-[450px] shrink-0",
+                                "w-[85vw] md:w-[450px] shrink-0",
                                 isMobile && i >= testimonials.length && "hidden"
                             )}
                         >
@@ -207,7 +207,10 @@ export function TestimonialCarousel() {
                                             <span className="text-base leading-none">{story.flag}</span>
                                             <span className="truncate">{story.university}</span>
                                         </p>
-                                        <p className="text-xs text-green-600 dark:text-green-500 font-medium mt-1.5 flex items-center gap-1">
+                                        <p className={cn(
+                                            "text-xs font-medium mt-1.5 flex items-center gap-1",
+                                            mounted && currentTheme === "dark" ? "text-green-400" : "text-green-600"
+                                        )}>
                                             <span>✓</span> Visa approved · {story.visaDate}
                                         </p>
                                     </div>

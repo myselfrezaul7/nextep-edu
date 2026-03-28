@@ -145,7 +145,7 @@ export function DestinationsGrid({ featuredOnly = false }: { featuredOnly?: bool
                     <motion.div variants={item} key={destination.slug} className="h-full relative z-0 hover:z-10">
                         <Card3D href={`/destinations/${destination.slug}`}>
                             {/* Image Wrapper with Loading Skeleton Background color */}
-                            <div className="relative h-64 overflow-hidden bg-black/5 dark:bg-white/5">
+                            <div className="relative h-48 md:h-64 overflow-hidden bg-black/5 dark:bg-white/5">
                                 <Image
                                     src={destination.heroImage}
                                     alt={destination.name}
@@ -158,7 +158,7 @@ export function DestinationsGrid({ featuredOnly = false }: { featuredOnly?: bool
                                     <h3 className="text-2xl font-bold font-heading mb-1 flex items-center gap-2">
                                         <span>{destination.flag}</span> {destination.name}
                                     </h3>
-                                    <div className="flex items-center gap-2 text-sm font-medium text-white/90 opacity-0 group-hover:opacity-100 transform translate-y-4 group-hover:translate-y-0 transition-all duration-500">
+                                    <div className="flex items-center gap-2 text-sm font-medium text-white/90 opacity-100 md:opacity-0 md:group-hover:opacity-100 transform translate-y-0 md:translate-y-4 md:group-hover:translate-y-0 transition-all duration-500">
                                         Explore <ArrowRight className="w-4 h-4" />
                                     </div>
                                 </div>
