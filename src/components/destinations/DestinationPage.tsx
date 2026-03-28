@@ -157,7 +157,7 @@ export function DestinationPage({ destination }: DestinationPageProps) {
                             <div className="flex flex-col sm:flex-row gap-4 justify-center">
                                 <Button
                                     size="lg"
-                                    className="rounded-full bg-accent hover:bg-accent/90 text-slate-900"
+                                    className="rounded-full font-bold"
                                     onClick={() => document.getElementById('booking-modal')?.classList.remove('hidden')}
                                 >
                                     Book Free Consultation
