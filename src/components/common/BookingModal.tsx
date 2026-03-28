@@ -36,30 +36,17 @@ export function BookingModal() {
         setMounted(true);
     }, []);
 
-    // Expose global open function for other components to call
     useEffect(() => {
-        const openModal = () => setIsOpen(true);
-        window.__openBookingModal = openModal;
+        // Clean event-driven open
+        const handleOpen = () => setIsOpen(true);
+        window.addEventListener('open-booking-modal', handleOpen);
 
-        // Legacy support: listen for DOM class changes on #booking-modal
-        const modal = document.getElementById("booking-modal");
-        if (!modal) return;
-
-        const observer = new MutationObserver((mutations) => {
-            mutations.forEach((mutation) => {
-                if (mutation.type === "attributes" && mutation.attributeName === "class") {
-                    if (!modal.classList.contains("hidden")) {
-                        setIsOpen(true);
-                    }
-                }
-            });
-        });
-
-        observer.observe(modal, { attributes: true });
+        // Expose global open function for other components to call if needed
+        window.__openBookingModal = handleOpen;
 
         return () => {
+            window.removeEventListener('open-booking-modal', handleOpen);
             delete window.__openBookingModal;
-            observer.disconnect();
         };
     }, []);
 
@@ -106,9 +93,6 @@ export function BookingModal() {
     const closeModal = useCallback(() => {
         setIsOpen(false);
         setTimeout(() => setIsSuccess(false), 300); // Reset success state after animation
-        // Also update DOM class for legacy compatibility
-        const modal = document.getElementById("booking-modal");
-        if (modal) modal.classList.add("hidden");
         reset();
     }, [reset]);
 
@@ -142,6 +126,7 @@ export function BookingModal() {
 
     const currentTheme = theme === "system" ? systemTheme : theme;
     const isDark = mounted && currentTheme === "dark";
+    const isMobile = mounted && window.innerWidth < 640;
 
     const inputClass = cn(
         "w-full p-3 md:p-3.5 rounded-xl border outline-none transition-all duration-200",
@@ -159,38 +144,35 @@ export function BookingModal() {
 
     const errorClass = cn("text-xs mt-1 font-medium", isDark ? "text-red-400" : "text-red-500");
 
-    // We keep the hidden div explicitly around for legacy DOM hook (MutationObserver)
     return (
-        <>
-            <div id="booking-modal" className={isOpen ? "block" : "hidden"} aria-hidden="true" />
-            
-            <AnimatePresence>
-                {isOpen && (
+        <AnimatePresence>
+            {isOpen && (
+                <motion.div
+                    role="dialog"
+                    aria-modal="true"
+                    aria-labelledby="booking-modal-title"
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    exit={{ opacity: 0 }}
+                    transition={{ duration: 0.3 }}
+                    className="fixed inset-0 z-[100] flex items-end sm:items-center justify-center bg-black/60 backdrop-blur-sm sm:p-4"
+                    onClick={(e) => {
+                        if (e.target === e.currentTarget) closeModal();
+                    }}
+                >
                     <motion.div
-                        role="dialog"
-                        aria-modal="true"
-                        aria-labelledby="booking-modal-title"
-                        initial={{ opacity: 0 }}
-                        animate={{ opacity: 1 }}
-                        exit={{ opacity: 0 }}
-                        className="fixed inset-0 z-[100] flex items-center justify-center bg-black/60 backdrop-blur-sm p-4"
-                        onClick={(e) => {
-                            if (e.target === e.currentTarget) closeModal();
-                        }}
+                        initial={{ opacity: 0, y: isMobile ? '100%' : 20, scale: isMobile ? 1 : 0.95 }}
+                        animate={{ opacity: 1, y: 0, scale: 1 }}
+                        exit={{ opacity: 0, y: isMobile ? '100%' : 20, scale: isMobile ? 1 : 0.95 }}
+                        transition={{ type: "spring", damping: 30, stiffness: 300 }}
+                        ref={modalRef}
+                        className={cn(
+                            "relative backdrop-blur-2xl w-full max-w-lg rounded-t-3xl sm:rounded-3xl shadow-2xl border overflow-hidden flex flex-col max-h-[90vh]",
+                            isDark
+                                ? "bg-[rgba(15,23,42,0.92)] border-white/10 shadow-[0_8px_40px_rgba(0,0,0,0.5)]"
+                                : "bg-white/90 border-black/5 shadow-[0_8px_40px_rgba(0,0,0,0.12)]"
+                        )}
                     >
-                        <motion.div
-                            initial={{ opacity: 0, scale: 0.95, y: 20 }}
-                            animate={{ opacity: 1, scale: 1, y: 0 }}
-                            exit={{ opacity: 0, scale: 0.95, y: 20 }}
-                            transition={{ type: "spring", duration: 0.5, bounce: 0.1 }}
-                            ref={modalRef}
-                            className={cn(
-                                "relative backdrop-blur-2xl w-full max-w-lg rounded-3xl shadow-2xl border overflow-hidden flex flex-col max-h-[90vh]",
-                                isDark
-                                    ? "bg-[rgba(15,23,42,0.92)] border-white/10 shadow-[0_8px_40px_rgba(0,0,0,0.5)]"
-                                    : "bg-white/90 border-black/5 shadow-[0_8px_40px_rgba(0,0,0,0.12)]"
-                            )}
-                        >
                             {/* Glowing Top Accent Line */}
                             <div className="absolute top-0 inset-x-0 h-px bg-gradient-to-r from-transparent via-accent/50 to-transparent" />
 
@@ -362,7 +344,6 @@ export function BookingModal() {
                     </motion.div>
                 )}
             </AnimatePresence>
-        </>
     );
 }
 

@@ -163,7 +163,7 @@ export function MobileTabBar() {
                 {/* BOOK */}
                 <motion.button
                     whileTap={{ scale: 0.9 }}
-                    onClick={() => document.getElementById('booking-modal')?.classList.remove('hidden')}
+                    onClick={() => window.dispatchEvent(new CustomEvent('open-booking-modal'))}
                     className={cn(
                         "relative flex flex-col items-center justify-center w-14 h-12 rounded-xl transition-all duration-200",
                         isDark ? "text-white/60 hover:text-white" : "text-muted-foreground hover:text-foreground"

@@ -63,7 +63,7 @@ export function HeroSection() {
                             <Button
                                 size="lg"
                                 className="rounded-full text-base w-full sm:w-auto"
-                                onClick={() => document.getElementById('booking-modal')?.classList.remove('hidden')}
+                                onClick={() => window.dispatchEvent(new CustomEvent('open-booking-modal'))}
                             >
                                 Let&apos;s Talk
                             </Button>

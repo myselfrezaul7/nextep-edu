@@ -134,7 +134,7 @@ export function Header() {
                         </div>
                     </div>
 
-                    <Button className="rounded-full px-6" onClick={() => document.getElementById('booking-modal')?.classList.remove('hidden')}>
+                    <Button className="rounded-full px-6" onClick={() => window.dispatchEvent(new CustomEvent('open-booking-modal'))}>
                         Book Consultation
                     </Button>
 
