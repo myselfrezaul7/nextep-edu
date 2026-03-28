@@ -8,11 +8,11 @@ const buttonVariants = cva(
     {
         variants: {
             variant: {
-                default: "bg-accent/90 backdrop-blur-sm text-accent-foreground hover:bg-accent shadow-md hover:shadow-lg hover:shadow-accent/20 transform hover:-translate-y-0.5 transition-all duration-300 border border-accent/20",
+                default: "bg-gradient-to-r from-accent to-yellow-500 text-accent-foreground shadow-lg shadow-accent/25 hover:shadow-xl hover:shadow-accent/35 transform hover:-translate-y-0.5 active:translate-y-0 transition-all duration-300 border border-white/20",
                 destructive:
                     "bg-destructive text-destructive-foreground hover:bg-destructive/90",
                 outline:
-                    "border border-accent/40 text-accent bg-white/5 backdrop-blur-sm hover:bg-accent/10 hover:border-accent/60 hover:text-accent transition-all duration-300",
+                    "border border-accent/30 text-accent backdrop-blur-md bg-white/10 dark:bg-white/5 hover:bg-accent/15 hover:border-accent/50 transition-all duration-300 shadow-sm hover:shadow-md hover:shadow-accent/10",
                 secondary:
                     "bg-secondary text-secondary-foreground hover:bg-secondary/80",
                 ghost: "hover:bg-accent/10 hover:text-accent",
