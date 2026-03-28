@@ -5,6 +5,9 @@ import { useForm } from "react-hook-form";
 import toast from "react-hot-toast";
 import { X, Calendar, Clock, BookOpen, User, Mail, Phone, GraduationCap, CheckCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { useTheme } from "next-themes";
+import { cn } from "@/lib/utils";
+import { motion, AnimatePresence } from "framer-motion";
 
 type FormData = {
     name: string;
@@ -25,8 +28,12 @@ export function BookingModal() {
     const modalRef = useRef<HTMLDivElement>(null);
     const firstInputRef = useRef<HTMLInputElement | null>(null);
 
+    const { theme, systemTheme } = useTheme();
+    const [mounted, setMounted] = useState(false);
+
     useEffect(() => {
         setMinDate(new Date().toISOString().split("T")[0]);
+        setMounted(true);
     }, []);
 
     // Expose global open function for other components to call
@@ -133,171 +140,229 @@ export function BookingModal() {
         }
     };
 
-    if (!isOpen) {
-        return <div id="booking-modal" className="hidden" />;
-    }
+    const currentTheme = theme === "system" ? systemTheme : theme;
+    const isDark = mounted && currentTheme === "dark";
 
+    const inputClass = cn(
+        "w-full p-3 md:p-3.5 rounded-xl border outline-none transition-all duration-200",
+        "focus:ring-2 focus:ring-accent/40 focus:border-accent/50",
+        "placeholder:text-muted-foreground/50 text-sm md:text-base",
+        isDark
+            ? "bg-white/5 border-white/10 text-white hover:border-white/20"
+            : "bg-black/[0.03] border-black/10 text-foreground hover:border-black/20"
+    );
+
+    const labelClass = cn(
+        "text-sm font-semibold flex items-center gap-2 mb-1.5",
+        isDark ? "text-white/80" : "text-foreground/80"
+    );
+
+    const errorClass = cn("text-xs mt-1 font-medium", isDark ? "text-red-400" : "text-red-500");
+
+    // We keep the hidden div explicitly around for legacy DOM hook (MutationObserver)
     return (
-        <div
-            id="booking-modal"
-            role="dialog"
-            aria-modal="true"
-            aria-labelledby="booking-modal-title"
-            className="fixed inset-0 z-[100] flex items-center justify-center bg-black/60 backdrop-blur-sm p-4 transition-all duration-300"
-            onClick={(e) => {
-                if (e.target === e.currentTarget) closeModal();
-            }}
-        >
-            <div
-                ref={modalRef}
-                className="relative bg-white/80 dark:bg-[#0B1120]/80 backdrop-blur-2xl w-full max-w-lg rounded-2xl shadow-2xl border border-black/5 dark:border-white/10 overflow-hidden flex flex-col max-h-[90vh] animate-in fade-in zoom-in-95 duration-200"
-            >
-                {/* Glowing Top Accent Line */}
-                <div className="absolute top-0 inset-x-0 h-px bg-gradient-to-r from-transparent via-accent/50 to-transparent" />
-
-                {/* Header */}
-                <div className="p-6 border-b border-black/5 dark:border-white/10 flex justify-between items-center bg-accent/5">
-                    <div>
-                        <h3 id="booking-modal-title" className="text-xl font-bold font-heading text-primary">
-                            {isSuccess ? "Booking Confirmed" : "Book Your Free Consultation"}
-                        </h3>
-                        {!isSuccess && <p className="text-sm text-foreground/70">Let&apos;s plan your future together.</p>}
-                    </div>
-                    <button
-                        onClick={closeModal}
-                        className="p-2 hover:bg-black/5 dark:hover:bg-white/10 rounded-full transition-colors"
-                        aria-label="Close booking modal"
+        <>
+            <div id="booking-modal" className={isOpen ? "block" : "hidden"} aria-hidden="true" />
+            
+            <AnimatePresence>
+                {isOpen && (
+                    <motion.div
+                        role="dialog"
+                        aria-modal="true"
+                        aria-labelledby="booking-modal-title"
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        exit={{ opacity: 0 }}
+                        className="fixed inset-0 z-[100] flex items-center justify-center bg-black/60 backdrop-blur-sm p-4"
+                        onClick={(e) => {
+                            if (e.target === e.currentTarget) closeModal();
+                        }}
                     >
-                        <X className="w-5 h-5" />
-                    </button>
-                </div>
+                        <motion.div
+                            initial={{ opacity: 0, scale: 0.95, y: 20 }}
+                            animate={{ opacity: 1, scale: 1, y: 0 }}
+                            exit={{ opacity: 0, scale: 0.95, y: 20 }}
+                            transition={{ type: "spring", duration: 0.5, bounce: 0.1 }}
+                            ref={modalRef}
+                            className={cn(
+                                "relative backdrop-blur-2xl w-full max-w-lg rounded-3xl shadow-2xl border overflow-hidden flex flex-col max-h-[90vh]",
+                                isDark
+                                    ? "bg-[rgba(15,23,42,0.92)] border-white/10 shadow-[0_8px_40px_rgba(0,0,0,0.5)]"
+                                    : "bg-white/90 border-black/5 shadow-[0_8px_40px_rgba(0,0,0,0.12)]"
+                            )}
+                        >
+                            {/* Glowing Top Accent Line */}
+                            <div className="absolute top-0 inset-x-0 h-px bg-gradient-to-r from-transparent via-accent/50 to-transparent" />
 
-                {/* Content */}
-                <div className="overflow-y-auto p-6">
-                    {isSuccess ? (
-                        <div className="flex flex-col items-center text-center py-8 space-y-4 animate-in fade-in zoom-in duration-500">
-                            <div className="w-20 h-20 bg-green-100 dark:bg-green-900/30 rounded-full flex items-center justify-center mb-4 text-green-600 dark:text-green-400">
-                                <CheckCircle className="w-10 h-10" />
-                            </div>
-                            <h4 className="text-3xl font-bold font-heading text-primary">We Got Your Request!</h4>
-                            <p className="text-muted-foreground text-lg max-w-sm mx-auto">
-                                Our team will reach out within 24 hours.
-                            </p>
-                            <Button onClick={closeModal} size="lg" className="mt-8 px-8 rounded-full shadow-lg hover:shadow-xl hover:scale-105 transition-all w-full max-w-xs text-lg font-bold">
-                                Close Window
-                            </Button>
-                        </div>
-                    ) : (
-                        <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
-
-                            {/* Honeypot */}
-                            <input type="text" className="hidden" {...register("website_url")} autoComplete="off" tabIndex={-1} />
-
-                            <div className="space-y-2">
-                                <label className="text-sm font-medium flex items-center gap-2"><User className="w-4 h-4 text-accent" /> Full Name</label>
-                                <input
-                                    {...register("name", { required: "Name is required" })}
-                                    ref={(e) => {
-                                        register("name").ref(e);
-                                        firstInputRef.current = e;
-                                    }}
-                                    className="w-full p-3 rounded-lg border border-border bg-background focus:ring-2 focus:ring-accent/50 outline-none transition-all"
-                                    placeholder="e.g. Rahim Ahmed"
-                                />
-                                {errors.name && <p className="text-xs text-red-500">{errors.name.message}</p>}
-                            </div>
-
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                <div className="space-y-2">
-                                    <label className="text-sm font-medium flex items-center gap-2"><Mail className="w-4 h-4 text-accent" /> Email</label>
-                                    <input
-                                        {...register("email", { required: "Email is required", pattern: { value: /^\S+@\S+$/i, message: "Invalid email" } })}
-                                        className="w-full p-3 rounded-lg border border-border bg-background focus:ring-2 focus:ring-accent/50 outline-none transition-all"
-                                        placeholder="hello@example.com"
-                                    />
-                                    {errors.email && <p className="text-xs text-red-500">{errors.email.message}</p>}
+                            {/* Header */}
+                            <div className={cn(
+                                "p-5 md:p-6 border-b flex justify-between items-center",
+                                isDark ? "border-white/10 bg-accent/5" : "border-black/5 bg-accent/5"
+                            )}>
+                                <div>
+                                    <h3 id="booking-modal-title" className="text-xl md:text-2xl font-bold font-heading text-primary">
+                                        {isSuccess ? "Booking Confirmed" : "Free Consultation"}
+                                    </h3>
+                                    {!isSuccess && <p className={cn("text-xs md:text-sm mt-1", isDark ? "text-white/60" : "text-foreground/70")}>Let&apos;s plan your future together.</p>}
                                 </div>
-                                <div className="space-y-2">
-                                    <label className="text-sm font-medium flex items-center gap-2"><Phone className="w-4 h-4 text-accent" /> Phone</label>
-                                    <input
-                                        {...register("phone", { required: "Phone is required" })}
-                                        className="w-full p-3 rounded-lg border border-border bg-background focus:ring-2 focus:ring-accent/50 outline-none transition-all"
-                                        placeholder="017..."
-                                    />
-                                    {errors.phone && <p className="text-xs text-red-500">{errors.phone.message}</p>}
-                                </div>
+                                <motion.button
+                                    whileTap={{ scale: 0.9 }}
+                                    onClick={closeModal}
+                                    className={cn(
+                                        "p-2 rounded-full transition-colors flex-shrink-0",
+                                        isDark ? "hover:bg-white/10" : "hover:bg-black/5"
+                                    )}
+                                    aria-label="Close booking modal"
+                                >
+                                    <X className="w-5 h-5 md:w-6 md:h-6" />
+                                </motion.button>
                             </div>
 
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                <div className="space-y-2">
-                                    <label className="text-sm font-medium flex items-center gap-2"><Calendar className="w-4 h-4 text-accent" /> Date</label>
-                                    <input
-                                        type="date"
-                                        min={minDate}
-                                        {...register("date", { required: "Date is required" })}
-                                        className="w-full p-3 rounded-lg border border-border bg-background focus:ring-2 focus:ring-accent/50 outline-none transition-all"
-                                    />
-                                    {errors.date && <p className="text-xs text-red-500">{errors.date.message}</p>}
-                                </div>
-                                <div className="space-y-2">
-                                    <label className="text-sm font-medium flex items-center gap-2"><Clock className="w-4 h-4 text-accent" /> Time</label>
-                                    <select
-                                        {...register("time", { required: "Time is required" })}
-                                        className="w-full p-3 rounded-lg border border-border bg-background focus:ring-2 focus:ring-accent/50 outline-none transition-all"
+                            {/* Content */}
+                            <div className="overflow-y-auto p-5 md:p-6 scrollbar-hide">
+                                {isSuccess ? (
+                                    <motion.div 
+                                        initial={{ opacity: 0, scale: 0.9 }}
+                                        animate={{ opacity: 1, scale: 1 }}
+                                        transition={{ type: "spring", duration: 0.6 }}
+                                        className="flex flex-col items-center text-center py-8 space-y-4"
                                     >
-                                        <option value="">Select Time</option>
-                                        <option value="10:00 AM">10:00 AM</option>
-                                        <option value="11:00 AM">11:00 AM</option>
-                                        <option value="12:00 PM">12:00 PM</option>
-                                        <option value="02:00 PM">02:00 PM</option>
-                                        <option value="03:00 PM">03:00 PM</option>
-                                        <option value="04:00 PM">04:00 PM</option>
-                                        <option value="05:00 PM">05:00 PM</option>
-                                    </select>
-                                    {errors.time && <p className="text-xs text-red-500">{errors.time.message}</p>}
-                                </div>
-                            </div>
+                                        <div className={cn(
+                                            "w-20 h-20 rounded-full flex items-center justify-center mb-4",
+                                            isDark ? "bg-green-500/15 text-green-400" : "bg-green-100 text-green-600"
+                                        )}>
+                                            <CheckCircle className="w-10 h-10" />
+                                        </div>
+                                        <h4 className="text-3xl font-bold font-heading text-primary">We Got Your Request!</h4>
+                                        <p className="text-muted-foreground text-lg max-w-sm mx-auto">
+                                            Our team will reach out within 24 hours.
+                                        </p>
+                                        <motion.div whileTap={{ scale: 0.97 }} className="w-full max-w-xs mt-8">
+                                            <Button onClick={closeModal} size="lg" className="w-full rounded-xl text-lg font-bold">
+                                                Close Window
+                                            </Button>
+                                        </motion.div>
+                                    </motion.div>
+                                ) : (
+                                    <form onSubmit={handleSubmit(onSubmit)} className="space-y-4 md:space-y-5">
+                                        {/* Honeypot */}
+                                        <input type="text" className="hidden" {...register("website_url")} autoComplete="off" tabIndex={-1} />
 
-                            <div className="space-y-2">
-                                <label className="text-sm font-medium flex items-center gap-2"><GraduationCap className="w-4 h-4 text-accent" /> Education Level</label>
-                                <select
-                                    {...register("education_level", { required: "Education level is required" })}
-                                    className="w-full p-3 rounded-lg border border-border bg-background focus:ring-2 focus:ring-accent/50 outline-none transition-all"
-                                >
-                                    <option value="">Select Level</option>
-                                    <option value="Bachelors">Bachelor&apos;s</option>
-                                    <option value="Masters">Master&apos;s</option>
-                                    <option value="PhD">PhD</option>
-                                    <option value="Language_Course">Language Course</option>
-                                    <option value="Foundation_Year">Foundation Year</option>
-                                </select>
-                                {errors.education_level && <p className="text-xs text-red-500">{errors.education_level.message}</p>}
-                            </div>
+                                        <div className="space-y-1 md:space-y-0">
+                                            <label className={labelClass}><User className="w-4 h-4 text-accent" /> Full Name</label>
+                                            <input
+                                                {...register("name", { required: "Name is required" })}
+                                                ref={(e) => {
+                                                    register("name").ref(e);
+                                                    firstInputRef.current = e;
+                                                }}
+                                                className={inputClass}
+                                                placeholder="e.g. Rahim Ahmed"
+                                            />
+                                            {errors.name && <p className={errorClass}>{errors.name.message}</p>}
+                                        </div>
 
-                            <div className="space-y-2">
-                                <label className="text-sm font-medium flex items-center gap-2"><BookOpen className="w-4 h-4 text-accent" /> Interested In</label>
-                                <select
-                                    {...register("topic")}
-                                    className="w-full p-3 rounded-lg border border-border bg-background focus:ring-2 focus:ring-accent/50 outline-none transition-all"
-                                >
-                                    <option value="General_Inquiry">General Inquiry</option>
-                                    <option value="University_Admission">University Admission</option>
-                                    <option value="Visa_Processing">Visa Processing</option>
-                                    <option value="Scholarship_Help">Scholarship Help</option>
-                                    <option value="LOM_SOP_Writing">LOM/SOP Writing</option>
-                                </select>
-                            </div>
+                                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                            <div className="space-y-1 md:space-y-0">
+                                                <label className={labelClass}><Mail className="w-4 h-4 text-accent" /> Email</label>
+                                                <input
+                                                    {...register("email", { required: "Email is required", pattern: { value: /^\S+@\S+$/i, message: "Invalid email" } })}
+                                                    className={inputClass}
+                                                    placeholder="hello@example.com"
+                                                />
+                                                {errors.email && <p className={errorClass}>{errors.email.message}</p>}
+                                            </div>
+                                            <div className="space-y-1 md:space-y-0">
+                                                <label className={labelClass}><Phone className="w-4 h-4 text-accent" /> Phone</label>
+                                                <input
+                                                    {...register("phone", { required: "Phone is required" })}
+                                                    className={inputClass}
+                                                    placeholder="017..."
+                                                />
+                                                {errors.phone && <p className={errorClass}>{errors.phone.message}</p>}
+                                            </div>
+                                        </div>
 
-                            <div className="pt-4">
-                                <Button type="submit" className="w-full h-12 text-lg font-bold" disabled={isSubmitting}>
-                                    {isSubmitting ? "Booking..." : "Confirm Booking"}
-                                </Button>
+                                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                            <div className="space-y-1 md:space-y-0">
+                                                <label className={labelClass}><Calendar className="w-4 h-4 text-accent" /> Date</label>
+                                                <input
+                                                    type="date"
+                                                    min={minDate}
+                                                    {...register("date", { required: "Date is required" })}
+                                                    className={cn(inputClass, "min-h-[50px] md:min-h-[54px]")}
+                                                />
+                                                {errors.date && <p className={errorClass}>{errors.date.message}</p>}
+                                            </div>
+                                            <div className="space-y-1 md:space-y-0">
+                                                <label className={labelClass}><Clock className="w-4 h-4 text-accent" /> Time</label>
+                                                <select
+                                                    {...register("time", { required: "Time is required" })}
+                                                    className={cn(inputClass, "min-h-[50px] md:min-h-[54px] appearance-none cursor-pointer")}
+                                                >
+                                                    <option value="">Select Time</option>
+                                                    <option value="10:00 AM">10:00 AM</option>
+                                                    <option value="11:00 AM">11:00 AM</option>
+                                                    <option value="12:00 PM">12:00 PM</option>
+                                                    <option value="02:00 PM">02:00 PM</option>
+                                                    <option value="03:00 PM">03:00 PM</option>
+                                                    <option value="04:00 PM">04:00 PM</option>
+                                                    <option value="05:00 PM">05:00 PM</option>
+                                                </select>
+                                                {errors.time && <p className={errorClass}>{errors.time.message}</p>}
+                                            </div>
+                                        </div>
+
+                                        <div className="space-y-1 md:space-y-0">
+                                            <label className={labelClass}><GraduationCap className="w-4 h-4 text-accent" /> Education Level</label>
+                                            <select
+                                                {...register("education_level", { required: "Education level is required" })}
+                                                className={cn(inputClass, "min-h-[50px] md:min-h-[54px] appearance-none cursor-pointer")}
+                                            >
+                                                <option value="">Select Level</option>
+                                                <option value="Bachelors">Bachelor&apos;s</option>
+                                                <option value="Masters">Master&apos;s</option>
+                                                <option value="PhD">PhD</option>
+                                                <option value="Language_Course">Language Course</option>
+                                                <option value="Foundation_Year">Foundation Year</option>
+                                            </select>
+                                            {errors.education_level && <p className={errorClass}>{errors.education_level.message}</p>}
+                                        </div>
+
+                                        <div className="space-y-1 md:space-y-0">
+                                            <label className={labelClass}><BookOpen className="w-4 h-4 text-accent" /> Interested In</label>
+                                            <select
+                                                {...register("topic")}
+                                                className={cn(inputClass, "min-h-[50px] md:min-h-[54px] appearance-none cursor-pointer")}
+                                            >
+                                                <option value="General_Inquiry">General Inquiry</option>
+                                                <option value="University_Admission">University Admission</option>
+                                                <option value="Visa_Processing">Visa Processing</option>
+                                                <option value="Scholarship_Help">Scholarship Help</option>
+                                                <option value="LOM_SOP_Writing">LOM/SOP Writing</option>
+                                            </select>
+                                        </div>
+
+                                        <div className="pt-4 pb-2 md:pt-6">
+                                            <motion.div whileTap={{ scale: 0.97 }}>
+                                                <Button type="submit" className="w-full h-14 text-lg font-bold rounded-xl shadow-lg hover:shadow-xl hover:-translate-y-1 transition-all flex items-center justify-center gap-2" disabled={isSubmitting}>
+                                                    {isSubmitting ? (
+                                                        <>
+                                                            <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                                                            <span>Booking...</span>
+                                                        </>
+                                                    ) : "Confirm Booking ✨"}
+                                                </Button>
+                                            </motion.div>
+                                        </div>
+                                    </form>
+                                )}
                             </div>
-                        </form>
-                    )}
-                </div>
-            </div>
-        </div>
+                        </motion.div>
+                    </motion.div>
+                )}
+            </AnimatePresence>
+        </>
     );
 }
 
