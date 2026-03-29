@@ -88,13 +88,25 @@ export function HeroSection() {
                         transition={{ duration: 0.9, delay: 0.45, ease: [0.22, 1, 0.36, 1] }}
                         className="pt-6"
                     >
-                        <div className="flex flex-wrap items-center gap-4 text-sm text-muted-foreground bg-surface/50 dark:bg-card/50 px-4 py-2 rounded-full w-fit border border-border/50 backdrop-blur-sm">
-                            <div className="flex -space-x-2">
-                                <div className="w-8 h-8 rounded-full border-2 border-background bg-blue-100 flex items-center justify-center text-xs font-bold text-blue-800">TH</div>
-                                <div className="w-8 h-8 rounded-full border-2 border-background bg-green-100 flex items-center justify-center text-xs font-bold text-green-800">NJ</div>
-                                <div className="w-8 h-8 rounded-full border-2 border-background bg-purple-100 flex items-center justify-center text-xs font-bold text-purple-800">MD</div>
+                        <div className={cn(
+                            "flex items-center gap-3 px-5 py-3 rounded-full w-fit glass-nav border",
+                            mounted && currentTheme === "dark"
+                                ? "bg-[rgba(15,23,42,0.7)] border-white/10"
+                                : "bg-white/70 border-black/5"
+                        )}>
+                            <div className="flex -space-x-2.5">
+                                <div className="w-9 h-9 rounded-full ring-2 ring-accent/50 bg-gradient-to-br from-blue-400 to-blue-600 flex items-center justify-center text-xs font-bold text-white shadow-sm z-30">TH</div>
+                                <div className="w-9 h-9 rounded-full ring-2 ring-accent/50 bg-gradient-to-br from-emerald-400 to-emerald-600 flex items-center justify-center text-xs font-bold text-white shadow-sm z-20">NJ</div>
+                                <div className="w-9 h-9 rounded-full ring-2 ring-accent/50 bg-gradient-to-br from-violet-400 to-violet-600 flex items-center justify-center text-xs font-bold text-white shadow-sm z-10">MD</div>
                             </div>
-                            <span>Trusted by <strong className="text-accent">200+ students</strong> across 20+ countries</span>
+                            <div className="w-px h-6 bg-accent/30" />
+                            <div className="text-sm">
+                                <span className="text-muted-foreground">Trusted by </span>
+                                <span className="text-accent font-bold text-base">200+</span>
+                                <span className="text-muted-foreground font-medium"> students</span>
+                                <span className="text-muted-foreground/70"> across </span>
+                                <span className="font-semibold text-foreground/80">20+ countries</span>
+                            </div>
                         </div>
                     </motion.div>
                 </div>
