@@ -9,6 +9,8 @@ import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { SearchModal } from "@/components/common/SearchModal";
+import { LanguageToggle } from "@/components/common/LanguageToggle";
+import { useTranslation } from "@/i18n/LanguageContext";
 import { destinations as destinationsData } from "@/data/destinations";
 
 // Auto-generate destination nav items from data
@@ -30,6 +32,7 @@ export function Header() {
     const [dropdownOpen, setDropdownOpen] = useState(false);
     const { theme, setTheme, systemTheme } = useTheme();
     const [mounted, setMounted] = useState(false);
+    const { t, locale } = useTranslation();
 
     const currentTheme = theme === "system" ? systemTheme : theme;
 
@@ -77,10 +80,10 @@ export function Header() {
                 {/* Desktop Nav */}
                 <div className="hidden lg:flex items-center gap-6">
                     <Link href="/#services" className="text-sm font-medium hover:text-accent transition-colors">
-                        Services
+                        {t("common.nav.services")}
                     </Link>
                     <Link href="/#about" className="text-sm font-medium hover:text-accent transition-colors">
-                        About
+                        {t("common.nav.about")}
                     </Link>
 
                     <div
@@ -93,7 +96,7 @@ export function Header() {
                             aria-expanded={dropdownOpen}
                             aria-haspopup="true"
                         >
-                            Destinations <ChevronDown className={cn("w-4 h-4 transition-transform", dropdownOpen && "rotate-180")} />
+                            {t("common.nav.destinations")} <ChevronDown className={cn("w-4 h-4 transition-transform", dropdownOpen && "rotate-180")} />
                         </button>
 
                         {/* Dropdown Menu — perfectly matches mobile glassmorphism */}
@@ -129,16 +132,18 @@ export function Header() {
                                         : "border-black/10 hover:bg-black/5"
                                 )}
                             >
-                                View All Destinations
+                                {t("common.nav.viewAllDestinations")}
                             </Link>
                         </div>
                     </div>
 
                     <Button className="rounded-full px-6" onClick={() => window.dispatchEvent(new CustomEvent('open-booking-modal'))}>
-                        Book Consultation
+                        {t("common.nav.bookConsultation")}
                     </Button>
 
                     <SearchModal />
+
+                    <LanguageToggle />
 
                     <motion.button
                         whileTap={{ scale: 0.9 }}
@@ -153,6 +158,8 @@ export function Header() {
                 {/* Mobile Icons (Logo, Search, Theme) */}
                 <div className="flex items-center gap-1.5 lg:hidden">
                     <SearchModal />
+                    <div className="w-[1px] h-5 bg-border/60 mx-1" />
+                    <LanguageToggle />
                     <div className="w-[1px] h-5 bg-border/60 mx-1" />
                     <motion.button
                         whileTap={{ scale: 0.9 }}

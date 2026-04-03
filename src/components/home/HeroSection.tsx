@@ -8,10 +8,12 @@ import { useTheme } from "next-themes";
 import { useState, useEffect } from "react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
+import { useTranslation } from "@/i18n/LanguageContext";
 
 export function HeroSection() {
     const { theme, systemTheme } = useTheme();
     const [mounted, setMounted] = useState(false);
+    const { t } = useTranslation();
     const currentTheme = theme === "system" ? systemTheme : theme;
 
     useEffect(() => {
@@ -32,7 +34,7 @@ export function HeroSection() {
                         transition={{ duration: 1, ease: [0.22, 1, 0.36, 1] }}
                         className="text-3xl md:text-6xl font-bold font-heading text-primary leading-tight"
                     >
-                        Your Bridge to <span className="text-accent">Global Education</span>
+                        {t("home.hero.title")} <span className="text-accent">{t("home.hero.titleAccent")}</span>
                     </motion.h1>
 
                     <motion.p
@@ -41,7 +43,7 @@ export function HeroSection() {
                         transition={{ duration: 0.9, delay: 0.15, ease: [0.22, 1, 0.36, 1] }}
                         className="text-lg md:text-2xl font-medium italic text-accent"
                     >
-                        Dream it. Plan it. Achieve it.
+                        {t("home.hero.tagline")}
                     </motion.p>
 
                     <motion.p
@@ -50,7 +52,7 @@ export function HeroSection() {
                         transition={{ duration: 0.9, delay: 0.25, ease: [0.22, 1, 0.36, 1] }}
                         className="text-lg text-muted-foreground max-w-lg leading-relaxed"
                     >
-                        Expert guidance for Bangladeshi students aspiring to study abroad. We make your international education journey seamless and successful.
+                        {t("home.hero.description")}
                     </motion.p>
 
                     <motion.div

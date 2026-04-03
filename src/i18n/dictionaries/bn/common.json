@@ -1,0 +1,88 @@
+{
+  "nav": {
+    "services": "সার্ভিস সমূহ",
+    "about": "আমাদের সম্পর্কে",
+    "destinations": "গন্তব্যসমূহ",
+    "viewAllDestinations": "সকল গন্তব্য দেখুন",
+    "bookConsultation": "কনসালটেশন বুক করুন"
+  },
+  "footer": {
+    "ctaTitle": "আপনার যাত্রা শুরু করতে প্রস্তুত?",
+    "ctaSubtitle": "একটি ফ্রি কনসালটেশন বুক করুন এবং আপনার বিদেশে পড়ার স্বপ্ন পূরণের প্রথম ধাপ নিন।",
+    "ctaButton": "ফ্রি কনসালটেশন বুক করুন",
+    "quickLinks": "প্রয়োজনীয় লিঙ্ক",
+    "popularDestinations": "জনপ্রিয় গন্তব্যসমূহ",
+    "contactUs": "যোগাযোগ করুন",
+    "home": "হোম",
+    "services": "সার্ভিস সমূহ",
+    "aboutUs": "আমাদের সম্পর্কে",
+    "destinations": "গন্তব্যসমূহ",
+    "copyright": "নেক্সটেপ এডু। সর্বস্বত্ব সংরক্ষিত।"
+  },
+  "tab": {
+    "home": "হোম",
+    "services": "সার্ভিস",
+    "book": "বুকিং",
+    "about": "সম্পর্কে"
+  },
+  "modal": {
+    "title": "ফ্রি কনসালটেশন",
+    "subtitle": "চলুন একসাথে আপনার ভবিষ্যৎ পরিকল্পনা করি।",
+    "successTitle": "আপনার অনুরোধ পেয়েছি!",
+    "successSubtitle": "আমাদের টিম ২৪ ঘণ্টার মধ্যে যোগাযোগ করবে।",
+    "closeWindow": "উইন্ডো বন্ধ করুন",
+    "confirmBooking": "বুকিং কনফার্ম করুন",
+    "booking": "বুকিং হচ্ছে..."
+  },
+  "form": {
+    "fullName": "পুরো নাম",
+    "email": "ইমেইল",
+    "phone": "মোবাইল নম্বর",
+    "date": "তারিখ",
+    "time": "সময়",
+    "selectTime": "সময় নির্বাচন করুন",
+    "educationLevel": "শিক্ষাগত যোগ্যতা",
+    "selectLevel": "লেভেল নির্বাচন করুন",
+    "interestedIn": "আগ্রহের বিষয়",
+    "namePlaceholder": "যেমন: রহিম আহমেদ",
+    "emailPlaceholder": "hello@example.com",
+    "phonePlaceholder": "017...",
+    "bachelors": "ব্যাচেলর'স",
+    "masters": "মাস্টার্স",
+    "phd": "পিএইচডি",
+    "languageCourse": "ল্যাঙ্গুয়েজ কোর্স",
+    "foundationYear": "ফাউন্ডেশন ইয়ার",
+    "generalInquiry": "সাধারণ জিজ্ঞাসা",
+    "universityAdmission": "বিশ্ববিদ্যালয়ে ভর্তি",
+    "visaProcessing": "ভিসা প্রসেসিং",
+    "scholarshipHelp": "স্কলারশিপ সহায়তা",
+    "lomSopWriting": "LOM/SOP রাইটিং"
+  },
+  "validation": {
+    "nameRequired": "নাম আবশ্যক",
+    "emailRequired": "ইমেইল আবশ্যক",
+    "invalidEmail": "অকার্যকর ইমেইল",
+    "phoneRequired": "মোবাইল নম্বর আবশ্যক",
+    "dateRequired": "তারিখ আবশ্যক",
+    "timeRequired": "সময় আবশ্যক",
+    "educationRequired": "শিক্ষাগত যোগ্যতা আবশ্যক"
+  },
+  "error": {
+    "pageNotFound": "পৃষ্ঠা পাওয়া যায়নি",
+    "notFoundSubtitle": "মনে হচ্ছে এই পৃষ্ঠাটি স্টাডি ব্রেক নিয়েছে! চলুন আপনাকে আবার ট্র্যাকে ফিরিয়ে আনি।",
+    "goHome": "হোমে ফিরে যান",
+    "exploreDestinations": "গন্তব্যসমূহ দেখুন"
+  },
+  "search": {
+    "ariaLabel": "গন্তব্য, সার্ভিস এবং পেজ খুঁজুন",
+    "placeholder": "গন্তব্য বা সার্ভিস খুঁজুন...",
+    "noResults": "কোনাে ফলাফল পাওয়া যায়নি",
+    "hint": "খুঁজলে পেতে পারেন",
+    "categoryDestination": "গন্তব্য",
+    "categoryService": "সার্ভিস",
+    "categoryPage": "পেজ"
+  },
+  "whatsapp": {
+    "ariaLabel": "আমাদের সাথে হোয়াটসঅ্যাপে চ্যাট করুন"
+  }
+}

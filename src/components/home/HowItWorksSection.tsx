@@ -6,30 +6,23 @@ import { useTheme } from "next-themes";
 import { useState, useEffect } from "react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
+import { useTranslation } from "@/i18n/LanguageContext";
 
-const steps = [
+const stepsData = [
     {
-        number: "01",
-        title: "Book a Call",
-        description: "Schedule a free 30-minute consultation. We listen, understand your goals, and assess your profile.",
+        id: "call",
         icon: PhoneCall,
     },
     {
-        number: "02",
-        title: "Get Your Plan",
-        description: "Receive a personalized roadmap with university shortlists, timelines, and a clear checklist.",
+        id: "plan",
         icon: ClipboardList,
     },
     {
-        number: "03",
-        title: "Apply & Prepare",
-        description: "We handle SOPs, documents, visa applications, and mock interviews. You stay stress-free.",
+        id: "apply",
         icon: SendHorizonal,
     },
     {
-        number: "04",
-        title: "Fly Abroad",
-        description: "Pre-departure briefing, blocked accounts, housing tips — you're fully ready for your new life.",
+        id: "fly",
         icon: PlaneTakeoff,
     },
 ];
@@ -37,6 +30,7 @@ const steps = [
 export function HowItWorksSection() {
     const { theme, systemTheme } = useTheme();
     const [mounted, setMounted] = useState(false);
+    const { t } = useTranslation();
     const currentTheme = theme === "system" ? systemTheme : theme;
 
     useEffect(() => {
@@ -86,9 +80,9 @@ export function HowItWorksSection() {
 
                 {/* Steps Grid */}
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 lg:gap-6 max-w-6xl mx-auto">
-                    {steps.map((step, i) => (
+                    {stepsData.map((step, i) => (
                         <motion.div
-                            key={step.number}
+                            key={step.id}
                             initial={{ opacity: 0, y: 30 }}
                             whileInView={{ opacity: 1, y: 0 }}
                             viewport={{ once: true }}
@@ -97,7 +91,7 @@ export function HowItWorksSection() {
                             className="relative group"
                         >
                             {/* Connector line — hidden on mobile, visible on lg between cards */}
-                            {i < steps.length - 1 && (
+                            {i < stepsData.length - 1 && (
                                 <div className="hidden lg:block absolute top-12 left-[calc(100%+0.25rem)] w-[calc(100%-3rem)] border-t-2 border-dashed border-accent/20 z-0 pointer-events-none" />
                             )}
 
@@ -111,8 +105,8 @@ export function HowItWorksSection() {
                                 <div className="absolute inset-x-0 top-0 h-1 bg-gradient-to-r from-transparent via-accent/60 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
 
                                 {/* Step number badge */}
-                                <div className="text-xs font-bold tracking-widest text-accent/60 mb-4">
-                                    STEP {step.number}
+                                <div className="text-xs font-bold tracking-widest text-accent/60 mb-4 uppercase">
+                                    {t("home.howItWorks.stepLabel")} 0{i + 1}
                                 </div>
 
                                 {/* Icon */}
@@ -122,13 +116,13 @@ export function HowItWorksSection() {
 
                                 {/* Content */}
                                 <h3 className="font-heading font-bold text-xl text-primary mb-3">
-                                    {step.title}
+                                    {t(`home.howItWorks.steps.${step.id}.title`)}
                                 </h3>
                                 <p className={cn(
                                     "text-sm leading-relaxed flex-grow",
                                     mounted && currentTheme === "dark" ? "text-white/70" : "text-muted-foreground"
                                 )}>
-                                    {step.description}
+                                    {t(`home.howItWorks.steps.${step.id}.description`)}
                                 </p>
                             </div>
                         </motion.div>
@@ -145,10 +139,10 @@ export function HowItWorksSection() {
                 >
                     <Button
                         size="lg"
-                        className="rounded-full text-base px-8"
+                        className="rounded-full text-base px-8 h-14 font-bold shadow-xl"
                         onClick={() => window.dispatchEvent(new CustomEvent('open-booking-modal'))}
                     >
-                        Start With Step 1 — It&apos;s Free
+                        {t("home.howItWorks.ctaButton")}
                     </Button>
                 </motion.div>
             </div>

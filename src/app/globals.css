@@ -95,7 +95,16 @@
 body {
     background-color: var(--background);
     color: var(--foreground);
-    font-family: var(--font-sans);
+    font-family: var(--font-ibm-plex-sans), system-ui, -apple-system, sans-serif;
+}
+
+html[lang="bn"] body {
+    font-family: var(--font-bengali), var(--font-ibm-plex-sans), system-ui, -apple-system, sans-serif;
+    line-height: 1.8;
+}
+
+html[lang="bn"] .text-sm {
+    line-height: 1.75;
 }
 
 /* Enable smooth scrolling for all anchor tags */

@@ -1,0 +1,93 @@
+{
+  "hero": {
+    "title": "Your Bridge to ",
+    "titleAccent": "Global Education",
+    "tagline": "Dream it. Plan it. Achieve it.",
+    "description": "Expert guidance for Bangladeshi students aspiring to study abroad. We make your international education journey seamless and successful.",
+    "ctaPrimary": "Let's Talk",
+    "ctaSecondary": "See Our Work",
+    "trustedBy": "Trusted by ",
+    "students": " students",
+    "across": " across ",
+    "countries": "20+ countries"
+  },
+  "services": {
+    "title": "What We ",
+    "titleAccent": "Actually",
+    "titleSuffix": " Do For You",
+    "subtitle": "Detailed SOPs, visa support, scholarship hunting—we handle the gritty details so you can focus on packing your bags.",
+    "items": {
+      "lom": {
+        "title": "LOM / SOP Solution",
+        "description": "We craft your story, not just edit grammar. Our experts help you write compelling Letters of Motivation and SOPs that admissions officers actually read."
+      },
+      "offer": {
+        "title": "Offer Letter",
+        "description": "Fast-tracked applications via our university network. We ensure your application is complete and error-free to maximize acceptance chances."
+      },
+      "visa": {
+        "title": "Visa Support",
+        "description": "End-to-end guidance from appointment booking to mock interviews. We know the checklists inside out."
+      },
+      "selection": {
+        "title": "University Selection",
+        "description": "Oxford or Toronto? We help you shortlist unis that fit your vibe, budget, and goals."
+      },
+      "bank": {
+        "title": "Bank Solvency",
+        "description": "Struggling to show funds? We guide you on proper documentation, blocked accounts, and financial proof strategies that satisfy visa officers."
+      },
+      "scholarship": {
+        "title": "Scholarship Hunting",
+        "description": "Studying abroad is expensive. We find hidden financial aid options and help you apply effectively."
+      }
+    }
+  },
+  "about": {
+    "title": "Why Students Trust Us",
+    "description": "We've helped hundreds of Bangladeshi students achieve their dreams of studying abroad. Our team combines personal experience with professional expertise.",
+    "features": [
+      "Zero Fraud Risk: We NEVER hold your original passport or documents",
+      "No Advance Fees: You pay only after service delivery (consultation excluded)",
+      "Connections with 200+ universities worldwide",
+      "BPMN 2.0 optimized workflows for faster, error-free applications"
+    ],
+    "ctaButton": "Chat With Us",
+    "stats": {
+      "consultations": "Consultations Done",
+      "countries": "Countries",
+      "visa": "Visa Success Rate"
+    }
+  },
+  "howItWorks": {
+    "badge": "Simple Process",
+    "title": "How It Works",
+    "subtitle": "From your first call to your flight — four simple steps to studying abroad.",
+    "ctaButton": "Start With Step 1 — It's Free",
+    "stepLabel": "STEP",
+    "steps": {
+      "call": {
+        "title": "Book a Call",
+        "description": "Schedule a free 30-minute consultation. We listen, understand your goals, and assess your profile."
+      },
+      "plan": {
+        "title": "Get Your Plan",
+        "description": "Receive a personalized roadmap with university shortlists, timelines, and a clear checklist."
+      },
+      "apply": {
+        "title": "Apply & Prepare",
+        "description": "We handle SOPs, documents, visa applications, and mock interviews. You stay stress-free."
+      },
+      "fly": {
+        "title": "Fly Abroad",
+        "description": "Pre-departure briefing, blocked accounts, housing tips — you're fully ready for your new life."
+      }
+    }
+  },
+  "testimonials": {
+    "badge": "Real Stories",
+    "title": "From Students Who've Been There",
+    "subtitle": "These stories say it better than we ever could.",
+    "visaLabel": "Visa Approved: "
+  }
+}

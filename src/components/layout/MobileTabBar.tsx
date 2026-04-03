@@ -6,12 +6,14 @@ import { useTheme } from "next-themes";
 import { cn } from "@/lib/utils";
 import { usePathname } from "next/navigation";
 import { motion } from "framer-motion";
+import { useTranslation } from "@/i18n/LanguageContext";
 
 export function MobileTabBar() {
     const { theme, systemTheme } = useTheme();
     const [mounted, setMounted] = useState(false);
     const pathname = usePathname();
     const [activeHash, setActiveHash] = useState("");
+    const { t } = useTranslation();
 
     const currentTheme = theme === "system" ? systemTheme : theme;
     const isDark = mounted && currentTheme === "dark";
@@ -128,7 +130,7 @@ export function MobileTabBar() {
                     )}
                 >
                     <Home className={cn("w-5 h-5 mb-1", isHomeActive && "fill-accent/20")} strokeWidth={isHomeActive ? 2.5 : 2} />
-                    <span className="text-[10px] font-bold mt-0.5 uppercase tracking-wider">Home</span>
+                    <span className="text-[10px] font-bold mt-0.5 uppercase tracking-wider">{t("common.tab.home")}</span>
                     {isHomeActive && (
                         <motion.div
                             layoutId="activeTabPill"
@@ -150,7 +152,7 @@ export function MobileTabBar() {
                     )}
                 >
                     <BookOpen className={cn("w-5 h-5 mb-1", isServicesActive && "fill-accent/20")} strokeWidth={isServicesActive ? 2.5 : 2} />
-                    <span className="text-[10px] font-bold mt-0.5 uppercase tracking-wider">Services</span>
+                    <span className="text-[10px] font-bold mt-0.5 uppercase tracking-wider">{t("common.tab.services")}</span>
                     {isServicesActive && (
                         <motion.div
                             layoutId="activeTabPill"
@@ -185,7 +187,7 @@ export function MobileTabBar() {
                     )}
                 >
                     <Info className={cn("w-5 h-5 mb-1", isAboutActive && "fill-accent/20")} strokeWidth={isAboutActive ? 2.5 : 2} />
-                    <span className="text-[10px] font-bold mt-0.5 uppercase tracking-wider">About</span>
+                    <span className="text-[10px] font-bold mt-0.5 uppercase tracking-wider">{t("common.tab.about")}</span>
                     {isAboutActive && (
                         <motion.div
                             layoutId="activeTabPill"
