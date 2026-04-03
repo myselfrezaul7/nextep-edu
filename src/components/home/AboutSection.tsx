@@ -6,13 +6,7 @@ import { CheckCircle } from "lucide-react";
 import { useTheme } from "next-themes";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
-
-const features = [
-    "Zero Fraud Risk: We NEVER hold your original passport or documents",
-    "No Advance Fees: You pay only after service delivery (consultation excluded)",
-    "Connections with 200+ universities worldwide",
-    "BPMN 2.0 optimized workflows for faster, error-free applications",
-];
+import { useTranslation } from "@/i18n/LanguageContext";
 
 const containerVariants = {
     hidden: { opacity: 0 },
@@ -130,6 +124,7 @@ function WorldMapDecor() {
 export function AboutSection() {
     const { theme, systemTheme } = useTheme();
     const [mounted, setMounted] = useState(false);
+    const { t } = useTranslation();
     const currentTheme = theme === "system" ? systemTheme : theme;
     const isDark = mounted && currentTheme === "dark";
 
@@ -159,14 +154,14 @@ export function AboutSection() {
                         viewport={{ once: true }}
                         className="space-y-4 mb-8"
                     >
-                        {features.map((feature, i) => (
+                        {[0, 1, 2, 3].map((index) => (
                             <motion.li
-                                key={i}
+                                key={index}
                                 variants={itemVariants}
                                 className="flex items-center gap-3 font-medium text-foreground"
                             >
                                 <CheckCircle className="w-5 h-5 text-accent shrink-0" />
-                                {feature}
+                                {t(`home.about.features.${index}`)}
                             </motion.li>
                         ))}
                     </motion.ul>

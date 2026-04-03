@@ -1,0 +1,88 @@
+{
+  "nav": {
+    "services": "Services",
+    "about": "About",
+    "destinations": "Destinations",
+    "viewAllDestinations": "View All Destinations",
+    "bookConsultation": "Book Consultation"
+  },
+  "footer": {
+    "ctaTitle": "Ready to Start Your Journey?",
+    "ctaSubtitle": "Book a free consultation and take the first step toward studying abroad.",
+    "ctaButton": "Book Free Consultation",
+    "quickLinks": "Quick Links",
+    "popularDestinations": "Popular Destinations",
+    "contactUs": "Contact Us",
+    "home": "Home",
+    "services": "Services",
+    "aboutUs": "About Us",
+    "destinations": "Destinations",
+    "copyright": "NexTep Edu. All rights reserved."
+  },
+  "tab": {
+    "home": "Home",
+    "services": "Services",
+    "book": "Book",
+    "about": "About"
+  },
+  "modal": {
+    "title": "Free Consultation",
+    "subtitle": "Let's plan your future together.",
+    "successTitle": "We Got Your Request!",
+    "successSubtitle": "Our team will reach out within 24 hours.",
+    "closeWindow": "Close Window",
+    "confirmBooking": "Confirm Booking",
+    "booking": "Booking..."
+  },
+  "form": {
+    "fullName": "Full Name",
+    "email": "Email",
+    "phone": "Phone",
+    "date": "Date",
+    "time": "Time",
+    "selectTime": "Select Time",
+    "educationLevel": "Education Level",
+    "selectLevel": "Select Level",
+    "interestedIn": "Interested In",
+    "namePlaceholder": "e.g. Rahim Ahmed",
+    "emailPlaceholder": "hello@example.com",
+    "phonePlaceholder": "017...",
+    "bachelors": "Bachelor's",
+    "masters": "Master's",
+    "phd": "PhD",
+    "languageCourse": "Language Course",
+    "foundationYear": "Foundation Year",
+    "generalInquiry": "General Inquiry",
+    "universityAdmission": "University Admission",
+    "visaProcessing": "Visa Processing",
+    "scholarshipHelp": "Scholarship Help",
+    "lomSopWriting": "LOM/SOP Writing"
+  },
+  "validation": {
+    "nameRequired": "Name is required",
+    "emailRequired": "Email is required",
+    "invalidEmail": "Invalid email",
+    "phoneRequired": "Phone is required",
+    "dateRequired": "Date is required",
+    "timeRequired": "Time is required",
+    "educationRequired": "Education level is required"
+  },
+  "error": {
+    "pageNotFound": "Page Not Found",
+    "notFoundSubtitle": "Looks like this page took a study break! Let's get you back on track.",
+    "goHome": "Go Home",
+    "exploreDestinations": "Explore Destinations"
+  },
+  "search": {
+    "ariaLabel": "Search destinations, services, and pages",
+    "placeholder": "Search destinations, services...",
+    "noResults": "No results found for",
+    "hint": "Try searching for",
+    "categoryDestination": "Destination",
+    "categoryService": "Service",
+    "categoryPage": "Page"
+  },
+  "whatsapp": {
+    "ariaLabel": "Chat with us on WhatsApp"
+  }
+}

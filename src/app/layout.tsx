@@ -1,5 +1,5 @@
 import type { Metadata, Viewport } from "next";
-import { IBM_Plex_Sans, Playfair_Display } from "next/font/google";
+import { IBM_Plex_Sans, Playfair_Display, Noto_Sans_Bengali } from "next/font/google";
 import { ThemeProvider } from "@/components/theme-provider";
 import { Header } from "@/components/layout/Header";
 import { Footer } from "@/components/layout/Footer";
@@ -12,6 +12,7 @@ import { BackToTop } from "@/components/common/BackToTop";
 import { PageTransition } from "@/components/common/PageTransition";
 import { ErrorBoundary } from "@/components/common/ErrorBoundary";
 import { SpeedInsights } from "@vercel/speed-insights/next";
+import { LanguageProvider } from "@/i18n/LanguageContext";
 import "./globals.css";
 
 
@@ -25,6 +26,12 @@ const playfair = Playfair_Display({
     subsets: ["latin"],
     weight: ["400", "700"],
     variable: "--font-playfair",
+});
+
+const notoBengali = Noto_Sans_Bengali({
+    subsets: ["bengali"],
+    weight: ["400", "500", "600", "700"],
+    variable: "--font-bengali",
 });
 
 // SEO Metadata targeting Bangladeshi students
@@ -60,6 +67,10 @@ export const metadata: Metadata = {
         "study abroad without IELTS Bangladesh",
         "tuition free universities for Bangladeshi students",
         "Germany student visa from Bangladesh",
+        "বাংলাদেশ থেকে জার্মানিতে পড়াশোনা",
+        "বিদেশে পড়াশোনার খরচ",
+        "স্কলারশিপ বাংলাদেশ",
+        "ভিসা সাহায্য ঢাকা"
     ],
     authors: [{ name: "NexTep Edu", url: "https://www.nextepedu.com" }],
     creator: "NexTep Edu",
@@ -74,6 +85,7 @@ export const metadata: Metadata = {
         canonical: "./",
         languages: {
             "en-BD": "./",
+            "bn-BD": "./",
         },
     },
     // Open Graph for Facebook/LinkedIn (popular in Bangladesh)
@@ -126,7 +138,7 @@ export const metadata: Metadata = {
         "geo.placename": "Dhaka, Bangladesh",
         "geo.position": "23.8103;90.4125",
         ICBM: "23.8103, 90.4125",
-        "content-language": "en-BD",
+        "content-language": "en-BD, bn-BD",
     },
 };
 
@@ -150,14 +162,18 @@ export default function RootLayout({
         <html lang="en" suppressHydrationWarning>
             <head>
                 <StructuredData />
+                <link rel="alternate" hrefLang="en" href="https://www.nextepedu.com" />
+                <link rel="alternate" hrefLang="bn" href="https://www.nextepedu.com" />
+                <link rel="alternate" hrefLang="x-default" href="https://www.nextepedu.com" />
             </head>
-            <body className={`${ibmPlexSans.variable} ${playfair.variable} font-sans antialiased min-h-screen flex flex-col selection:bg-accent/20 selection:text-foreground`}>
-                <ThemeProvider
-                    attribute="class"
-                    defaultTheme="system"
-                    enableSystem
-                    disableTransitionOnChange
-                >
+            <body className={`${ibmPlexSans.variable} ${playfair.variable} ${notoBengali.variable} font-sans antialiased min-h-screen flex flex-col selection:bg-accent/20 selection:text-foreground`}>
+                <LanguageProvider>
+                    <ThemeProvider
+                        attribute="class"
+                        defaultTheme="system"
+                        enableSystem
+                        disableTransitionOnChange
+                    >
                     <ScrollProgress />
                     <div className="flex flex-col min-h-screen">
                         <Header />
@@ -174,6 +190,7 @@ export default function RootLayout({
                     <BackToTop />
                     <SpeedInsights />
                 </ThemeProvider>
+                </LanguageProvider>
             </body>
         </html>
     );

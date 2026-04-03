@@ -8,12 +8,14 @@ import { useState, useEffect } from "react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { motion, AnimatePresence } from "framer-motion";
+import { useTranslation } from "@/i18n/LanguageContext";
 
 export function Footer() {
     const { theme, systemTheme } = useTheme();
     const [mounted, setMounted] = useState(false);
     const [openSection, setOpenSection] = useState<string | null>(null);
     const [isMobile, setIsMobile] = useState(false);
+    const { t, locale } = useTranslation();
     const currentTheme = theme === "system" ? systemTheme : theme;
 
     useEffect(() => {
@@ -47,10 +49,10 @@ export function Footer() {
                         transition={{ duration: 0.5 }}
                     >
                         <h3 className="text-2xl md:text-3xl font-bold font-heading text-white mb-3">
-                            Ready to Start Your Journey?
+                            {t("common.footer.ctaTitle")}
                         </h3>
                         <p className="text-white/70 mb-6 max-w-lg mx-auto text-sm md:text-base">
-                            Book a free consultation and take the first step toward studying abroad.
+                            {t("common.footer.ctaSubtitle")}
                         </p>
                         <motion.div whileTap={{ scale: 0.95 }} className="inline-block">
                             <Button
@@ -58,7 +60,7 @@ export function Footer() {
                                 className="rounded-full font-bold text-base px-8"
                                 onClick={() => window.dispatchEvent(new CustomEvent('open-booking-modal'))}
                             >
-                                Book Free Consultation
+                                {t("common.footer.ctaButton")}
                             </Button>
                         </motion.div>
                     </motion.div>
@@ -106,7 +108,7 @@ export function Footer() {
                                 onClick={() => toggleSection("quick-links")}
                                 className="w-full flex items-center justify-between py-4 md:py-0 md:mb-6 text-foreground font-bold hover:text-accent transition-colors"
                             >
-                                <span>Quick Links</span>
+                                <span>{t("common.footer.quickLinks")}</span>
                                 <ChevronDown className={cn("w-4 h-4 md:hidden transition-transform duration-300", openSection === "quick-links" && "rotate-180")} />
                             </button>
                             <AnimatePresence initial={false}>
@@ -117,10 +119,10 @@ export function Footer() {
                                         exit={isMobile ? { height: 0, opacity: 0 } : undefined}
                                         className="space-y-1 md:space-y-3 text-sm pb-4 md:pb-0 overflow-hidden"
                                     >
-                                        <li><Link href="/" className={cn("py-2.5 md:py-0 block hover:text-accent transition-colors", mounted && currentTheme === "dark" ? "text-white/70" : "text-muted-foreground")}>Home</Link></li>
-                                        <li><Link href="/#services" className={cn("py-2.5 md:py-0 block hover:text-accent transition-colors", mounted && currentTheme === "dark" ? "text-white/70" : "text-muted-foreground")}>Services</Link></li>
-                                        <li><Link href="/#about" className={cn("py-2.5 md:py-0 block hover:text-accent transition-colors", mounted && currentTheme === "dark" ? "text-white/70" : "text-muted-foreground")}>About Us</Link></li>
-                                        <li><Link href="/destinations" className={cn("py-2.5 md:py-0 block hover:text-accent transition-colors", mounted && currentTheme === "dark" ? "text-white/70" : "text-muted-foreground")}>Destinations</Link></li>
+                                        <li><Link href="/" className={cn("py-2.5 md:py-0 block hover:text-accent transition-colors", mounted && currentTheme === "dark" ? "text-white/70" : "text-muted-foreground")}>{t("common.footer.home")}</Link></li>
+                                        <li><Link href="/#services" className={cn("py-2.5 md:py-0 block hover:text-accent transition-colors", mounted && currentTheme === "dark" ? "text-white/70" : "text-muted-foreground")}>{t("common.footer.services")}</Link></li>
+                                        <li><Link href="/#about" className={cn("py-2.5 md:py-0 block hover:text-accent transition-colors", mounted && currentTheme === "dark" ? "text-white/70" : "text-muted-foreground")}>{t("common.footer.aboutUs")}</Link></li>
+                                        <li><Link href="/destinations" className={cn("py-2.5 md:py-0 block hover:text-accent transition-colors", mounted && currentTheme === "dark" ? "text-white/70" : "text-muted-foreground")}>{t("common.footer.destinations")}</Link></li>
                                     </motion.ul>
                                 )}
                             </AnimatePresence>
@@ -132,7 +134,7 @@ export function Footer() {
                                 onClick={() => toggleSection("destinations")}
                                 className="w-full flex items-center justify-between py-4 md:py-0 md:mb-6 text-foreground font-bold hover:text-accent transition-colors"
                             >
-                                <span>Popular Destinations</span>
+                                <span>{t("common.footer.popularDestinations")}</span>
                                 <ChevronDown className={cn("w-4 h-4 md:hidden transition-transform duration-300", openSection === "destinations" && "rotate-180")} />
                             </button>
                             <AnimatePresence initial={false}>
@@ -159,7 +161,7 @@ export function Footer() {
                                 onClick={() => toggleSection("contact")}
                                 className="w-full flex items-center justify-between py-4 md:py-0 md:mb-6 text-foreground font-bold hover:text-accent transition-colors"
                             >
-                                <span>Contact Us</span>
+                                <span>{t("common.footer.contactUs")}</span>
                                 <ChevronDown className={cn("w-4 h-4 md:hidden transition-transform duration-300", openSection === "contact" && "rotate-180")} />
                             </button>
                             <AnimatePresence initial={false}>

@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/button";
 import { useTheme } from "next-themes";
 import { cn } from "@/lib/utils";
 import { motion, AnimatePresence } from "framer-motion";
+import { useTranslation } from "@/i18n/LanguageContext";
 
 type FormData = {
     name: string;
@@ -30,6 +31,7 @@ export function BookingModal() {
 
     const { theme, systemTheme } = useTheme();
     const [mounted, setMounted] = useState(false);
+    const { t } = useTranslation();
 
     useEffect(() => {
         setMinDate(new Date().toISOString().split("T")[0]);
@@ -183,9 +185,9 @@ export function BookingModal() {
                             )}>
                                 <div>
                                     <h3 id="booking-modal-title" className="text-xl md:text-2xl font-bold font-heading text-primary">
-                                        {isSuccess ? "Booking Confirmed" : "Free Consultation"}
+                                        {isSuccess ? t("common.modal.bookingConfirmed", undefined, "Booking Confirmed") : t("common.modal.freeConsultation", undefined, "Free Consultation")}
                                     </h3>
-                                    {!isSuccess && <p className={cn("text-xs md:text-sm mt-1", isDark ? "text-white/60" : "text-foreground/70")}>Let&apos;s plan your future together.</p>}
+                                    {!isSuccess && <p className={cn("text-xs md:text-sm mt-1", isDark ? "text-white/60" : "text-foreground/70")}>{t("common.modal.subtitle", undefined, "Let's plan your future together.")}</p>}
                                 </div>
                                 <motion.button
                                     whileTap={{ scale: 0.9 }}
@@ -215,13 +217,13 @@ export function BookingModal() {
                                         )}>
                                             <CheckCircle className="w-10 h-10" />
                                         </div>
-                                        <h4 className="text-3xl font-bold font-heading text-primary">We Got Your Request!</h4>
+                                        <h4 className="text-3xl font-bold font-heading text-primary">{t("common.modal.successTitle", undefined, "We Got Your Request!")}</h4>
                                         <p className="text-muted-foreground text-lg max-w-sm mx-auto">
-                                            Our team will reach out within 24 hours.
+                                            {t("common.modal.successDesc", undefined, "Our team will reach out within 24 hours.")}
                                         </p>
                                         <motion.div whileTap={{ scale: 0.97 }} className="w-full max-w-xs mt-8">
                                             <Button onClick={closeModal} size="lg" className="w-full rounded-xl text-lg font-bold">
-                                                Close Window
+                                                {t("common.modal.closeWindow", undefined, "Close Window")}
                                             </Button>
                                         </motion.div>
                                     </motion.div>
@@ -231,35 +233,35 @@ export function BookingModal() {
                                         <input type="text" className="hidden" {...register("website_url")} autoComplete="off" tabIndex={-1} />
 
                                         <div className="space-y-1 md:space-y-0">
-                                            <label className={labelClass}><User className="w-4 h-4 text-accent" /> Full Name</label>
+                                            <label className={labelClass}><User className="w-4 h-4 text-accent" /> {t("common.modal.fullName", undefined, "Full Name")}</label>
                                             <input
-                                                {...register("name", { required: "Name is required" })}
+                                                {...register("name", { required: t("common.modal.reqName", undefined, "Name is required") })}
                                                 ref={(e) => {
                                                     register("name").ref(e);
                                                     firstInputRef.current = e;
                                                 }}
                                                 className={inputClass}
-                                                placeholder="e.g. Rahim Ahmed"
+                                                placeholder={t("common.modal.phName", undefined, "e.g. Rahim Ahmed")}
                                             />
                                             {errors.name && <p className={errorClass}>{errors.name.message}</p>}
                                         </div>
 
                                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                                             <div className="space-y-1 md:space-y-0">
-                                                <label className={labelClass}><Mail className="w-4 h-4 text-accent" /> Email</label>
+                                                <label className={labelClass}><Mail className="w-4 h-4 text-accent" /> {t("common.modal.email", undefined, "Email")}</label>
                                                 <input
-                                                    {...register("email", { required: "Email is required", pattern: { value: /^\S+@\S+$/i, message: "Invalid email" } })}
+                                                    {...register("email", { required: t("common.modal.reqEmail", undefined, "Email is required"), pattern: { value: /^\S+@\S+$/i, message: t("common.modal.reqEmailInvalid", undefined, "Invalid email") } })}
                                                     className={inputClass}
-                                                    placeholder="hello@example.com"
+                                                    placeholder={t("common.modal.phEmail", undefined, "hello@example.com")}
                                                 />
                                                 {errors.email && <p className={errorClass}>{errors.email.message}</p>}
                                             </div>
                                             <div className="space-y-1 md:space-y-0">
-                                                <label className={labelClass}><Phone className="w-4 h-4 text-accent" /> Phone</label>
+                                                <label className={labelClass}><Phone className="w-4 h-4 text-accent" /> {t("common.modal.phone", undefined, "Phone")}</label>
                                                 <input
-                                                    {...register("phone", { required: "Phone is required" })}
+                                                    {...register("phone", { required: t("common.modal.reqPhone", undefined, "Phone is required") })}
                                                     className={inputClass}
-                                                    placeholder="017..."
+                                                    placeholder={t("common.modal.phPhone", undefined, "017...")}
                                                 />
                                                 {errors.phone && <p className={errorClass}>{errors.phone.message}</p>}
                                             </div>
@@ -267,22 +269,22 @@ export function BookingModal() {
 
                                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                                             <div className="space-y-1 md:space-y-0">
-                                                <label className={labelClass}><Calendar className="w-4 h-4 text-accent" /> Date</label>
+                                                <label className={labelClass}><Calendar className="w-4 h-4 text-accent" /> {t("common.modal.date", undefined, "Date")}</label>
                                                 <input
                                                     type="date"
                                                     min={minDate}
-                                                    {...register("date", { required: "Date is required" })}
+                                                    {...register("date", { required: t("common.modal.reqDate", undefined, "Date is required") })}
                                                     className={cn(inputClass, "min-h-[50px] md:min-h-[54px]")}
                                                 />
                                                 {errors.date && <p className={errorClass}>{errors.date.message}</p>}
                                             </div>
                                             <div className="space-y-1 md:space-y-0">
-                                                <label className={labelClass}><Clock className="w-4 h-4 text-accent" /> Time</label>
+                                                <label className={labelClass}><Clock className="w-4 h-4 text-accent" /> {t("common.modal.time", undefined, "Time")}</label>
                                                 <select
-                                                    {...register("time", { required: "Time is required" })}
+                                                    {...register("time", { required: t("common.modal.reqTime", undefined, "Time is required") })}
                                                     className={cn(inputClass, "min-h-[50px] md:min-h-[54px] appearance-none cursor-pointer")}
                                                 >
-                                                    <option value="">Select Time</option>
+                                                    <option value="">{t("common.modal.selectTime", undefined, "Select Time")}</option>
                                                     <option value="10:00 AM">10:00 AM</option>
                                                     <option value="11:00 AM">11:00 AM</option>
                                                     <option value="12:00 PM">12:00 PM</option>
@@ -296,32 +298,32 @@ export function BookingModal() {
                                         </div>
 
                                         <div className="space-y-1 md:space-y-0">
-                                            <label className={labelClass}><GraduationCap className="w-4 h-4 text-accent" /> Education Level</label>
+                                            <label className={labelClass}><GraduationCap className="w-4 h-4 text-accent" /> {t("common.modal.educationLevel", undefined, "Education Level")}</label>
                                             <select
-                                                {...register("education_level", { required: "Education level is required" })}
+                                                {...register("education_level", { required: t("common.modal.reqEducationInfo", undefined, "Education level is required") })}
                                                 className={cn(inputClass, "min-h-[50px] md:min-h-[54px] appearance-none cursor-pointer")}
                                             >
-                                                <option value="">Select Level</option>
-                                                <option value="Bachelors">Bachelor&apos;s</option>
-                                                <option value="Masters">Master&apos;s</option>
-                                                <option value="PhD">PhD</option>
-                                                <option value="Language_Course">Language Course</option>
-                                                <option value="Foundation_Year">Foundation Year</option>
+                                                <option value="">{t("common.modal.selectLevel", undefined, "Select Level")}</option>
+                                                <option value="Bachelors">{t("common.modal.eduBachelors", undefined, "Bachelor's")}</option>
+                                                <option value="Masters">{t("common.modal.eduMasters", undefined, "Master's")}</option>
+                                                <option value="PhD">{t("common.modal.eduPhD", undefined, "PhD")}</option>
+                                                <option value="Language_Course">{t("common.modal.eduLang", undefined, "Language Course")}</option>
+                                                <option value="Foundation_Year">{t("common.modal.eduFoundation", undefined, "Foundation Year")}</option>
                                             </select>
                                             {errors.education_level && <p className={errorClass}>{errors.education_level.message}</p>}
                                         </div>
 
                                         <div className="space-y-1 md:space-y-0">
-                                            <label className={labelClass}><BookOpen className="w-4 h-4 text-accent" /> Interested In</label>
+                                            <label className={labelClass}><BookOpen className="w-4 h-4 text-accent" /> {t("common.modal.interestedIn", undefined, "Interested In")}</label>
                                             <select
                                                 {...register("topic")}
                                                 className={cn(inputClass, "min-h-[50px] md:min-h-[54px] appearance-none cursor-pointer")}
                                             >
-                                                <option value="General_Inquiry">General Inquiry</option>
-                                                <option value="University_Admission">University Admission</option>
-                                                <option value="Visa_Processing">Visa Processing</option>
-                                                <option value="Scholarship_Help">Scholarship Help</option>
-                                                <option value="LOM_SOP_Writing">LOM/SOP Writing</option>
+                                                <option value="General_Inquiry">{t("common.modal.topicGeneral", undefined, "General Inquiry")}</option>
+                                                <option value="University_Admission">{t("common.modal.topicAdmission", undefined, "University Admission")}</option>
+                                                <option value="Visa_Processing">{t("common.modal.topicVisa", undefined, "Visa Processing")}</option>
+                                                <option value="Scholarship_Help">{t("common.modal.topicScholarship", undefined, "Scholarship Help")}</option>
+                                                <option value="LOM_SOP_Writing">{t("common.modal.topicSOP", undefined, "LOM/SOP...")}</option>
                                             </select>
                                         </div>
 
@@ -331,9 +333,9 @@ export function BookingModal() {
                                                     {isSubmitting ? (
                                                         <>
                                                             <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-                                                            <span>Booking...</span>
+                                                            <span>{t("common.modal.submitLoading", undefined, "Booking...")}</span>
                                                         </>
-                                                    ) : "Confirm Booking"}
+                                                    ) : t("common.modal.submit", undefined, "Confirm Booking")}
                                                 </Button>
                                             </motion.div>
                                         </div>

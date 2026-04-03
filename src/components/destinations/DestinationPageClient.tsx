@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/button";
 import { useTheme } from "next-themes";
 import { useEffect, useState } from "react";
 import { cn } from "@/lib/utils";
+import { useTranslation } from "@/i18n/LanguageContext";
 
 interface SerializedDestination {
     slug: string;
@@ -87,6 +88,7 @@ const iconMap: Record<string, React.ComponentType<{ className?: string }>> = {
 export function DestinationPageClient({ destination, relatedDestinations = [] }: DestinationPageClientProps) {
     const { theme, systemTheme } = useTheme();
     const [mounted, setMounted] = useState(false);
+    const { t } = useTranslation();
 
     useEffect(() => {
         setMounted(true);
@@ -128,10 +130,10 @@ export function DestinationPageClient({ destination, relatedDestinations = [] }:
                             </div>
                         </div>
                         <h1 className="text-4xl md:text-6xl font-bold font-heading text-white mb-4">
-                            {destination.heroTitle}
+                            {t(`destinations.countries.${destination.slug}.heroTitle`, undefined, destination.heroTitle)}
                         </h1>
                         <p className="text-lg md:text-xl text-white/90 max-w-2xl">
-                            {destination.heroDescription}
+                            {t(`destinations.countries.${destination.slug}.heroDescription`, undefined, destination.heroDescription)}
                         </p>
                     </motion.div>
                 </div>
@@ -147,10 +149,10 @@ export function DestinationPageClient({ destination, relatedDestinations = [] }:
                         className="text-center mb-12"
                     >
                         <h2 className="text-3xl md:text-4xl font-bold font-heading text-primary mb-4">
-                            Why Study in {destination.name}?
+                            {t("destinations.page.whyStudy", { country: t(`destinations.countries.${destination.slug}.name`, undefined, destination.name) }, `Why Study in ${destination.name}?`)}
                         </h2>
                         <p className="text-muted-foreground max-w-2xl mx-auto">
-                            Discover the advantages that make {destination.name} an ideal destination for Bangladeshi students.
+                            {t("destinations.page.whyStudySubtitle", { country: t(`destinations.countries.${destination.slug}.name`, undefined, destination.name) }, `Discover the advantages that make ${destination.name} an ideal destination for Bangladeshi students.`)}
                         </p>
                     </motion.div>
 
@@ -174,12 +176,12 @@ export function DestinationPageClient({ destination, relatedDestinations = [] }:
                                     <div className="w-12 h-12 rounded-xl bg-accent/10 flex items-center justify-center text-accent mb-4">
                                         <BenefitIcon className="w-6 h-6" />
                                     </div>
-                                    <h3 className="text-lg font-bold text-primary mb-2">{benefit.title}</h3>
+                                    <h3 className="text-lg font-bold text-primary mb-2">{t(`destinations.benefits.${benefit.title}.title`, undefined, benefit.title)}</h3>
                                     <p className={cn(
                                         "text-sm",
                                         mounted && currentTheme === "dark" ? "text-white/70" : "text-muted-foreground"
                                     )}>
-                                        {benefit.description}
+                                        {t(`destinations.benefits.${benefit.title}.desc`, undefined, benefit.description)}
                                     </p>
                                 </motion.div>
                             );

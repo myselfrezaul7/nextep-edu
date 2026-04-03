@@ -25,10 +25,12 @@ export default function GlobalError({
                             Oops!
                         </h1>
                         <h2 style={{ fontSize: "1.5rem", fontWeight: "bold", marginBottom: "1rem" }}>
-                            Something went wrong
+                            Something went wrong / কিছু ভুল হয়েছে
                         </h2>
                         <p style={{ color: "#94A3B8", marginBottom: "2rem" }}>
                             We&apos;re sorry for the inconvenience. Please try again.
+                            <br />
+                            সাময়িক অসুবিধার জন্য আমরা দুঃখিত। অনুগ্রহ করে আবার চেষ্টা করুন।
                         </p>
                         <button
                             onClick={() => reset()}

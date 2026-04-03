@@ -8,6 +8,7 @@ import { useState, useRef, useEffect } from "react";
 import { useTheme } from "next-themes";
 import { cn } from "@/lib/utils";
 import { destinations } from "@/data/destinations";
+import { useTranslation } from "@/i18n/LanguageContext";
 
 // Top 6 destinations to show on homepage
 const TOP_SLUGS = ["germany", "usa", "australia", "canada", "uk", "south-korea"];
@@ -124,6 +125,7 @@ function Card3D({ children, href }: { children: React.ReactNode, href: string })
 export function DestinationsGrid({ featuredOnly = false }: { featuredOnly?: boolean }) {
     const { theme, systemTheme } = useTheme();
     const [mounted, setMounted] = useState(false);
+    const { t } = useTranslation();
     const currentTheme = theme === "system" ? systemTheme : theme;
 
     useEffect(() => {
@@ -156,10 +158,10 @@ export function DestinationsGrid({ featuredOnly = false }: { featuredOnly?: bool
                                 <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent opacity-80 group-hover:opacity-60 transition-opacity" />
                                 <div className="absolute bottom-6 left-6 text-white z-10" style={{ transform: "translateZ(30px)" }}>
                                     <h3 className="text-2xl font-bold font-heading mb-1 flex items-center gap-2">
-                                        <span>{destination.flag}</span> {destination.name}
+                                        <span>{destination.flag}</span> {t(`destinations.countries.${destination.slug}.name`, undefined, destination.name)}
                                     </h3>
                                     <div className="flex items-center gap-2 text-sm font-medium text-white/90 opacity-100 md:opacity-0 md:group-hover:opacity-100 transform translate-y-0 md:translate-y-4 md:group-hover:translate-y-0 transition-all duration-500">
-                                        Explore <ArrowRight className="w-4 h-4" />
+                                        {t("common.nav.explore", undefined, "Explore")} <ArrowRight className="w-4 h-4" />
                                     </div>
                                 </div>
                             </div>
@@ -172,11 +174,11 @@ export function DestinationsGrid({ featuredOnly = false }: { featuredOnly?: bool
                                                 <benefit.icon className="w-4 h-4" />
                                             </div>
                                             <div>
-                                                <h4 className="font-bold text-sm text-foreground">{benefit.title}</h4>
+                                                <h4 className="font-bold text-sm text-foreground">{t(`destinations.benefits.${benefit.title}.title`, undefined, benefit.title)}</h4>
                                                 <p className={cn(
                                                     "text-xs line-clamp-2",
                                                     mounted && currentTheme === "dark" ? "text-white/70" : "text-muted-foreground"
-                                                )}>{benefit.description}</p>
+                                                )}>{t(`destinations.benefits.${benefit.title}.desc`, undefined, benefit.description)}</p>
                                             </div>
                                         </div>
                                     ))}
@@ -200,7 +202,7 @@ export function DestinationsGrid({ featuredOnly = false }: { featuredOnly?: bool
                         href="/destinations"
                         className="inline-flex items-center gap-2 px-8 py-4 rounded-full bg-primary text-primary-foreground font-bold text-lg hover:opacity-90 hover:scale-105 transition-all duration-300 shadow-lg hover:shadow-xl"
                     >
-                        See All Destinations
+                        {t("common.nav.viewAllDestinations", undefined, "See All Destinations")}
                         <ArrowRight className="w-5 h-5" />
                     </Link>
                 </motion.div>

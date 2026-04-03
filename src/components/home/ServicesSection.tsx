@@ -14,10 +14,12 @@ import { useTheme } from "next-themes";
 import { useState, useEffect } from "react";
 import { cn } from "@/lib/utils";
 import { motion } from "framer-motion";
+import { useTranslation } from "@/i18n/LanguageContext";
 
 export function ServicesSection() {
     const { theme, systemTheme } = useTheme();
     const [mounted, setMounted] = useState(false);
+    const { t } = useTranslation();
     const currentTheme = theme === "system" ? systemTheme : theme;
 
     useEffect(() => {
@@ -40,12 +42,12 @@ export function ServicesSection() {
                         transition={{ duration: 0.6 }}
                         className="text-3xl md:text-5xl font-bold font-heading mb-6 text-primary"
                     >
-                        What We <span className="text-accent relative inline-block">
-                            Actually
+                        {t("home.services.title")} <span className="text-accent relative inline-block">
+                            {t("home.services.titleAccent")}
                             <svg className="absolute w-full h-3 -bottom-1 left-0 text-accent/30" viewBox="0 0 100 10" preserveAspectRatio="none">
                                 <path d="M0 5 Q 50 10 100 5" stroke="currentColor" strokeWidth="3" fill="none" />
                             </svg>
-                        </span> Do For You
+                        </span> {t("home.services.titleSuffix")}
                     </motion.h2>
                     <motion.p
                         initial={{ opacity: 0, y: 20 }}
@@ -57,7 +59,7 @@ export function ServicesSection() {
                             mounted && currentTheme === "dark" ? "text-white/70" : "text-muted-foreground"
                         )}
                     >
-                        Detailed SOPs, visa support, scholarship hunting—we handle the gritty details so you can focus on packing your bags.
+                        {t("home.services.subtitle")}
                     </motion.p>
                 </div>
 
