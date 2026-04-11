@@ -132,27 +132,27 @@ export function MobileTabBar() {
             transition={{ type: "spring", stiffness: 300, damping: 30 }}
             className={cn(
                 "fixed bottom-4 left-4 right-4 z-50 md:hidden",
-                "px-6 py-2.5 rounded-[2rem] border glass-nav transition-all duration-300",
+                "px-4 py-2.5 rounded-[2rem] border glass-nav transition-all duration-300",
                 isDark
                     ? "bg-[rgba(15,23,42,0.85)] border-white/10 shadow-[0_4px_30px_rgba(0,0,0,0.3)]"
                     : "bg-white/85 border-black/5 shadow-[0_4px_30px_rgba(0,0,0,0.1)]"
             )}
             style={{ paddingBottom: 'env(safe-area-inset-bottom)' }}
         >
-            <div className="flex justify-around items-center">
+            <div className="flex justify-between items-center">
                 {/* HOME */}
                 <motion.button
                     whileTap={{ scale: 0.9 }}
                     onClick={() => handleNavClick("")}
                     className={cn(
-                        "relative flex flex-col items-center justify-center w-14 h-12 rounded-xl transition-all duration-200",
+                        "relative flex flex-col items-center justify-center gap-0.5 w-14 h-12 rounded-xl transition-all duration-200",
                         isHomeActive
                             ? "bg-accent/15 text-accent"
                             : isDark ? "text-white/60 hover:text-white" : "text-muted-foreground hover:text-foreground"
                     )}
                 >
-                    <Home className={cn("w-5 h-5 mb-1", isHomeActive && "fill-accent/20")} strokeWidth={isHomeActive ? 2.5 : 2} />
-                    <span className="text-[10px] font-bold mt-0.5 uppercase tracking-wider">{t("common.tab.home")}</span>
+                    <Home className={cn("w-5 h-5", isHomeActive && "fill-accent/20")} strokeWidth={isHomeActive ? 2.5 : 2} />
+                    <span className="text-[10px] font-bold uppercase tracking-wider">{t("common.tab.home")}</span>
                     {isHomeActive && (
                         <motion.div
                             layoutId="activeTabPill"
@@ -167,14 +167,14 @@ export function MobileTabBar() {
                     whileTap={{ scale: 0.9 }}
                     onClick={() => handleNavClick("#services")}
                     className={cn(
-                        "relative flex flex-col items-center justify-center w-14 h-12 rounded-xl transition-all duration-200",
+                        "relative flex flex-col items-center justify-center gap-0.5 w-14 h-12 rounded-xl transition-all duration-200",
                         isServicesActive
                             ? "bg-accent/15 text-accent"
                             : isDark ? "text-white/60 hover:text-white" : "text-muted-foreground hover:text-foreground"
                     )}
                 >
-                    <BookOpen className={cn("w-5 h-5 mb-1", isServicesActive && "fill-accent/20")} strokeWidth={isServicesActive ? 2.5 : 2} />
-                    <span className="text-[10px] font-bold mt-0.5 uppercase tracking-wider">{t("common.tab.services")}</span>
+                    <BookOpen className={cn("w-5 h-5", isServicesActive && "fill-accent/20")} strokeWidth={isServicesActive ? 2.5 : 2} />
+                    <span className="text-[10px] font-bold uppercase tracking-wider">{t("common.tab.services")}</span>
                     {isServicesActive && (
                         <motion.div
                             layoutId="activeTabPill"
@@ -189,12 +189,12 @@ export function MobileTabBar() {
                     whileTap={{ scale: 0.9 }}
                     onClick={() => window.dispatchEvent(new CustomEvent('open-booking-modal'))}
                     className={cn(
-                        "relative flex flex-col items-center justify-center w-14 h-12 rounded-xl transition-all duration-200",
+                        "relative flex flex-col items-center justify-center gap-0.5 w-14 h-12 rounded-xl transition-all duration-200",
                         isDark ? "text-white/60 hover:text-white" : "text-muted-foreground hover:text-foreground"
                     )}
                 >
-                    <CalendarCheck className={"w-5 h-5 mb-1"} strokeWidth={2} />
-                    <span className="text-[10px] font-bold mt-0.5 uppercase tracking-wider">Book</span>
+                    <CalendarCheck className="w-5 h-5" strokeWidth={2} />
+                    <span className="text-[10px] font-bold uppercase tracking-wider">Book</span>
                 </motion.button>
 
                 {/* ABOUT */}
@@ -202,14 +202,14 @@ export function MobileTabBar() {
                     whileTap={{ scale: 0.9 }}
                     onClick={() => handleNavClick("#about")}
                     className={cn(
-                        "relative flex flex-col items-center justify-center w-14 h-12 rounded-xl transition-all duration-200",
+                        "relative flex flex-col items-center justify-center gap-0.5 w-14 h-12 rounded-xl transition-all duration-200",
                         isAboutActive
                             ? "bg-accent/15 text-accent"
                             : isDark ? "text-white/60 hover:text-white" : "text-muted-foreground hover:text-foreground"
                     )}
                 >
-                    <Info className={cn("w-5 h-5 mb-1", isAboutActive && "fill-accent/20")} strokeWidth={isAboutActive ? 2.5 : 2} />
-                    <span className="text-[10px] font-bold mt-0.5 uppercase tracking-wider">{t("common.tab.about")}</span>
+                    <Info className={cn("w-5 h-5", isAboutActive && "fill-accent/20")} strokeWidth={isAboutActive ? 2.5 : 2} />
+                    <span className="text-[10px] font-bold uppercase tracking-wider">{t("common.tab.about")}</span>
                     {isAboutActive && (
                         <motion.div
                             layoutId="activeTabPill"
