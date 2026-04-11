@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { Home, BookOpen, CalendarCheck, Info } from "lucide-react";
 import { useTheme } from "next-themes";
 import { cn } from "@/lib/utils";
@@ -14,6 +14,9 @@ export function MobileTabBar() {
     const pathname = usePathname();
     const [activeHash, setActiveHash] = useState("");
     const { t } = useTranslation();
+    const [tabVisible, setTabVisible] = useState(true);
+    const lastScrollY = useRef(0);
+    const scrollTimeout = useRef<NodeJS.Timeout | null>(null);
 
     const currentTheme = theme === "system" ? systemTheme : theme;
     const isDark = mounted && currentTheme === "dark";
@@ -70,9 +73,28 @@ export function MobileTabBar() {
         window.addEventListener("hashchange", handleHashChange);
         handleHashChange(); // Init
         
+        const handleScroll = () => {
+            const currentScrollY = window.scrollY;
+
+            if (currentScrollY > lastScrollY.current && currentScrollY > 100) {
+                setTabVisible(false); // scrolling down
+            } else {
+                setTabVisible(true); // scrolling up
+            }
+            lastScrollY.current = currentScrollY;
+
+            if (scrollTimeout.current) clearTimeout(scrollTimeout.current);
+            scrollTimeout.current = setTimeout(() => {
+                setTabVisible(true);
+            }, 300);
+        };
+        window.addEventListener("scroll", handleScroll, { passive: true });
+        
         return () => {
             window.removeEventListener("hashchange", handleHashChange);
             observer.disconnect();
+            window.removeEventListener("scroll", handleScroll);
+            if (scrollTimeout.current) clearTimeout(scrollTimeout.current);
         };
     }, []);
 
@@ -105,19 +127,19 @@ export function MobileTabBar() {
 
     return (
         <motion.nav
-            initial={{ y: 100 }}
-            animate={{ y: 0 }}
-            transition={{ type: "spring", bounce: 0, duration: 0.5 }}
+            initial={{ y: 0 }}
+            animate={{ y: tabVisible ? 0 : "120%" }}
+            transition={{ type: "spring", stiffness: 300, damping: 30 }}
             className={cn(
                 "fixed bottom-4 left-4 right-4 z-50 md:hidden",
-                "px-4 py-2.5 rounded-[2rem] border glass-nav transition-all duration-300",
+                "px-6 py-2.5 rounded-[2rem] border glass-nav transition-all duration-300",
                 isDark
                     ? "bg-[rgba(15,23,42,0.85)] border-white/10 shadow-[0_4px_30px_rgba(0,0,0,0.3)]"
                     : "bg-white/85 border-black/5 shadow-[0_4px_30px_rgba(0,0,0,0.1)]"
             )}
             style={{ paddingBottom: 'env(safe-area-inset-bottom)' }}
         >
-            <div className="flex justify-between items-center">
+            <div className="flex justify-around items-center">
                 {/* HOME */}
                 <motion.button
                     whileTap={{ scale: 0.9 }}
