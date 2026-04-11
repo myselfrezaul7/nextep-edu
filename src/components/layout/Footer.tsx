@@ -41,7 +41,7 @@ export function Footer() {
                 {/* Frosted glass inner glow */}
                 <div className="absolute inset-0 bg-gradient-to-br from-accent/10 via-transparent to-accent/5 pointer-events-none" />
                 <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_50%,_rgba(212,175,55,0.15)_0%,_transparent_60%)] pointer-events-none" />
-                <div className="container mx-auto px-4 py-12 md:py-16 relative z-10 text-center">
+                <div className="container mx-auto px-4 py-10 md:py-16 relative z-10 text-center">
                     <motion.div
                         initial={{ opacity: 0, y: 20 }}
                         whileInView={{ opacity: 1, y: 0 }}
@@ -72,7 +72,7 @@ export function Footer() {
 
             {/* Main Footer Content */}
             <div className={cn(
-                "backdrop-blur-xl py-16 border-t",
+                "backdrop-blur-xl py-10 md:py-16 border-t",
                 mounted && currentTheme === "dark" ? "bg-[rgba(15,23,42,0.85)] border-white/10" : "bg-white/60 border-black/5"
             )}>
                 <div className="container mx-auto px-4">
@@ -81,7 +81,7 @@ export function Footer() {
                         initial={{ opacity: 0, x: -20 }}
                         whileInView={{ opacity: 1, x: 0 }}
                         viewport={{ once: true }}
-                        className="mb-12"
+                        className="mb-8 md:mb-12"
                     >
                         <div className="flex items-center gap-2 mb-4">
                             <div className={cn(
@@ -101,7 +101,7 @@ export function Footer() {
                     </motion.div>
 
                     {/* Links Grid */}
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-2 md:gap-12">
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-0 md:gap-12">
                         {/* Quick Links */}
                         <div className="border-b md:border-none border-border/30">
                             <button 
@@ -200,7 +200,7 @@ export function Footer() {
 
             {/* Bottom Bar */}
             <div className="border-t border-border/30 pb-28 md:pb-0">
-                <div className="container mx-auto px-4 py-8 flex flex-col-reverse md:flex-row items-center justify-between gap-6 md:gap-4">
+                <div className="container mx-auto px-4 py-5 md:py-8 flex flex-col-reverse md:flex-row items-center justify-between gap-6 md:gap-4">
                     <p className={cn(
                         "text-xs md:text-sm text-center md:text-left",
                         mounted && currentTheme === "dark" ? "text-white/50" : "text-muted-foreground"
