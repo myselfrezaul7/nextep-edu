@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { useTheme } from "next-themes";
@@ -30,19 +30,40 @@ const mobileTopDestinations = MOBILE_TOP_SLUGS
 export function Header() {
     const [scrolled, setScrolled] = useState(false);
     const [dropdownOpen, setDropdownOpen] = useState(false);
+    const [navVisible, setNavVisible] = useState(true);
     const { theme, setTheme, systemTheme } = useTheme();
     const [mounted, setMounted] = useState(false);
     const { t, locale } = useTranslation();
+    const lastScrollY = useRef(0);
+    const scrollTimeout = useRef<NodeJS.Timeout | null>(null);
 
     const currentTheme = theme === "system" ? systemTheme : theme;
 
     useEffect(() => {
         setMounted(true);
         const handleScroll = () => {
-            setScrolled(window.scrollY > 20);
+            const currentScrollY = window.scrollY;
+            setScrolled(currentScrollY > 20);
+
+            // Auto-hide logic
+            if (currentScrollY > lastScrollY.current && currentScrollY > 100) {
+                setNavVisible(false); // scrolling down
+            } else {
+                setNavVisible(true); // scrolling up
+            }
+            lastScrollY.current = currentScrollY;
+
+            // Show after scroll stops
+            if (scrollTimeout.current) clearTimeout(scrollTimeout.current);
+            scrollTimeout.current = setTimeout(() => {
+                setNavVisible(true);
+            }, 300);
         };
-        window.addEventListener("scroll", handleScroll);
-        return () => window.removeEventListener("scroll", handleScroll);
+        window.addEventListener("scroll", handleScroll, { passive: true });
+        return () => {
+            window.removeEventListener("scroll", handleScroll);
+            if (scrollTimeout.current) clearTimeout(scrollTimeout.current);
+        };
     }, []);
 
     const toggleTheme = () => {
@@ -50,7 +71,12 @@ export function Header() {
     };
 
     return (
-        <div className="fixed top-0 left-0 w-full z-50 flex justify-center mt-4 px-4 transition-all duration-300">
+        <motion.div
+            initial={{ y: 0 }}
+            animate={{ y: navVisible ? 0 : "-120%" }}
+            transition={{ type: "spring", stiffness: 300, damping: 30 }}
+            className="fixed top-0 left-0 w-full z-50 flex justify-center mt-4 px-4 transition-all duration-300"
+        >
             <nav
                 className={cn(
                     "flex justify-between items-center w-full max-w-5xl px-4 md:px-6 py-3 transition-all duration-300",
@@ -171,6 +197,6 @@ export function Header() {
                     </motion.button>
                 </div>
             </nav>
-        </div>
+        </motion.div>
     );
 }

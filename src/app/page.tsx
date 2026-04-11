@@ -20,6 +20,8 @@ export default function Home() {
     return (
         <div className="flex flex-col">
             <HeroSection />
+            <ServicesSection />
+            <HowItWorksSection />
 
             {/* Destinations Section with SEO heading */}
             <section id="destinations" className="py-16 md:py-24 bg-background">
@@ -39,8 +41,6 @@ export default function Home() {
                 </div>
             </section>
 
-            <ServicesSection />
-            <HowItWorksSection />
             <AboutSection />
             <TestimonialCarousel />
         </div>

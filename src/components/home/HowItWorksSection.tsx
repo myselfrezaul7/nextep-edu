@@ -38,7 +38,7 @@ export function HowItWorksSection() {
     }, []);
 
     return (
-        <section className="py-16 md:py-28 bg-background relative overflow-hidden">
+        <section className="py-12 md:py-28 bg-background relative overflow-hidden">
             {/* Subtle background accents */}
             <div className="absolute inset-0 pointer-events-none">
                 <div className="absolute top-[10%] left-[5%] w-[300px] h-[300px] bg-accent/5 rounded-full blur-3xl" />
@@ -47,7 +47,7 @@ export function HowItWorksSection() {
 
             <div className="container mx-auto px-4 relative z-10">
                 {/* Header */}
-                <div className="text-center mb-16 md:mb-20">
+                <div className="text-center mb-10 md:mb-20">
                     <motion.div
                         initial={{ opacity: 0, scale: 0.9 }}
                         whileInView={{ opacity: 1, scale: 1 }}
@@ -79,7 +79,7 @@ export function HowItWorksSection() {
                 </div>
 
                 {/* Steps Grid */}
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 lg:gap-6 max-w-6xl mx-auto">
+                <div className="flex overflow-x-auto snap-x snap-mandatory pb-4 -mx-4 px-4 scrollbar-hide md:grid md:grid-cols-2 lg:grid-cols-4 gap-6 max-w-6xl md:mx-auto">
                     {stepsData.map((step, i) => (
                         <motion.div
                             key={step.id}
@@ -88,7 +88,7 @@ export function HowItWorksSection() {
                             viewport={{ once: true }}
                             whileTap={{ scale: 0.97 }}
                             transition={{ duration: 0.5, delay: i * 0.12 }}
-                            className="relative group"
+                            className="relative group w-[75vw] sm:w-[260px] snap-center shrink-0 md:w-auto md:shrink"
                         >
                             {/* Connector line — hidden on mobile, visible on lg between cards */}
                             {i < stepsData.length - 1 && (
