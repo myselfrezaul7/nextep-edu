@@ -46,9 +46,11 @@ export function Header() {
             setScrolled(currentScrollY > 20);
 
             // Auto-hide logic
-            if (currentScrollY > lastScrollY.current && currentScrollY > 100) {
+            if (currentScrollY <= 20) {
+                setNavVisible(true);
+            } else if (currentScrollY > lastScrollY.current && currentScrollY > 60) {
                 setNavVisible(false); // scrolling down
-            } else {
+            } else if (currentScrollY < lastScrollY.current) {
                 setNavVisible(true); // scrolling up
             }
             lastScrollY.current = currentScrollY;
@@ -57,7 +59,7 @@ export function Header() {
             if (scrollTimeout.current) clearTimeout(scrollTimeout.current);
             scrollTimeout.current = setTimeout(() => {
                 setNavVisible(true);
-            }, 300);
+            }, 150);
         };
         window.addEventListener("scroll", handleScroll, { passive: true });
         return () => {
@@ -71,11 +73,11 @@ export function Header() {
     };
 
     return (
-        <motion.div
-            initial={{ y: 0 }}
-            animate={{ y: navVisible ? 0 : "-120%" }}
-            transition={{ type: "spring", stiffness: 300, damping: 30 }}
-            className="fixed top-0 left-0 w-full z-50 flex justify-center mt-4 px-4 transition-all duration-300"
+        <div
+            className={cn(
+                "fixed top-0 left-0 w-full z-50 flex justify-center mt-4 px-4 transition-all duration-300 ease-out",
+                navVisible ? "translate-y-0 opacity-100" : "-translate-y-[120%] opacity-0"
+            )}
         >
             <nav
                 className={cn(
@@ -197,6 +199,6 @@ export function Header() {
                     </motion.button>
                 </div>
             </nav>
-        </motion.div>
+        </div>
     );
 }
