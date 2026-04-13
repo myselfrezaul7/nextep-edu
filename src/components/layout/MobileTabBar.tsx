@@ -76,9 +76,11 @@ export function MobileTabBar() {
         const handleScroll = () => {
             const currentScrollY = window.scrollY;
 
-            if (currentScrollY > lastScrollY.current && currentScrollY > 100) {
+            if (currentScrollY <= 20) {
+                setTabVisible(true);
+            } else if (currentScrollY > lastScrollY.current && currentScrollY > 60) {
                 setTabVisible(false); // scrolling down
-            } else {
+            } else if (currentScrollY < lastScrollY.current) {
                 setTabVisible(true); // scrolling up
             }
             lastScrollY.current = currentScrollY;
@@ -86,7 +88,7 @@ export function MobileTabBar() {
             if (scrollTimeout.current) clearTimeout(scrollTimeout.current);
             scrollTimeout.current = setTimeout(() => {
                 setTabVisible(true);
-            }, 300);
+            }, 150);
         };
         window.addEventListener("scroll", handleScroll, { passive: true });
         
@@ -127,12 +129,10 @@ export function MobileTabBar() {
 
     return (
         <motion.nav
-            initial={{ y: 0 }}
-            animate={{ y: tabVisible ? 0 : "120%" }}
-            transition={{ type: "spring", stiffness: 300, damping: 30 }}
             className={cn(
                 "fixed bottom-4 left-4 right-4 z-50 md:hidden",
-                "px-4 py-2.5 rounded-[2rem] border glass-nav transition-all duration-300",
+                "px-4 py-2.5 rounded-[2rem] border glass-nav transition-all duration-300 ease-out",
+                tabVisible ? "translate-y-0 opacity-100" : "translate-y-[120%] opacity-0",
                 isDark
                     ? "bg-[rgba(15,23,42,0.85)] border-white/10 shadow-[0_4px_30px_rgba(0,0,0,0.3)]"
                     : "bg-white/85 border-black/5 shadow-[0_4px_30px_rgba(0,0,0,0.1)]"
