@@ -1,4 +1,6 @@
 // JSON-LD Structured Data for SEO
+import { destinations } from "@/data/destinations";
+
 export function StructuredData() {
     const organizationSchema = {
         "@context": "https://schema.org",
@@ -42,6 +44,7 @@ export function StructuredData() {
             "Study in Canada",
             "Study in Australia",
         ],
+        foundingDate: "2018",
     };
 
     const localBusinessSchema = {
@@ -51,7 +54,7 @@ export function StructuredData() {
         name: "NexTep Edu - Study Abroad Consultancy Dhaka",
         image: "https://nextepedu.com/assets/og-image.png",
         url: "https://nextepedu.com",
-        telephone: "+8801711000000",
+        telephone: "+4915147483493",
         priceRange: "$$",
         address: {
             "@type": "PostalAddress",
@@ -89,6 +92,8 @@ export function StructuredData() {
         url: "https://nextepedu.com",
         name: "NexTep Edu",
         description: "Study Abroad Consultancy for Bangladeshi Students",
+        datePublished: "2024-01-01T08:00:00+08:00",
+        dateModified: new Date().toISOString(),
         publisher: {
             "@id": "https://nextepedu.com/#organization",
         },
@@ -215,6 +220,59 @@ export function StructuredData() {
         }
     };
 
+    const destinationListSchema = {
+        "@context": "https://schema.org",
+        "@type": "ItemList",
+        itemListElement: Object.values(destinations).map((dest, index) => ({
+            "@type": "ListItem",
+            position: index + 1,
+            item: {
+                "@type": "Country",
+                name: dest.name,
+                url: `https://nextepedu.com/destinations/${dest.slug}`
+            }
+        }))
+    };
+
+    const reviewsSchema = [
+        {
+            "@context": "https://schema.org",
+            "@type": "Review",
+            itemReviewed: {
+                "@type": "EducationalOrganization",
+                name: "NexTep Edu"
+            },
+            author: {
+                "@type": "Person",
+                name: "Mehedi Drubok"
+            },
+            reviewRating: {
+                "@type": "Rating",
+                ratingValue: "5",
+                bestRating: "5"
+            },
+            reviewBody: "NexTep Edu guided me through every step of my application to Germany. From document preparation to university selection, their support was invaluable."
+        },
+        {
+            "@context": "https://schema.org",
+            "@type": "Review",
+            itemReviewed: {
+                "@type": "EducationalOrganization",
+                name: "NexTep Edu"
+            },
+            author: {
+                "@type": "Person",
+                name: "Jannatul Ferdous"
+            },
+            reviewRating: {
+                "@type": "Rating",
+                ratingValue: "5",
+                bestRating: "5"
+            },
+            reviewBody: "I couldn't have imagined studying in Germany without NexTep Edu's help. They made the complex admission process feel simple and were always there to answer my questions."
+        }
+    ];
+
     return (
         <>
             <script
@@ -259,6 +317,21 @@ export function StructuredData() {
                     __html: JSON.stringify(serviceSchema),
                 }}
             />
+            <script
+                type="application/ld+json"
+                dangerouslySetInnerHTML={{
+                    __html: JSON.stringify(destinationListSchema),
+                }}
+            />
+            {reviewsSchema.map((review, i) => (
+                <script
+                    key={i}
+                    type="application/ld+json"
+                    dangerouslySetInnerHTML={{
+                        __html: JSON.stringify(review),
+                    }}
+                />
+            ))}
         </>
     );
 }

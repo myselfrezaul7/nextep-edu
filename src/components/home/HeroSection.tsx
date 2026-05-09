@@ -10,6 +10,8 @@ import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { useTranslation } from "@/i18n/LanguageContext";
 
+const EASE_OUT_EXPO = [0.16, 1, 0.3, 1] as const;
+
 export function HeroSection() {
     const { theme, systemTheme } = useTheme();
     const [mounted, setMounted] = useState(false);
@@ -31,7 +33,7 @@ export function HeroSection() {
                     <motion.h1
                         initial={{ opacity: 0, y: 30 }}
                         animate={{ opacity: 1, y: 0 }}
-                        transition={{ duration: 1, ease: [0.22, 1, 0.36, 1] }}
+                        transition={{ duration: 1, ease: EASE_OUT_EXPO }}
                         className="text-3xl md:text-6xl font-bold font-heading text-primary leading-tight"
                     >
                         {t("home.hero.title")} <span className="text-accent">{t("home.hero.titleAccent")}</span>
@@ -40,7 +42,7 @@ export function HeroSection() {
                     <motion.p
                         initial={{ opacity: 0, y: 20 }}
                         animate={{ opacity: 1, y: 0 }}
-                        transition={{ duration: 0.9, delay: 0.15, ease: [0.22, 1, 0.36, 1] }}
+                        transition={{ duration: 0.9, delay: 0.15, ease: EASE_OUT_EXPO }}
                         className="text-lg md:text-2xl font-medium font-[var(--font-script)] text-accent"
                     >
                         {t("home.hero.tagline")}
@@ -49,7 +51,7 @@ export function HeroSection() {
                     <motion.p
                         initial={{ opacity: 0, y: 20 }}
                         animate={{ opacity: 1, y: 0 }}
-                        transition={{ duration: 0.9, delay: 0.25, ease: [0.22, 1, 0.36, 1] }}
+                        transition={{ duration: 0.9, delay: 0.25, ease: EASE_OUT_EXPO }}
                         className="text-lg text-muted-foreground max-w-lg leading-relaxed"
                     >
                         {t("home.hero.description")}
@@ -58,7 +60,7 @@ export function HeroSection() {
                     <motion.div
                         initial={{ opacity: 0, y: 20 }}
                         animate={{ opacity: 1, y: 0 }}
-                        transition={{ duration: 0.9, delay: 0.35, ease: [0.22, 1, 0.36, 1] }}
+                        transition={{ duration: 0.9, delay: 0.35, ease: EASE_OUT_EXPO }}
                         className="flex flex-col sm:flex-row flex-wrap gap-4 pt-4"
                     >
                         <motion.div whileTap={{ scale: 0.95 }} className="w-full sm:w-auto">
@@ -87,7 +89,7 @@ export function HeroSection() {
                     <motion.div
                         initial={{ opacity: 0, y: 20 }}
                         animate={{ opacity: 1, y: 0 }}
-                        transition={{ duration: 0.9, delay: 0.45, ease: [0.22, 1, 0.36, 1] }}
+                        transition={{ duration: 0.9, delay: 0.45, ease: EASE_OUT_EXPO }}
                         className="pt-6"
                     >
                         <div className={cn(
@@ -122,15 +124,16 @@ export function HeroSection() {
                         y: [0, -10, 0] // Subtle floating effect
                     }}
                     transition={{
-                        opacity: { duration: 1, delay: 0.3, ease: [0.22, 1, 0.36, 1] },
-                        x: { duration: 1, delay: 0.3, ease: [0.22, 1, 0.36, 1] },
+                        opacity: { duration: 1, delay: 0.3, ease: EASE_OUT_EXPO },
+                        x: { duration: 1, delay: 0.3, ease: EASE_OUT_EXPO },
                         y: {
                             duration: 8,
                             repeat: Infinity,
-                            ease: [0.45, 0, 0.55, 1]
+                            ease: "easeInOut"
                         }
                     }}
-                    className="relative group perspective-1000"
+                    style={{ willChange: "transform, opacity" }}
+                    className="relative group perspective-1000 transform-gpu"
                 >
                     <div className={cn(
                         "relative rounded-2xl overflow-hidden shadow-2xl transform transition-transform duration-500 hover:rotate-y-0 -rotate-y-6 p-2 border",
@@ -149,7 +152,7 @@ export function HeroSection() {
                     {/* Floating Decorative Icons */}
                     <motion.div
                         animate={{ y: [0, -15, 0], rotate: [0, 5, 0] }}
-                        transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
+                        transition={{ duration: 6, repeat: Infinity, ease: "easeInOut" }}
                         className="hidden md:block absolute -top-6 -right-6 bg-accent/20 backdrop-blur-md p-4 rounded-full border border-accent/20 shadow-lg text-accent"
                     >
                         <Plane className="w-8 h-8" />
@@ -157,7 +160,7 @@ export function HeroSection() {
 
                     <motion.div
                         animate={{ y: [0, 20, 0], rotate: [0, -10, 0] }}
-                        transition={{ duration: 5, repeat: Infinity, ease: "easeInOut", delay: 1 }}
+                        transition={{ duration: 7, repeat: Infinity, ease: "easeInOut", delay: 1 }}
                         className="hidden md:block absolute top-1/2 -left-8 bg-blue-500/20 backdrop-blur-md p-4 rounded-full border border-blue-500/20 shadow-lg text-blue-500"
                     >
                         <GraduationCap className="w-8 h-8" />
@@ -165,7 +168,7 @@ export function HeroSection() {
 
                     <motion.div
                         animate={{ y: [0, -10, 0], rotate: [0, 15, 0] }}
-                        transition={{ duration: 6, repeat: Infinity, ease: "easeInOut", delay: 2 }}
+                        transition={{ duration: 8, repeat: Infinity, ease: "easeInOut", delay: 2 }}
                         className="hidden md:block absolute -bottom-6 right-10 bg-green-500/20 backdrop-blur-md p-3 rounded-full border border-green-500/20 shadow-lg text-green-500"
                     >
                         <Globe2 className="w-6 h-6" />

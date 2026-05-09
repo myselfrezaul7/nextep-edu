@@ -12,7 +12,7 @@ export const metadata: Metadata = {
     description:
         "NexTep Edu is Bangladesh's trusted study abroad consultancy. We help Bangladeshi students study in Germany, UK, USA, Canada, Australia with expert visa assistance, scholarship guidance & university admission support. Free consultation in Dhaka.",
     alternates: {
-        canonical: "https://nextepedu.com",
+        canonical: "https://www.nextepedu.com",
     },
 };
 

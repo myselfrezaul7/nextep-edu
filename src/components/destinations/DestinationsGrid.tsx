@@ -16,6 +16,8 @@ const topDestinations = TOP_SLUGS
     .map(slug => destinations[slug])
     .filter(Boolean);
 
+const EASE_OUT_EXPO = [0.16, 1, 0.3, 1] as const;
+
 const container = {
     hidden: { opacity: 0 },
     show: {
@@ -28,7 +30,7 @@ const container = {
 
 const item = {
     hidden: { opacity: 0, y: 30 },
-    show: { opacity: 1, y: 0, transition: { type: "spring" as const, stiffness: 50 } }
+    show: { opacity: 1, y: 0, transition: { duration: 0.5, ease: EASE_OUT_EXPO } }
 };
 
 function Card3D({ children, href }: { children: React.ReactNode, href: string }) {
@@ -152,6 +154,7 @@ export function DestinationsGrid({ featuredOnly = false }: { featuredOnly?: bool
                                     src={destination.heroImage}
                                     alt={destination.name}
                                     fill
+                                    loading="lazy"
                                     className="object-cover transition-transform duration-700 group-hover:scale-110"
                                     sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
                                 />

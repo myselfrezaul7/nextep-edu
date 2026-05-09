@@ -43,7 +43,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
         openGraph: {
             title: `Study in ${countryName} from Bangladesh | NexTep Edu`,
             description: `${destination.hero.description} Expert guidance for Bangladeshi students.`,
-            url: `https://nextepedu.com/destinations/${country}`,
+            url: `https://www.nextepedu.com/destinations/${country}`,
             siteName: "NexTep Edu",
             images: [
                 {
@@ -63,7 +63,11 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
             images: [destination.heroImage],
         },
         alternates: {
-            canonical: `/destinations/${country}`,
+            canonical: `https://www.nextepedu.com/destinations/${country}`,
+            languages: {
+                "en-BD": `https://www.nextepedu.com/destinations/${country}`,
+                "bn-BD": `https://www.nextepedu.com/bn/destinations/${country}`
+            }
         },
     };
 }
@@ -123,19 +127,19 @@ export default async function DestinationCountryPage({ params }: Props) {
                 "@type": "ListItem",
                 position: 1,
                 name: "Home",
-                item: "https://nextepedu.com",
+                item: "https://www.nextepedu.com",
             },
             {
                 "@type": "ListItem",
                 position: 2,
                 name: "Destinations",
-                item: "https://nextepedu.com/#destinations",
+                item: "https://www.nextepedu.com/#destinations",
             },
             {
                 "@type": "ListItem",
                 position: 3,
                 name: destination.name,
-                item: `https://nextepedu.com/destinations/${country}`,
+                item: `https://www.nextepedu.com/destinations/${country}`,
             },
         ],
     };

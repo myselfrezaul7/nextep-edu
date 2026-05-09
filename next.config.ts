@@ -85,6 +85,11 @@ const nextConfig: NextConfig = {
   // Strict mode for catching bugs
   reactStrictMode: true,
   trailingSlash: false,
+
+  experimental: {
+    optimizeCss: true,
+    optimizePackageImports: ['lucide-react', 'framer-motion'],
+  },
 };
 
 export default nextConfig;
