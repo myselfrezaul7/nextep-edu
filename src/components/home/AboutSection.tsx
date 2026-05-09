@@ -139,7 +139,7 @@ export function AboutSection() {
                 <motion.div
                     initial={{ opacity: 0, scale: 0.95 }}
                     whileInView={{ opacity: 1, scale: 1 }}
-                    viewport={{ once: true }}
+                    viewport={{ once: true, amount: 0.2 }}
                     transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
                 >
                     <h2 className="text-3xl md:text-5xl font-bold font-heading mb-6 text-primary">Why Students Trust Us</h2>
@@ -151,7 +151,7 @@ export function AboutSection() {
                         variants={containerVariants}
                         initial="hidden"
                         whileInView="visible"
-                        viewport={{ once: true }}
+                        viewport={{ once: true, amount: 0.2 }}
                         className="space-y-4 mb-8"
                     >
                         {[0, 1, 2, 3].map((index) => (
@@ -187,7 +187,7 @@ export function AboutSection() {
                                 key={stat.label}
                                 initial={{ opacity: 0, x: 50 }}
                                 whileInView={{ opacity: 1, x: 0 }}
-                                viewport={{ once: true }}
+                                viewport={{ once: true, amount: 0.2 }}
                                 whileTap={{ scale: 0.97 }}
                                 transition={{ delay: index * 0.12, duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
                                 className={cn(
@@ -197,7 +197,7 @@ export function AboutSection() {
                                         : "bg-white/60 border-black/5 hover:bg-white/80"
                                 )}
                             >
-                                <h3 className="text-2xl md:text-5xl font-bold text-accent mb-1 md:mb-2" style={{ willChange: 'contents' }}>
+                                <h3 className="text-2xl md:text-5xl font-bold text-accent mb-1 md:mb-2">
                                     <AnimatedCounter value={stat.value} suffix={stat.suffix} />
                                 </h3>
                                 <p className={cn("font-medium text-xs md:text-base", isDark ? "text-white/70" : "text-muted-foreground")}>{stat.label}</p>

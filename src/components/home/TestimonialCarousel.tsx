@@ -150,13 +150,14 @@ export function TestimonialCarousel() {
                     drag={isMobile ? "x" : false}
                     dragConstraints={{ right: 0, left: -dragConstraints }}
                     dragElastic={0.1}
+                    style={{ willChange: "transform" }}
                     className={cn(
-                        "flex w-max gap-6 px-4 md:px-0",
+                        "flex w-max gap-6 px-4 md:px-0 transform-gpu",
                         !isMobile && "animate-marquee hover:pause"
                     )}
                 >
-                    {/* Duplicate the array 3 times to ensure the screen is always filled (only hide on mobile to bound drag) */}
-                    {[...testimonials, ...testimonials, ...testimonials].map((story, i) => (
+                    {/* Duplicate the array 2 times to ensure the screen is always filled (only hide on mobile to bound drag) */}
+                    {[...testimonials, ...testimonials].map((story, i) => (
                         <motion.div
                             whileTap={{ scale: 0.97 }}
                             key={i}

@@ -8,6 +8,8 @@ import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { useTranslation } from "@/i18n/LanguageContext";
 
+const EASE_OUT_EXPO = [0.16, 1, 0.3, 1] as const;
+
 const stepsData = [
     {
         id: "call",
@@ -51,8 +53,8 @@ export function HowItWorksSection() {
                     <motion.div
                         initial={{ opacity: 0, scale: 0.9 }}
                         whileInView={{ opacity: 1, scale: 1 }}
-                        viewport={{ once: true }}
-                        transition={{ duration: 0.5 }}
+                        viewport={{ once: true, amount: 0.2 }}
+                        transition={{ duration: 0.5, ease: EASE_OUT_EXPO }}
                     >
                         <span className="inline-block px-4 py-1.5 rounded-full bg-accent/10 border border-accent/20 text-accent text-sm md:text-base font-medium mb-4">
                             Simple Process
@@ -61,17 +63,17 @@ export function HowItWorksSection() {
                     <motion.h2
                         initial={{ opacity: 0, y: 20 }}
                         whileInView={{ opacity: 1, y: 0 }}
-                        viewport={{ once: true }}
-                        transition={{ duration: 0.6, delay: 0.1 }}
-                        className="text-3xl md:text-5xl font-bold font-heading mb-4 text-primary"
+                        viewport={{ once: true, amount: 0.2 }}
+                        transition={{ duration: 0.6, ease: EASE_OUT_EXPO }}
+                        className="text-3xl md:text-5xl font-bold font-heading mb-6 text-primary"
                     >
                         How It Works
                     </motion.h2>
                     <motion.p
                         initial={{ opacity: 0, y: 20 }}
                         whileInView={{ opacity: 1, y: 0 }}
-                        viewport={{ once: true }}
-                        transition={{ duration: 0.6, delay: 0.2 }}
+                        viewport={{ once: true, amount: 0.2 }}
+                        transition={{ duration: 0.6, delay: 0.1, ease: EASE_OUT_EXPO }}
                         className="text-base md:text-xl text-muted-foreground max-w-2xl mx-auto"
                     >
                         From your first call to your flight — four simple steps to studying abroad.
@@ -85,10 +87,10 @@ export function HowItWorksSection() {
                             key={step.id}
                             initial={{ opacity: 0, y: 30 }}
                             whileInView={{ opacity: 1, y: 0 }}
-                            viewport={{ once: true }}
+                            viewport={{ once: true, amount: 0.2 }}
                             whileTap={{ scale: 0.97 }}
-                            transition={{ duration: 0.5, delay: i * 0.12 }}
-                            className="relative group w-[75vw] sm:w-[260px] snap-center shrink-0 md:w-auto md:shrink"
+                            transition={{ duration: 0.6, delay: i * 0.15, ease: EASE_OUT_EXPO }}
+                            className="relative group w-[80vw] sm:w-[320px] md:w-auto shrink-0 md:shrink snap-center"
                         >
                             {/* Connector line — hidden on mobile, visible on lg between cards */}
                             {i < stepsData.length - 1 && (

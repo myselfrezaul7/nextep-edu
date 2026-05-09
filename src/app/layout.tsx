@@ -5,7 +5,6 @@ import { Header } from "@/components/layout/Header";
 import { Footer } from "@/components/layout/Footer";
 import { MobileTabBar } from "@/components/layout/MobileTabBar";
 import { StructuredData } from "@/components/common/structured-data";
-import { BookingModal } from "@/components/common/BookingModal";
 import { WhatsAppFAB } from "@/components/common/WhatsAppFAB";
 import { ScrollProgress } from "@/components/common/ScrollProgress";
 import { BackToTop } from "@/components/common/BackToTop";
@@ -13,31 +12,35 @@ import { PageTransition } from "@/components/common/PageTransition";
 import { ErrorBoundary } from "@/components/common/ErrorBoundary";
 import { SpeedInsights } from "@vercel/speed-insights/next";
 import { LanguageProvider } from "@/i18n/LanguageContext";
+import { BookingModal } from "@/components/common/BookingModal";
 import "./globals.css";
-
 
 const ibmPlexSans = IBM_Plex_Sans({
     subsets: ["latin"],
     weight: ["400", "500", "600", "700"],
     variable: "--font-ibm-plex-sans",
+    display: "swap",
 });
 
 const playfair = Playfair_Display({
     subsets: ["latin"],
     weight: ["400", "700"],
     variable: "--font-playfair",
+    display: "swap",
 });
 
 const notoBengali = Noto_Sans_Bengali({
     subsets: ["bengali"],
-    weight: ["400", "500", "600", "700"],
+    weight: ["400", "600"],
     variable: "--font-bengali",
+    display: "swap",
 });
 
 const dancingScript = Dancing_Script({
     subsets: ["latin"],
-    weight: ["400", "500", "600", "700"],
+    weight: ["400", "700"],
     variable: "--font-script",
+    display: "swap",
 });
 
 // SEO Metadata targeting Bangladeshi students
@@ -167,6 +170,9 @@ export default function RootLayout({
     return (
         <html lang="en" suppressHydrationWarning>
             <head>
+                <link rel="preconnect" href="https://fonts.googleapis.com" />
+                <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
+                <link rel="preconnect" href="https://api.web3forms.com" />
                 <StructuredData />
                 <link rel="alternate" hrefLang="en" href="https://www.nextepedu.com" />
                 <link rel="alternate" hrefLang="bn" href="https://www.nextepedu.com" />

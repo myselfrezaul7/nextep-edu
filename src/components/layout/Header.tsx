@@ -8,9 +8,11 @@ import { Search, Moon, Sun, ChevronDown } from "lucide-react";
 import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
-import { SearchModal } from "@/components/common/SearchModal";
 import { LanguageToggle } from "@/components/common/LanguageToggle";
 import { useTranslation } from "@/i18n/LanguageContext";
+import dynamic from "next/dynamic";
+
+const SearchModal = dynamic(() => import("@/components/common/SearchModal").then(mod => mod.SearchModal), { ssr: false });
 import { destinations as destinationsData } from "@/data/destinations";
 
 // Auto-generate destination nav items from data

@@ -16,6 +16,8 @@ import { cn } from "@/lib/utils";
 import { motion } from "framer-motion";
 import { useTranslation } from "@/i18n/LanguageContext";
 
+const EASE_OUT_EXPO = [0.16, 1, 0.3, 1] as const;
+
 export function ServicesSection() {
     const { theme, systemTheme } = useTheme();
     const [mounted, setMounted] = useState(false);
@@ -38,8 +40,8 @@ export function ServicesSection() {
                     <motion.h2
                         initial={{ opacity: 0, y: 20 }}
                         whileInView={{ opacity: 1, y: 0 }}
-                        viewport={{ once: true }}
-                        transition={{ duration: 0.6 }}
+                        viewport={{ once: true, amount: 0.2 }}
+                        transition={{ duration: 0.6, ease: EASE_OUT_EXPO }}
                         className="text-3xl md:text-5xl font-bold font-heading mb-6 text-primary"
                     >
                         {t("home.services.title")} <span className="text-accent relative inline-block">
@@ -52,8 +54,8 @@ export function ServicesSection() {
                     <motion.p
                         initial={{ opacity: 0, y: 20 }}
                         whileInView={{ opacity: 1, y: 0 }}
-                        viewport={{ once: true }}
-                        transition={{ delay: 0.1, duration: 0.6 }}
+                        viewport={{ once: true, amount: 0.2 }}
+                        transition={{ delay: 0.1, duration: 0.6, ease: EASE_OUT_EXPO }}
                         className={cn(
                             "text-lg",
                             mounted && currentTheme === "dark" ? "text-white/70" : "text-muted-foreground"
@@ -69,9 +71,9 @@ export function ServicesSection() {
                             key={i}
                             initial={{ opacity: 0, y: 20 }}
                             whileInView={{ opacity: 1, y: 0 }}
-                            viewport={{ once: true }}
+                            viewport={{ once: true, amount: 0.2 }}
                             whileTap={{ scale: 0.97 }}
-                            transition={{ duration: 0.4, delay: i * 0.05 }}
+                            transition={{ duration: 0.5, delay: i * 0.08, ease: EASE_OUT_EXPO }}
                             className={cn(
                                 "relative group cursor-pointer overflow-hidden rounded-3xl p-6 md:p-8 flex flex-col w-[75vw] sm:w-[280px] md:w-auto md:min-w-0 snap-center shrink-0 md:shrink border",
                                 mounted && currentTheme === "dark"

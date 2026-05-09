@@ -107,10 +107,7 @@ html[lang="bn"] .text-sm {
     line-height: 1.75;
 }
 
-/* Enable smooth scrolling for all anchor tags */
-html {
-    scroll-behavior: smooth;
-}
+/* Removed scroll-behavior: smooth as it conflicts with JS-based scrolling and framer-motion */
 
 /* Global button micro-animations */
 button:active {
@@ -182,4 +179,10 @@ button {
 }
 .scrollbar-hide::-webkit-scrollbar {
   display: none; /* Chrome, Safari and Opera */
+}
+
+/* Hardware acceleration utility for animations */
+.transform-gpu {
+    will-change: transform;
+    transform: translateZ(0);
 }
