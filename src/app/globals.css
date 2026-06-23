@@ -107,6 +107,8 @@ html[lang="bn"] .text-sm {
     line-height: 1.75;
 }
 
+*:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; border-radius: 4px; }
+
 /* Removed scroll-behavior: smooth as it conflicts with JS-based scrolling and framer-motion */
 
 /* Global button micro-animations */
@@ -183,6 +185,29 @@ button {
 
 /* Hardware acceleration utility for animations */
 .transform-gpu {
+    transform: translateZ(0);
+}
+
+.animate-gpu {
     will-change: transform;
     transform: translateZ(0);
+}
+
+@keyframes shimmer {
+    0% { transform: translateX(-100%); }
+    100% { transform: translateX(100%); }
+}
+
+@keyframes glow-pulse {
+    0% { box-shadow: 0 0 12px 3px var(--accent); opacity: 0.8; }
+    50% { box-shadow: 0 0 20px 6px var(--accent); opacity: 1; }
+    100% { box-shadow: 0 0 12px 3px var(--accent); opacity: 0.8; }
+}
+
+.animate-shimmer {
+    animation: shimmer 2s infinite;
+}
+
+.progress-glow {
+    animation: glow-pulse 2s infinite;
 }

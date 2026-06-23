@@ -5,13 +5,13 @@ export function StructuredData() {
     const organizationSchema = {
         "@context": "https://schema.org",
         "@type": "EducationalOrganization",
-        "@id": "https://nextepedu.com/#organization",
+        "@id": "https://www.nextepedu.com/#organization",
         name: "NexTep Edu",
         alternateName: "NexTep Education Consultancy",
-        url: "https://nextepedu.com",
+        url: "https://www.nextepedu.com",
         logo: {
             "@type": "ImageObject",
-            url: "https://nextepedu.com/assets/logo.png",
+            url: "https://www.nextepedu.com/assets/logo.png",
             width: 512,
             height: 512,
         },
@@ -45,15 +45,20 @@ export function StructuredData() {
             "Study in Australia",
         ],
         foundingDate: "2018",
+        contactPoint: {
+            "@type": "ContactPoint",
+            telephone: "+4915147483493",
+            contactType: "customer service"
+        }
     };
 
     const localBusinessSchema = {
         "@context": "https://schema.org",
         "@type": "LocalBusiness",
-        "@id": "https://nextepedu.com/#localbusiness",
+        "@id": "https://www.nextepedu.com/#localbusiness",
         name: "NexTep Edu - Study Abroad Consultancy Dhaka",
-        image: "https://nextepedu.com/assets/og-image.png",
-        url: "https://nextepedu.com",
+        image: "https://www.nextepedu.com/assets/og-image.png",
+        url: "https://www.nextepedu.com",
         telephone: "+4915147483493",
         priceRange: "$$",
         address: {
@@ -88,20 +93,20 @@ export function StructuredData() {
     const websiteSchema = {
         "@context": "https://schema.org",
         "@type": "WebSite",
-        "@id": "https://nextepedu.com/#website",
-        url: "https://nextepedu.com",
+        "@id": "https://www.nextepedu.com/#website",
+        url: "https://www.nextepedu.com",
         name: "NexTep Edu",
         description: "Study Abroad Consultancy for Bangladeshi Students",
         datePublished: "2024-01-01T08:00:00+08:00",
         dateModified: new Date().toISOString(),
         publisher: {
-            "@id": "https://nextepedu.com/#organization",
+            "@id": "https://www.nextepedu.com/#organization",
         },
         potentialAction: {
             "@type": "SearchAction",
             target: {
                 "@type": "EntryPoint",
-                urlTemplate: "https://nextepedu.com/destinations/{search_term_string}",
+                urlTemplate: "https://www.nextepedu.com/destinations/{search_term_string}",
             },
             "query-input": "required name=search_term_string",
         },
@@ -162,7 +167,7 @@ export function StructuredData() {
                 "@type": "ListItem",
                 position: 1,
                 name: "Home",
-                item: "https://nextepedu.com",
+                item: "https://www.nextepedu.com",
             },
         ],
     };
@@ -170,7 +175,7 @@ export function StructuredData() {
     const aggregateRatingSchema = {
         "@context": "https://schema.org",
         "@type": "EducationalOrganization",
-        "@id": "https://nextepedu.com/#organization",
+        "@id": "https://www.nextepedu.com/#organization",
         aggregateRating: {
             "@type": "AggregateRating",
             ratingValue: "5.0",
@@ -185,7 +190,7 @@ export function StructuredData() {
         "@type": "Service",
         serviceType: "Study Abroad Consulting",
         provider: {
-            "@id": "https://nextepedu.com/#organization"
+            "@id": "https://www.nextepedu.com/#organization"
         },
         areaServed: {
             "@type": "Country",

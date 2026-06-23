@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect, useMemo, useRef } from "react";
-import { Search, Globe, GraduationCap, MapPin, X } from "lucide-react";
+import { Search, Globe, GraduationCap, MapPin, X, Clock } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useRouter } from "next/navigation";
 import { destinations } from "@/data/destinations";
@@ -12,14 +12,16 @@ interface SearchResult {
     category: string;
     href: string;
     description?: string;
+    flag?: string;
+    isRecent?: boolean;
 }
 
-// Auto-generate search data from destinations data source
 const destinationResults: SearchResult[] = Object.values(destinations).map(d => ({
     title: d.name,
     category: "Destination",
     href: `/destinations/${d.slug}`,
-    description: d.hero.description.slice(0, 60) + "..."
+    description: d.hero.description.slice(0, 60) + "...",
+    flag: d.flag
 }));
 
 const serviceResults: SearchResult[] = [
@@ -63,14 +65,33 @@ export function SearchModal() {
 
     // Filter results based on query
     const results = useMemo(() => {
-        if (!query.trim()) return searchData.slice(0, 8); // Show popular results
+        if (!query.trim()) {
+            const recent = JSON.parse(localStorage.getItem("nextepedu_recent_searches") || "[]");
+            if (recent.length > 0) {
+                return recent.map((r: SearchResult) => ({...r, isRecent: true}));
+            }
+            return searchData.slice(0, 8); // Show popular results
+        }
 
-        const lowerQuery = query.toLowerCase();
+        const lowerQuery = query.toLowerCase().split("");
+        
+        const isFuzzyMatch = (text: string) => {
+            const lowerText = text.toLowerCase();
+            let queryIdx = 0;
+            for (let i = 0; i < lowerText.length; i++) {
+                if (lowerText[i] === lowerQuery[queryIdx]) {
+                    queryIdx++;
+                }
+                if (queryIdx === lowerQuery.length) return true;
+            }
+            return false;
+        };
+
         return searchData.filter(
             item =>
-                item.title.toLowerCase().includes(lowerQuery) ||
-                item.category.toLowerCase().includes(lowerQuery) ||
-                item.description?.toLowerCase().includes(lowerQuery)
+                isFuzzyMatch(item.title) ||
+                isFuzzyMatch(item.category) ||
+                (item.description && isFuzzyMatch(item.description))
         ).slice(0, 10); // Limit results for performance
     }, [query]);
 
@@ -96,7 +117,7 @@ export function SearchModal() {
                 e.preventDefault();
                 const selectedResult = results[selectedIndex];
                 if (selectedResult) {
-                    navigateToResult(selectedResult.href);
+                    navigateToResult(selectedResult.href, selectedResult);
                 }
             }
         };
@@ -122,7 +143,14 @@ export function SearchModal() {
         setSelectedIndex(0);
     };
 
-    const navigateToResult = (href: string) => {
+    const navigateToResult = (href: string, result: SearchResult) => {
+        const recent = JSON.parse(localStorage.getItem("nextepedu_recent_searches") || "[]");
+        const resultToSave = { ...result };
+        delete resultToSave.isRecent;
+        
+        const newRecent = [resultToSave, ...recent.filter((r: SearchResult) => r.href !== href)].slice(0, 5);
+        localStorage.setItem("nextepedu_recent_searches", JSON.stringify(newRecent));
+
         router.push(href);
         closeModal();
     };
@@ -213,7 +241,7 @@ export function SearchModal() {
                                                     Suggested
                                                 </motion.div>
                                             )}
-                                            {results.map((result, index) => {
+                                            {results.map((result: SearchResult, index: number) => {
                                                 const isSelected = index === selectedIndex;
                                                 return (
                                                     <motion.div
@@ -223,7 +251,7 @@ export function SearchModal() {
                                                         animate={{ opacity: 1, x: 0 }}
                                                         exit={{ opacity: 0, scale: 0.95 }}
                                                         transition={{ duration: 0.15, delay: index * 0.02 }}
-                                                        onClick={() => navigateToResult(result.href)}
+                                                        onClick={() => navigateToResult(result.href, result)}
                                                         onMouseEnter={() => setSelectedIndex(index)}
                                                         className={cn(
                                                             "group flex items-center gap-4 p-3 rounded-xl cursor-pointer transition-all duration-200 w-full relative",
@@ -242,15 +270,16 @@ export function SearchModal() {
                                                             "w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0 transition-colors shadow-sm",
                                                             isSelected ? "bg-accent text-primary-foreground" : "bg-background border border-border/50 text-muted-foreground group-hover:text-foreground"
                                                         )}>
-                                                            {getCategoryIcon(result.category)}
+                                                            {result.isRecent ? <Clock className="w-5 h-5" /> : getCategoryIcon(result.category)}
                                                         </div>
 
                                                         <div className="flex-1 min-w-0 flex flex-col justify-center">
                                                             <div className="flex items-center justify-between gap-2">
                                                                 <h4 className={cn(
-                                                                    "font-semibold truncate transition-colors",
+                                                                    "font-semibold truncate transition-colors flex items-center gap-2",
                                                                     isSelected ? "text-accent" : "text-foreground group-hover:text-primary"
                                                                 )}>
+                                                                    {result.flag && <span>{result.flag}</span>}
                                                                     {result.title}
                                                                 </h4>
                                                                 <span className={cn(

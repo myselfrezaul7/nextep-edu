@@ -88,11 +88,31 @@ const iconMap: Record<string, React.ComponentType<{ className?: string }>> = {
 export function DestinationPageClient({ destination, relatedDestinations = [] }: DestinationPageClientProps) {
     const { theme, systemTheme } = useTheme();
     const [mounted, setMounted] = useState(false);
+    const [searchQuery, setSearchQuery] = useState("");
     const { t } = useTranslation();
 
     useEffect(() => {
         setMounted(true);
     }, []);
+
+    const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
+        const card = e.currentTarget;
+        card.style.transition = 'none';
+        const rect = card.getBoundingClientRect();
+        const x = e.clientX - rect.left;
+        const y = e.clientY - rect.top;
+        const centerX = rect.width / 2;
+        const centerY = rect.height / 2;
+        const rotateX = ((y - centerY) / centerY) * -10;
+        const rotateY = ((x - centerX) / centerX) * 10;
+        card.style.transform = `perspective(1000px) rotateX(${rotateX}deg) rotateY(${rotateY}deg) scale3d(1.02, 1.02, 1.02)`;
+    };
+
+    const handleMouseLeave = (e: React.MouseEvent<HTMLDivElement>) => {
+        const card = e.currentTarget;
+        card.style.transition = 'transform 0.5s ease';
+        card.style.transform = 'perspective(1000px) rotateX(0deg) rotateY(0deg) scale3d(1, 1, 1)';
+    };
 
     const currentTheme = theme === "system" ? systemTheme : theme;
 
@@ -164,8 +184,8 @@ export function DestinationPageClient({ destination, relatedDestinations = [] }:
                                     key={benefit.title}
                                     initial={{ opacity: 0, y: 30 }}
                                     whileInView={{ opacity: 1, y: 0 }}
-                                    viewport={{ once: true }}
-                                    transition={{ delay: index * 0.1 }}
+                                    viewport={{ once: true, amount: 0.3 }}
+                                    transition={{ delay: index * 0.15 }}
                                     className={cn(
                                         "backdrop-blur-xl p-6 rounded-2xl border hover:border-accent/30 shadow-lg transition-all duration-300",
                                         mounted && currentTheme === "dark"
@@ -207,8 +227,22 @@ export function DestinationPageClient({ destination, relatedDestinations = [] }:
                         </p>
                     </motion.div>
 
+                    {destination.universities.length >= 5 && (
+                        <div className="max-w-md mx-auto mb-8 relative">
+                            <input
+                                type="text"
+                                placeholder="Search universities..."
+                                value={searchQuery}
+                                onChange={(e) => setSearchQuery(e.target.value)}
+                                className="w-full px-4 py-3 rounded-xl border border-border bg-background/50 backdrop-blur-sm focus:outline-none focus:ring-2 focus:ring-accent"
+                            />
+                        </div>
+                    )}
+
                     <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
-                        {destination.universities.map((university, index) => (
+                        {destination.universities
+                            .filter(u => u.name.toLowerCase().includes(searchQuery.toLowerCase()))
+                            .map((university, index) => (
                             <motion.div
                                 key={university.name}
                                 initial={{ opacity: 0, x: -20 }}
@@ -261,7 +295,11 @@ export function DestinationPageClient({ destination, relatedDestinations = [] }:
                                     className="h-full"
                                 >
                                     <Link href={`/destinations/${related.slug}`} className="group block h-full">
-                                        <div className="relative h-full overflow-hidden rounded-2xl border border-border/30 bg-card/95 backdrop-blur-xl shadow-lg hover:shadow-2xl transition-all duration-500 hover:-translate-y-2">
+                                        <div 
+                                            className="relative h-full overflow-hidden rounded-2xl border border-border/30 bg-card/95 backdrop-blur-xl shadow-lg hover:shadow-2xl transition-shadow duration-500"
+                                            onMouseMove={handleMouseMove}
+                                            onMouseLeave={handleMouseLeave}
+                                        >
                                             {/* Image Wrapper */}
                                             <div className="relative h-48 overflow-hidden">
                                                 <Image

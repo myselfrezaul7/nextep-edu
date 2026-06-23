@@ -22,9 +22,11 @@ export function ScrollProgress() {
         <div className="fixed top-0 left-0 w-full h-[3px] z-[60] pointer-events-none">
             <div
                 ref={progressRef}
-                className="h-full bg-gradient-to-r from-accent via-yellow-400 to-accent transition-[width] duration-100 ease-out"
+                className="h-full bg-gradient-to-r from-accent via-yellow-300 to-amber-400 transition-[width] duration-100 ease-out relative"
                 style={{ width: "0%" }}
-            />
+            >
+                <div className="absolute right-0 top-0 bottom-0 w-6 progress-glow blur-[4px]" />
+            </div>
         </div>
     );
 }

@@ -1,6 +1,6 @@
 "use client";
 
-import { motion, useInView } from "framer-motion";
+import { motion, useInView, useScroll, useTransform } from "framer-motion";
 import { useEffect, useRef, useState, memo } from "react";
 import { CheckCircle } from "lucide-react";
 import { useTheme } from "next-themes";
@@ -66,6 +66,9 @@ const AnimatedCounter = memo(function AnimatedCounter({ value, suffix }: { value
 
 // Simplified world map dots representing key destination cities
 function WorldMapDecor() {
+    const { scrollYProgress } = useScroll();
+    const pathLength = useTransform(scrollYProgress, [0.3, 0.8], [0, 1]);
+
     return (
         <svg
             viewBox="0 0 400 200"
@@ -104,19 +107,31 @@ function WorldMapDecor() {
 
             {/* Gold accent dots on key cities */}
             {/* London */}
-            <circle cx="195" cy="48" r="3" fill="currentColor" className="text-accent" opacity="0.8" />
+            <circle cx="195" cy="48" r="3" fill="currentColor" className="text-accent" opacity="0.8">
+                <animate attributeName="r" values="3;6;3" dur="2s" repeatCount="indefinite" />
+                <animate attributeName="opacity" values="0.8;0.2;0.8" dur="2s" repeatCount="indefinite" />
+            </circle>
             {/* Berlin */}
-            <circle cx="210" cy="52" r="3" fill="currentColor" className="text-accent" opacity="0.8" />
+            <circle cx="210" cy="52" r="3" fill="currentColor" className="text-accent" opacity="0.8">
+                <animate attributeName="r" values="3;6;3" dur="2.5s" repeatCount="indefinite" />
+                <animate attributeName="opacity" values="0.8;0.2;0.8" dur="2.5s" repeatCount="indefinite" />
+            </circle>
             {/* Toronto */}
-            <circle cx="90" cy="55" r="3" fill="currentColor" className="text-accent" opacity="0.8" />
+            <circle cx="90" cy="55" r="3" fill="currentColor" className="text-accent" opacity="0.8">
+                <animate attributeName="r" values="3;6;3" dur="3s" repeatCount="indefinite" />
+                <animate attributeName="opacity" values="0.8;0.2;0.8" dur="3s" repeatCount="indefinite" />
+            </circle>
             {/* Sydney */}
-            <circle cx="330" cy="148" r="3" fill="currentColor" className="text-accent" opacity="0.8" />
+            <circle cx="330" cy="148" r="3" fill="currentColor" className="text-accent" opacity="0.8">
+                <animate attributeName="r" values="3;6;3" dur="2.2s" repeatCount="indefinite" />
+                <animate attributeName="opacity" values="0.8;0.2;0.8" dur="2.2s" repeatCount="indefinite" />
+            </circle>
 
             {/* Connecting arcs from Bangladesh to key cities */}
-            <path d="M270 75 Q 230 20 195 48" stroke="currentColor" className="text-accent" strokeWidth="0.8" strokeDasharray="4 3" opacity="0.4" />
-            <path d="M270 75 Q 230 30 210 52" stroke="currentColor" className="text-accent" strokeWidth="0.8" strokeDasharray="4 3" opacity="0.4" />
-            <path d="M270 75 Q 180 30 90 55" stroke="currentColor" className="text-accent" strokeWidth="0.8" strokeDasharray="4 3" opacity="0.4" />
-            <path d="M270 75 Q 300 120 330 148" stroke="currentColor" className="text-accent" strokeWidth="0.8" strokeDasharray="4 3" opacity="0.4" />
+            <motion.path d="M270 75 Q 230 20 195 48" stroke="currentColor" className="text-accent" strokeWidth="0.8" strokeDasharray="4 3" opacity="0.4" style={{ pathLength }} />
+            <motion.path d="M270 75 Q 230 30 210 52" stroke="currentColor" className="text-accent" strokeWidth="0.8" strokeDasharray="4 3" opacity="0.4" style={{ pathLength }} />
+            <motion.path d="M270 75 Q 180 30 90 55" stroke="currentColor" className="text-accent" strokeWidth="0.8" strokeDasharray="4 3" opacity="0.4" style={{ pathLength }} />
+            <motion.path d="M270 75 Q 300 120 330 148" stroke="currentColor" className="text-accent" strokeWidth="0.8" strokeDasharray="4 3" opacity="0.4" style={{ pathLength }} />
         </svg>
     );
 }
@@ -127,6 +142,7 @@ export function AboutSection() {
     const { t } = useTranslation();
     const currentTheme = theme === "system" ? systemTheme : theme;
     const isDark = mounted && currentTheme === "dark";
+    const EASE_OUT_EXPO = [0.16, 1, 0.3, 1] as const;
 
     useEffect(() => {
         setMounted(true);
@@ -140,7 +156,7 @@ export function AboutSection() {
                     initial={{ opacity: 0, scale: 0.95 }}
                     whileInView={{ opacity: 1, scale: 1 }}
                     viewport={{ once: true, amount: 0.2 }}
-                    transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
+                    transition={{ duration: 0.8, ease: EASE_OUT_EXPO }}
                 >
                     <h2 className="text-3xl md:text-5xl font-bold font-heading mb-6 text-primary">Why Students Trust Us</h2>
                     <p className={cn("text-lg mb-8 leading-relaxed", isDark ? "text-white/70" : "text-muted-foreground")}>
@@ -189,7 +205,7 @@ export function AboutSection() {
                                 whileInView={{ opacity: 1, x: 0 }}
                                 viewport={{ once: true, amount: 0.2 }}
                                 whileTap={{ scale: 0.97 }}
-                                transition={{ delay: index * 0.12, duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
+                                transition={{ delay: index * 0.12, duration: 0.7, ease: EASE_OUT_EXPO }}
                                 className={cn(
                                     "relative backdrop-blur-xl p-4 md:p-8 rounded-2xl shadow-lg border text-center hover:border-accent hover:shadow-xl hover:shadow-accent/5 transition-all duration-500 ease-out overflow-hidden",
                                     isDark

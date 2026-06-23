@@ -142,7 +142,7 @@ export function MobileTabBar() {
             <div className="flex justify-between items-center">
                 {/* HOME */}
                 <motion.button
-                    whileTap={{ scale: 0.9 }}
+                    whileTap={{ scale: 0.9, transition: { type: "spring", stiffness: 400, damping: 17 } }}
                     onClick={() => handleNavClick("")}
                     className={cn(
                         "relative flex flex-col items-center justify-center gap-0.5 w-14 h-12 rounded-xl transition-all duration-200",
@@ -155,16 +155,16 @@ export function MobileTabBar() {
                     <span className="text-[10px] font-bold uppercase tracking-wider">{t("common.tab.home")}</span>
                     {isHomeActive && (
                         <motion.div
-                            layoutId="activeTabPill"
-                            className="absolute bottom-1 w-1 h-1 rounded-full bg-accent"
-                            transition={{ type: "spring", stiffness: 400, damping: 30 }}
+                            layoutId="tab-indicator"
+                            className="absolute top-1 w-10 h-1 rounded-full bg-accent -z-10"
+                            transition={{ type: "spring", stiffness: 300, damping: 25 }}
                         />
                     )}
                 </motion.button>
 
                 {/* SERVICES */}
                 <motion.button
-                    whileTap={{ scale: 0.9 }}
+                    whileTap={{ scale: 0.9, transition: { type: "spring", stiffness: 400, damping: 17 } }}
                     onClick={() => handleNavClick("#services")}
                     className={cn(
                         "relative flex flex-col items-center justify-center gap-0.5 w-14 h-12 rounded-xl transition-all duration-200",
@@ -177,16 +177,16 @@ export function MobileTabBar() {
                     <span className="text-[10px] font-bold uppercase tracking-wider">{t("common.tab.services")}</span>
                     {isServicesActive && (
                         <motion.div
-                            layoutId="activeTabPill"
-                            className="absolute bottom-1 w-1 h-1 rounded-full bg-accent"
-                            transition={{ type: "spring", stiffness: 400, damping: 30 }}
+                            layoutId="tab-indicator"
+                            className="absolute top-1 w-10 h-1 rounded-full bg-accent -z-10"
+                            transition={{ type: "spring", stiffness: 300, damping: 25 }}
                         />
                     )}
                 </motion.button>
 
                 {/* BOOK */}
                 <motion.button
-                    whileTap={{ scale: 0.9 }}
+                    whileTap={{ scale: 0.9, transition: { type: "spring", stiffness: 400, damping: 17 } }}
                     onClick={() => window.dispatchEvent(new CustomEvent('open-booking-modal'))}
                     className={cn(
                         "relative flex flex-col items-center justify-center gap-0.5 w-14 h-12 rounded-xl transition-all duration-200",
@@ -199,7 +199,7 @@ export function MobileTabBar() {
 
                 {/* ABOUT */}
                 <motion.button
-                    whileTap={{ scale: 0.9 }}
+                    whileTap={{ scale: 0.9, transition: { type: "spring", stiffness: 400, damping: 17 } }}
                     onClick={() => handleNavClick("#about")}
                     className={cn(
                         "relative flex flex-col items-center justify-center gap-0.5 w-14 h-12 rounded-xl transition-all duration-200",
@@ -212,9 +212,9 @@ export function MobileTabBar() {
                     <span className="text-[10px] font-bold uppercase tracking-wider">{t("common.tab.about")}</span>
                     {isAboutActive && (
                         <motion.div
-                            layoutId="activeTabPill"
-                            className="absolute bottom-1 w-1 h-1 rounded-full bg-accent"
-                            transition={{ type: "spring", stiffness: 400, damping: 30 }}
+                            layoutId="tab-indicator"
+                            className="absolute top-1 w-10 h-1 rounded-full bg-accent -z-10"
+                            transition={{ type: "spring", stiffness: 300, damping: 25 }}
                         />
                     )}
                 </motion.button>

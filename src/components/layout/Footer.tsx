@@ -54,6 +54,13 @@ export function Footer() {
                         <p className="text-white/70 mb-6 max-w-lg mx-auto text-sm md:text-base">
                             {t("common.footer.ctaSubtitle")}
                         </p>
+                        <div className="flex flex-wrap justify-center gap-4 text-white/80 text-sm font-medium mb-8">
+                            <span>200+ Consultations</span>
+                            <span>&middot;</span>
+                            <span>20+ Countries</span>
+                            <span>&middot;</span>
+                            <span>98% Visa Rate</span>
+                        </div>
                         <motion.div whileTap={{ scale: 0.95 }} className="inline-block">
                             <Button
                                 size="lg"
@@ -117,12 +124,13 @@ export function Footer() {
                                         initial={isMobile ? { height: 0, opacity: 0 } : undefined}
                                         animate={isMobile ? { height: "auto", opacity: 1 } : undefined}
                                         exit={isMobile ? { height: 0, opacity: 0 } : undefined}
+                                        transition={{ type: "spring", stiffness: 300, damping: 30 }}
                                         className="space-y-1 md:space-y-3 text-sm pb-4 md:pb-0 overflow-hidden"
                                     >
-                                        <li><Link href="/" className={cn("py-2.5 md:py-0 block hover:text-accent transition-colors", mounted && currentTheme === "dark" ? "text-white/70" : "text-muted-foreground")}>{t("common.footer.home")}</Link></li>
-                                        <li><Link href="/#services" className={cn("py-2.5 md:py-0 block hover:text-accent transition-colors", mounted && currentTheme === "dark" ? "text-white/70" : "text-muted-foreground")}>{t("common.footer.services")}</Link></li>
-                                        <li><Link href="/#about" className={cn("py-2.5 md:py-0 block hover:text-accent transition-colors", mounted && currentTheme === "dark" ? "text-white/70" : "text-muted-foreground")}>{t("common.footer.aboutUs")}</Link></li>
-                                        <li><Link href="/destinations" className={cn("py-2.5 md:py-0 block hover:text-accent transition-colors", mounted && currentTheme === "dark" ? "text-white/70" : "text-muted-foreground")}>{t("common.footer.destinations")}</Link></li>
+                                        <li><Link href="/" className={cn("py-2.5 md:py-0 block hover:text-accent hover:underline decoration-accent underline-offset-4 transition-colors", mounted && currentTheme === "dark" ? "text-white/70" : "text-muted-foreground")}>{t("common.footer.home")}</Link></li>
+                                        <li><Link href="/#services" className={cn("py-2.5 md:py-0 block hover:text-accent hover:underline decoration-accent underline-offset-4 transition-colors", mounted && currentTheme === "dark" ? "text-white/70" : "text-muted-foreground")}>{t("common.footer.services")}</Link></li>
+                                        <li><Link href="/#about" className={cn("py-2.5 md:py-0 block hover:text-accent hover:underline decoration-accent underline-offset-4 transition-colors", mounted && currentTheme === "dark" ? "text-white/70" : "text-muted-foreground")}>{t("common.footer.aboutUs")}</Link></li>
+                                        <li><Link href="/destinations" className={cn("py-2.5 md:py-0 block hover:text-accent hover:underline decoration-accent underline-offset-4 transition-colors", mounted && currentTheme === "dark" ? "text-white/70" : "text-muted-foreground")}>{t("common.footer.destinations")}</Link></li>
                                     </motion.ul>
                                 )}
                             </AnimatePresence>
@@ -145,11 +153,11 @@ export function Footer() {
                                         exit={isMobile ? { height: 0, opacity: 0 } : undefined}
                                         className="space-y-1 md:space-y-3 text-sm pb-4 md:pb-0 overflow-hidden"
                                     >
-                                        <li><Link href="/destinations/uk" className={cn("py-2.5 md:py-0 block hover:text-accent transition-colors", mounted && currentTheme === "dark" ? "text-white/70" : "text-muted-foreground")}>United Kingdom</Link></li>
-                                        <li><Link href="/destinations/usa" className={cn("py-2.5 md:py-0 block hover:text-accent transition-colors", mounted && currentTheme === "dark" ? "text-white/70" : "text-muted-foreground")}>USA</Link></li>
-                                        <li><Link href="/destinations/canada" className={cn("py-2.5 md:py-0 block hover:text-accent transition-colors", mounted && currentTheme === "dark" ? "text-white/70" : "text-muted-foreground")}>Canada</Link></li>
-                                        <li><Link href="/destinations/australia" className={cn("py-2.5 md:py-0 block hover:text-accent transition-colors", mounted && currentTheme === "dark" ? "text-white/70" : "text-muted-foreground")}>Australia</Link></li>
-                                        <li><Link href="/destinations/germany" className={cn("py-2.5 md:py-0 block hover:text-accent transition-colors", mounted && currentTheme === "dark" ? "text-white/70" : "text-muted-foreground")}>Germany</Link></li>
+                                        <li><Link href="/destinations/uk" className={cn("py-2.5 md:py-0 block hover:text-accent hover:underline decoration-accent underline-offset-4 transition-colors", mounted && currentTheme === "dark" ? "text-white/70" : "text-muted-foreground")}>United Kingdom</Link></li>
+                                        <li><Link href="/destinations/usa" className={cn("py-2.5 md:py-0 block hover:text-accent hover:underline decoration-accent underline-offset-4 transition-colors", mounted && currentTheme === "dark" ? "text-white/70" : "text-muted-foreground")}>USA</Link></li>
+                                        <li><Link href="/destinations/canada" className={cn("py-2.5 md:py-0 block hover:text-accent hover:underline decoration-accent underline-offset-4 transition-colors", mounted && currentTheme === "dark" ? "text-white/70" : "text-muted-foreground")}>Canada</Link></li>
+                                        <li><Link href="/destinations/australia" className={cn("py-2.5 md:py-0 block hover:text-accent hover:underline decoration-accent underline-offset-4 transition-colors", mounted && currentTheme === "dark" ? "text-white/70" : "text-muted-foreground")}>Australia</Link></li>
+                                        <li><Link href="/destinations/germany" className={cn("py-2.5 md:py-0 block hover:text-accent hover:underline decoration-accent underline-offset-4 transition-colors", mounted && currentTheme === "dark" ? "text-white/70" : "text-muted-foreground")}>Germany</Link></li>
                                     </motion.ul>
                                 )}
                             </AnimatePresence>
@@ -173,13 +181,13 @@ export function Footer() {
                                         className="space-y-1 md:space-y-4 text-sm pb-4 md:pb-0 overflow-hidden"
                                     >
                                         <li>
-                                            <a href="https://wa.me/4915147483493" target="_blank" rel="noopener noreferrer" className={cn("flex items-start gap-3 py-2.5 md:py-0 hover:text-accent transition-colors", mounted && currentTheme === "dark" ? "text-white/70" : "text-muted-foreground")}>
+                                            <a href="https://wa.me/4915147483493" target="_blank" rel="noopener noreferrer" className={cn("flex items-start gap-3 py-2.5 md:py-0 hover:text-accent hover:underline decoration-accent underline-offset-4 transition-colors", mounted && currentTheme === "dark" ? "text-white/70" : "text-muted-foreground")}>
                                                 <Phone className="w-4 h-4 mt-1 text-accent shrink-0" />
                                                 +49 151 47483493
                                             </a>
                                         </li>
                                         <li>
-                                            <a href="https://mail.google.com/mail/?view=cm&fs=1&to=info@nextepedu.com" target="_blank" rel="noopener noreferrer" className={cn("flex items-start gap-3 py-2.5 md:py-0 hover:text-accent transition-colors", mounted && currentTheme === "dark" ? "text-white/70" : "text-muted-foreground")}>
+                                            <a href="https://mail.google.com/mail/?view=cm&fs=1&to=info@nextepedu.com" target="_blank" rel="noopener noreferrer" className={cn("flex items-start gap-3 py-2.5 md:py-0 hover:text-accent hover:underline decoration-accent underline-offset-4 transition-colors", mounted && currentTheme === "dark" ? "text-white/70" : "text-muted-foreground")}>
                                                 <Mail className="w-4 h-4 mt-1 text-accent shrink-0" />
                                                 info@nextepedu.com
                                             </a>

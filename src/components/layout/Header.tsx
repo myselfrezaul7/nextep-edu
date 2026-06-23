@@ -11,6 +11,7 @@ import { cn } from "@/lib/utils";
 import { LanguageToggle } from "@/components/common/LanguageToggle";
 import { useTranslation } from "@/i18n/LanguageContext";
 import dynamic from "next/dynamic";
+import { usePathname } from "next/navigation";
 
 const SearchModal = dynamic(() => import("@/components/common/SearchModal").then(mod => mod.SearchModal), { ssr: false });
 import { destinations as destinationsData } from "@/data/destinations";
@@ -36,6 +37,9 @@ export function Header() {
     const { theme, setTheme, systemTheme } = useTheme();
     const [mounted, setMounted] = useState(false);
     const { t, locale } = useTranslation();
+    const pathname = usePathname();
+    const [activeHash, setActiveHash] = useState("");
+    const [scrollY, setScrollY] = useState(0);
     const lastScrollY = useRef(0);
     const scrollTimeout = useRef<NodeJS.Timeout | null>(null);
 
@@ -43,8 +47,13 @@ export function Header() {
 
     useEffect(() => {
         setMounted(true);
+        const handleHashChange = () => setActiveHash(window.location.hash);
+        window.addEventListener("hashchange", handleHashChange);
+        handleHashChange();
+
         const handleScroll = () => {
             const currentScrollY = window.scrollY;
+            setScrollY(currentScrollY);
             setScrolled(currentScrollY > 20);
 
             // Auto-hide logic
@@ -65,10 +74,15 @@ export function Header() {
         };
         window.addEventListener("scroll", handleScroll, { passive: true });
         return () => {
+            window.removeEventListener("hashchange", handleHashChange);
             window.removeEventListener("scroll", handleScroll);
             if (scrollTimeout.current) clearTimeout(scrollTimeout.current);
         };
     }, []);
+
+    const isServicesActive = pathname === "/" && activeHash === "#services";
+    const isAboutActive = pathname === "/" && activeHash === "#about";
+    const isDestinationsActive = pathname.startsWith("/destinations");
 
     const toggleTheme = () => {
         setTheme(theme === "dark" ? "light" : "dark");
@@ -89,6 +103,7 @@ export function Header() {
                         ? "bg-[rgba(15,23,42,0.85)] border-white/10 shadow-[0_4px_30px_rgba(0,0,0,0.3)] shadow-[inset_0_1px_0_rgba(255,255,255,0.05)]"
                         : "bg-white/70 border-black/5 shadow-[0_4px_30px_rgba(0,0,0,0.1)] shadow-[inset_0_1px_0_rgba(255,255,255,0.8)]"
                 )}
+                style={{ backdropFilter: `blur(${Math.min(scrollY / 10, 20)}px)`, WebkitBackdropFilter: `blur(${Math.min(scrollY / 10, 20)}px)` }}
             >
                 {/* Logo */}
                 <Link href="/" className="flex items-center gap-2 group shrink-0" onClick={() => window.scrollTo({ top: 0, behavior: "instant" })}>
@@ -109,11 +124,13 @@ export function Header() {
 
                 {/* Desktop Nav */}
                 <div className="hidden lg:flex items-center gap-6">
-                    <Link href="/#services" className="text-sm font-medium hover:text-accent transition-colors">
+                    <Link href="/#services" className="relative py-2 text-sm font-medium hover:text-accent transition-colors">
                         {t("common.nav.services")}
+                        {isServicesActive && <motion.div layoutId="nav-underline" className="absolute left-0 right-0 bottom-0 h-0.5 bg-accent" />}
                     </Link>
-                    <Link href="/#about" className="text-sm font-medium hover:text-accent transition-colors">
+                    <Link href="/#about" className="relative py-2 text-sm font-medium hover:text-accent transition-colors">
                         {t("common.nav.about")}
+                        {isAboutActive && <motion.div layoutId="nav-underline" className="absolute left-0 right-0 bottom-0 h-0.5 bg-accent" />}
                     </Link>
 
                     <div
@@ -122,11 +139,12 @@ export function Header() {
                         onMouseLeave={() => setDropdownOpen(false)}
                     >
                         <button
-                            className="flex items-center gap-1 text-sm font-medium hover:text-accent transition-colors py-2"
+                            className="relative flex items-center gap-1 text-sm font-medium hover:text-accent transition-colors py-2"
                             aria-expanded={dropdownOpen}
                             aria-haspopup="true"
                         >
                             {t("common.nav.destinations")} <ChevronDown className={cn("w-4 h-4 transition-transform", dropdownOpen && "rotate-180")} />
+                            {isDestinationsActive && <motion.div layoutId="nav-underline" className="absolute left-0 right-0 bottom-0 h-0.5 bg-accent" />}
                         </button>
 
                         {/* Dropdown Menu — perfectly matches mobile glassmorphism */}
