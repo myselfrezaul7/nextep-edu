@@ -2,6 +2,8 @@
 
 import { useTranslation } from "@/i18n/LanguageContext";
 import { DestinationsGrid } from "@/components/destinations/DestinationsGrid";
+import { destinations } from "@/data/destinations";
+import { motion } from "framer-motion";
 
 export function DestinationsPageContent() {
     const { t } = useTranslation();
@@ -12,9 +14,16 @@ export function DestinationsPageContent() {
             <section className="py-16 md:py-24 bg-gradient-to-b from-accent/5 to-transparent">
                 <div className="container mx-auto px-4">
                     <div className="max-w-3xl mx-auto text-center">
-                        <h1 className="text-4xl md:text-5xl font-bold text-foreground mb-6">
+                        <div className="inline-block px-4 py-1.5 rounded-full bg-accent/10 text-accent font-semibold text-sm mb-6 border border-accent/20">
+                            {Object.keys(destinations).length} Destinations
+                        </div>
+                        <motion.h1 
+                            initial={{ opacity: 0, y: 20 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            className="text-4xl md:text-5xl font-bold text-foreground mb-6"
+                        >
                             {t("destinations.page.title")}
-                        </h1>
+                        </motion.h1>
                         <p className="text-lg md:text-xl text-muted-foreground">
                             {t("destinations.page.subtitle")}
                         </p>

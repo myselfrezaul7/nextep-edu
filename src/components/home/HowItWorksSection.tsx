@@ -1,9 +1,9 @@
 "use client";
 
-import { motion } from "framer-motion";
+import { motion, useScroll, useTransform } from "framer-motion";
 import { PhoneCall, ClipboardList, SendHorizonal, PlaneTakeoff } from "lucide-react";
 import { useTheme } from "next-themes";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { useTranslation } from "@/i18n/LanguageContext";
@@ -14,18 +14,22 @@ const stepsData = [
     {
         id: "call",
         icon: PhoneCall,
+        timeEstimate: "15 mins",
     },
     {
         id: "plan",
         icon: ClipboardList,
+        timeEstimate: "1-2 days",
     },
     {
         id: "apply",
         icon: SendHorizonal,
+        timeEstimate: "2-4 weeks",
     },
     {
         id: "fly",
         icon: PlaneTakeoff,
+        timeEstimate: "3-6 months",
     },
 ];
 
@@ -34,6 +38,12 @@ export function HowItWorksSection() {
     const [mounted, setMounted] = useState(false);
     const { t } = useTranslation();
     const currentTheme = theme === "system" ? systemTheme : theme;
+    const containerRef = useRef<HTMLDivElement>(null);
+    const { scrollYProgress } = useScroll({
+        target: containerRef,
+        offset: ["start center", "end center"]
+    });
+    const pathLength = useTransform(scrollYProgress, [0, 0.8], [0, 1]);
 
     useEffect(() => {
         setMounted(true);
@@ -81,7 +91,21 @@ export function HowItWorksSection() {
                 </div>
 
                 {/* Steps Grid */}
-                <div className="flex overflow-x-auto snap-x snap-mandatory pb-4 -mx-4 px-4 scrollbar-hide md:grid md:grid-cols-2 lg:grid-cols-4 gap-6 max-w-6xl md:mx-auto">
+                <div ref={containerRef} className="relative flex overflow-x-auto snap-x snap-mandatory pb-4 -mx-4 px-4 scrollbar-hide md:grid md:grid-cols-2 lg:grid-cols-4 gap-6 max-w-6xl md:mx-auto">
+                    {/* SVG Progress Line */}
+                    <div className="hidden lg:block absolute top-20 left-[12.5%] w-[75%] h-[2px] z-0 pointer-events-none">
+                        <svg className="w-full h-full" preserveAspectRatio="none">
+                            <line x1="0" y1="1" x2="100%" y2="1" stroke="currentColor" className="text-accent/20" strokeWidth="2" strokeDasharray="8 8" />
+                            <motion.line 
+                                x1="0" y1="1" x2="100%" y2="1" 
+                                stroke="currentColor" 
+                                className="text-accent" 
+                                strokeWidth="2"
+                                style={{ pathLength }}
+                            />
+                        </svg>
+                    </div>
+
                     {stepsData.map((step, i) => (
                         <motion.div
                             key={step.id}
@@ -92,10 +116,6 @@ export function HowItWorksSection() {
                             transition={{ duration: 0.6, delay: i * 0.15, ease: EASE_OUT_EXPO }}
                             className="relative group w-[80vw] sm:w-[320px] md:w-auto shrink-0 md:shrink snap-center"
                         >
-                            {/* Connector line — hidden on mobile, visible on lg between cards */}
-                            {i < stepsData.length - 1 && (
-                                <div className="hidden lg:block absolute top-12 left-[calc(100%+0.25rem)] w-[calc(100%-3rem)] border-t-2 border-dashed border-accent/20 z-0 pointer-events-none" />
-                            )}
 
                             <div className={cn(
                                 "relative backdrop-blur-xl border rounded-2xl p-6 md:p-8 text-center hover:border-accent/40 shadow hover:shadow-xl transition-all duration-300 h-full flex flex-col items-center overflow-hidden",
@@ -112,8 +132,22 @@ export function HowItWorksSection() {
                                 </div>
 
                                 {/* Icon */}
-                                <div className="w-16 h-16 rounded-2xl bg-accent/10 border border-accent/20 flex items-center justify-center mb-6 group-hover:scale-110 group-hover:bg-accent/20 transition-all duration-300">
+                                <motion.div 
+                                    whileInView={
+                                        step.id === "call" ? { rotate: [0, 15, -15, 0] } :
+                                        step.id === "plan" ? { scale: [1, 1.1, 1] } :
+                                        step.id === "apply" ? { x: [0, 5, 0] } :
+                                        { y: [0, -5, 0] }
+                                    }
+                                    transition={{ duration: 0.5, delay: 0.5 + i * 0.15 }}
+                                    className="w-16 h-16 rounded-2xl bg-accent/10 border border-accent/20 flex items-center justify-center mb-3 group-hover:scale-110 group-hover:bg-accent/20 transition-all duration-300"
+                                >
                                     <step.icon className="w-7 h-7 text-accent" />
+                                </motion.div>
+
+                                {/* Time Estimate */}
+                                <div className="bg-accent/10 text-accent text-xs font-semibold px-3 py-1 rounded-full mb-4">
+                                    ⏱ {step.timeEstimate}
                                 </div>
 
                                 {/* Content */}

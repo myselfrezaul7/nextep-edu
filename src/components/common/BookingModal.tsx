@@ -22,26 +22,29 @@ type FormData = {
 };
 
 function ConfettiExplosion() {
-    const particles = Array.from({ length: 30 });
-    const colors = ['#D4AF37', '#10B981', '#3B82F6', '#EF4444', '#8B5CF6'];
+    const particles = Array.from({ length: 50 });
+    const colors = ['#D4AF37', '#10B981', '#3B82F6', '#EF4444', '#8B5CF6', '#F59E0B', '#EC4899'];
 
     return (
         <div className="absolute inset-0 overflow-hidden pointer-events-none flex items-center justify-center">
             {particles.map((_, i) => {
                 const angle = Math.random() * Math.PI * 2;
-                const distance = 50 + Math.random() * 150;
+                const distance = 50 + Math.random() * 250;
                 const tx = Math.cos(angle) * distance;
                 const ty = Math.sin(angle) * distance;
                 const color = colors[Math.floor(Math.random() * colors.length)];
+                const shape = Math.random() > 0.5 ? "rounded-full" : "rounded-sm";
+                const size = Math.random() * 8 + 4;
+                const rotate = Math.random() * 360;
                 
                 return (
                     <motion.div
                         key={i}
-                        initial={{ x: 0, y: 0, scale: 0, opacity: 1 }}
-                        animate={{ x: tx, y: ty, scale: Math.random() * 0.5 + 0.5, opacity: 0 }}
-                        transition={{ duration: 1 + Math.random() * 0.5, ease: "easeOut" }}
-                        className="absolute w-3 h-3 rounded-full"
-                        style={{ backgroundColor: color }}
+                        initial={{ x: 0, y: 0, scale: 0, opacity: 1, rotate: 0 }}
+                        animate={{ x: tx, y: ty, scale: Math.random() * 0.5 + 0.5, opacity: 0, rotate }}
+                        transition={{ duration: 1 + Math.random() * 0.8, ease: "easeOut" }}
+                        className={`absolute ${shape}`}
+                        style={{ backgroundColor: color, width: size, height: size }}
                     />
                 );
             })}
@@ -350,6 +353,7 @@ export function BookingModal() {
                                                         transition={{ duration: 0.3, ease: "easeInOut" }}
                                                         className="space-y-4 md:space-y-5"
                                                     >
+                                                        <h4 className="text-lg font-bold text-primary mb-2">Contact Details</h4>
                                                         <div className="space-y-1 md:space-y-0">
                                                             <label className={labelClass}><User className="w-4 h-4 text-accent" /> {t("common.modal.fullName", undefined, "Full Name")}</label>
                                                             <input
@@ -397,6 +401,7 @@ export function BookingModal() {
                                                         transition={{ duration: 0.3, ease: "easeInOut" }}
                                                         className="space-y-4 md:space-y-5"
                                                     >
+                                                        <h4 className="text-lg font-bold text-primary mb-2">Schedule Time</h4>
                                                         <div className="space-y-1 md:space-y-0">
                                                             <label className={labelClass}><Calendar className="w-4 h-4 text-accent" /> {t("common.modal.date", undefined, "Date")}</label>
                                                             <input
@@ -438,6 +443,7 @@ export function BookingModal() {
                                                         transition={{ duration: 0.3, ease: "easeInOut" }}
                                                         className="space-y-4 md:space-y-5"
                                                     >
+                                                        <h4 className="text-lg font-bold text-primary mb-2">Study Goals</h4>
                                                         <div className="space-y-1 md:space-y-0">
                                                             <label className={labelClass}><GraduationCap className="w-4 h-4 text-accent" /> {t("common.modal.educationLevel", undefined, "Education Level")}</label>
                                                             <select

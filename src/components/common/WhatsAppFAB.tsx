@@ -10,6 +10,15 @@ export function WhatsAppFAB() {
     const pathname = usePathname();
     const [isExpanded, setIsExpanded] = useState(false);
     const [showNudge, setShowNudge] = useState(false);
+    const [bottomOffset, setBottomOffset] = useState("1.5rem");
+
+    useEffect(() => {
+        const handleTabBar = (e: CustomEvent) => {
+            setBottomOffset(e.detail.visible ? "6.5rem" : "1.5rem");
+        };
+        window.addEventListener("tabbar-visibility", handleTabBar as EventListener);
+        return () => window.removeEventListener("tabbar-visibility", handleTabBar as EventListener);
+    }, []);
 
     // Idle timer for nudge
     useEffect(() => {
@@ -65,7 +74,7 @@ export function WhatsAppFAB() {
     const waUrl = `https://wa.me/${phoneNumber}?text=${encodeURIComponent(getMessage())}`;
 
     return (
-        <div className="fixed bottom-[6.5rem] md:bottom-6 right-6 z-50 flex flex-col items-end">
+        <div className="fixed right-6 z-50 flex flex-col items-end md:bottom-6 transition-[bottom] duration-300" style={{ bottom: bottomOffset }}>
             <AnimatePresence>
                 {/* Expanded Card */}
                 {isExpanded && (
@@ -93,7 +102,7 @@ export function WhatsAppFAB() {
                                 <X className="w-4 h-4" />
                             </button>
                         </div>
-                        <div className="p-4 bg-muted/30">
+                        <div className="p-4 bg-muted/30 dark:bg-slate-800/50">
                             <div className="bg-background rounded-xl p-3 border border-border/50 shadow-sm mb-4 inline-block max-w-[85%] relative">
                                 <p className="text-sm text-foreground/90">Hi there! 👋<br/>Need help finding the right destination?</p>
                                 {/* Chat bubble tail */}
@@ -116,8 +125,9 @@ export function WhatsAppFAB() {
                 {!isExpanded && showNudge && (
                     <motion.div
                         initial={{ opacity: 0, x: 20, scale: 0.9 }}
-                        animate={{ opacity: 1, x: 0, scale: 1 }}
+                        animate={{ opacity: 1, x: 0, scale: 1, y: [0, -10, 0] }}
                         exit={{ opacity: 0, x: 10, scale: 0.9 }}
+                        transition={{ y: { duration: 1.5, repeat: Infinity, ease: "easeInOut" } }}
                         className="absolute right-[4.5rem] bottom-2 bg-background border border-border/50 shadow-lg rounded-2xl rounded-br-sm px-4 py-3 whitespace-nowrap"
                     >
                         <p className="text-sm font-medium text-foreground">Need help choosing a country? 💬</p>

@@ -1,9 +1,9 @@
 "use client";
 
-import { motion } from "framer-motion";
+import { motion, useScroll, useTransform } from "framer-motion";
 import Link from "next/link";
 import Image from "next/image";
-import { ArrowRight, Sparkles, GraduationCap, Plane, Globe2 } from "lucide-react";
+import { GraduationCap, Plane, Globe2 } from "lucide-react";
 import { useTheme } from "next-themes";
 import { useState, useEffect } from "react";
 import { cn } from "@/lib/utils";
@@ -17,6 +17,8 @@ export function HeroSection() {
     const [mounted, setMounted] = useState(false);
     const { t } = useTranslation();
     const currentTheme = theme === "system" ? systemTheme : theme;
+    const { scrollY } = useScroll();
+    const y = useTransform(scrollY, [0, 1000], [0, 150]);
 
     useEffect(() => {
         setMounted(true);
@@ -30,14 +32,27 @@ export function HeroSection() {
             <div className="container mx-auto px-4 grid md:grid-cols-2 gap-12 items-center">
                 {/* Text Content */}
                 <div className="space-y-6">
-                    <motion.h1
-                        initial={{ opacity: 0, y: 30 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        transition={{ duration: 1, ease: EASE_OUT_EXPO }}
-                        className="text-3xl md:text-6xl font-bold font-heading text-primary leading-tight"
-                    >
-                        {t("home.hero.title")} <span className="text-accent">{t("home.hero.titleAccent")}</span>
-                    </motion.h1>
+                    <h1 className="text-3xl md:text-6xl font-bold font-heading text-primary leading-tight flex flex-wrap gap-x-2 md:gap-x-3">
+                        {t("home.hero.title").split(" ").map((word: string, i: number) => (
+                            <motion.span
+                                key={i}
+                                initial={{ opacity: 0, y: 30 }}
+                                animate={{ opacity: 1, y: 0 }}
+                                transition={{ duration: 0.8, delay: i * 0.1, ease: EASE_OUT_EXPO }}
+                                className="inline-block"
+                            >
+                                {word}
+                            </motion.span>
+                        ))}
+                        <motion.span
+                            initial={{ opacity: 0, y: 30 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            transition={{ duration: 0.8, delay: t("home.hero.title").split(" ").length * 0.1, ease: EASE_OUT_EXPO }}
+                            className="text-accent inline-block"
+                        >
+                            {t("home.hero.titleAccent")}
+                        </motion.span>
+                    </h1>
 
                     <motion.p
                         initial={{ opacity: 0, y: 20 }}
@@ -63,13 +78,14 @@ export function HeroSection() {
                         transition={{ duration: 0.9, delay: 0.35, ease: EASE_OUT_EXPO }}
                         className="flex flex-col sm:flex-row flex-wrap gap-4 pt-4"
                     >
-                        <motion.div whileTap={{ scale: 0.95 }} className="w-full sm:w-auto">
+                        <motion.div whileTap={{ scale: 0.95 }} className="w-full sm:w-auto group">
                             <Button
                                 size="lg"
-                                className="rounded-full text-base w-full sm:w-auto"
+                                className="rounded-full text-base w-full sm:w-auto relative overflow-hidden"
                                 onClick={() => window.dispatchEvent(new CustomEvent('open-booking-modal'))}
                             >
                                 Let&apos;s Talk
+                                <div className="absolute inset-0 -translate-x-full bg-gradient-to-r from-transparent via-white/40 to-transparent group-hover:animate-[shimmer_1.5s_infinite]" />
                             </Button>
                         </motion.div>
                         <motion.div whileTap={{ scale: 0.95 }} className="w-full sm:w-auto">
@@ -116,13 +132,14 @@ export function HeroSection() {
                 </div>
 
                 {/* Hero Image */}
-                <motion.div
-                    initial={{ opacity: 0, x: 50 }}
-                    animate={{
-                        opacity: 1,
-                        x: 0,
-                        y: [0, -10, 0] // Subtle floating effect
-                    }}
+                <motion.div style={{ y }} className="relative h-full w-full flex items-center justify-center transform-gpu">
+                    <motion.div
+                        initial={{ opacity: 0, x: 50 }}
+                        animate={{
+                            opacity: 1,
+                            x: 0,
+                            y: [0, -10, 0] // Subtle floating effect
+                        }}
                     transition={{
                         opacity: { duration: 1, delay: 0.3, ease: EASE_OUT_EXPO },
                         x: { duration: 1, delay: 0.3, ease: EASE_OUT_EXPO },
@@ -176,6 +193,7 @@ export function HeroSection() {
 
                     {/* Decorative element behind image */}
                     <div className="absolute -inset-4 bg-accent/10 rounded-3xl -z-10 blur-xl opacity-70" />
+                </motion.div>
                 </motion.div>
             </div>
         </section>

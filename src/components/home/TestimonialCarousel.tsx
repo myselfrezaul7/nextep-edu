@@ -1,7 +1,7 @@
 "use client";
 
-import { motion, useAnimationControls } from "framer-motion";
-import { Star, Quote, ChevronLeft, ChevronRight, Play } from "lucide-react";
+import { motion } from "framer-motion";
+import { Star, Quote } from "lucide-react";
 import { useTheme } from "next-themes";
 import { useState, useEffect, useRef } from "react";
 import { cn } from "@/lib/utils";
@@ -147,13 +147,15 @@ export function TestimonialCarousel() {
 
                 {/* Infinite Scrolling Track (Desktop) / Drag Track (Mobile) */}
                 <motion.div 
-                    drag={isMobile ? "x" : false}
+                    drag="x"
                     dragConstraints={{ right: 0, left: -dragConstraints }}
                     dragElastic={0.1}
+                    onDragStart={() => setIsHovered(true)}
+                    onDragEnd={() => setIsHovered(false)}
                     style={{ willChange: "transform" }}
                     className={cn(
-                        "flex w-max gap-6 px-4 md:px-0 transform-gpu",
-                        !isMobile && "animate-marquee hover:pause"
+                        "flex w-max gap-6 px-4 md:px-0 transform-gpu animate-marquee hover:pause",
+                        isHovered && "pause"
                     )}
                 >
                     {/* Duplicate the array 2 times to ensure the screen is always filled (only hide on mobile to bound drag) */}
@@ -203,16 +205,18 @@ export function TestimonialCarousel() {
                                         {story.initials}
                                     </div>
                                     <div className="min-w-0 flex-1">
-                                        <h4 className="font-bold text-primary text-base truncate">{story.author}</h4>
-                                        <p className="text-sm text-muted-foreground flex items-center gap-1.5 truncate mt-0.5">
-                                            <span className="text-base leading-none">{story.flag}</span>
-                                            <span className="truncate">{story.university}</span>
+                                        <h4 className="font-bold text-primary text-base truncate flex items-center gap-2">
+                                            {story.author}
+                                            <span className="text-xs bg-muted border border-border/50 px-1.5 py-0.5 rounded-sm">{story.flag}</span>
+                                        </h4>
+                                        <p className="text-sm text-muted-foreground truncate mt-0.5">
+                                            {story.university}
                                         </p>
                                         <p className={cn(
                                             "text-xs font-medium mt-1.5 flex items-center gap-1",
                                             mounted && currentTheme === "dark" ? "text-green-400" : "text-green-600"
                                         )}>
-                                            <span>✓</span> Visa approved · {story.visaDate}
+                                            Verified ✓ {story.visaDate}
                                         </p>
                                     </div>
                                 </div>
