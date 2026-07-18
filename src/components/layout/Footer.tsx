@@ -222,6 +222,7 @@ export function Footer() {
                             href="https://facebook.com/nextepbd"
                             target="_blank"
                             rel="noopener noreferrer"
+                            aria-label="Follow us on Facebook"
                             className={cn(
                                 "flex items-center justify-center w-10 h-10 md:w-8 md:h-8 rounded-full transition-all duration-300",
                                 mounted && currentTheme === "dark" 
@@ -236,6 +237,7 @@ export function Footer() {
                             href="https://instagram.com/nextepedu"
                             target="_blank"
                             rel="noopener noreferrer"
+                            aria-label="Follow us on Instagram"
                             className={cn(
                                 "flex items-center justify-center w-10 h-10 md:w-8 md:h-8 rounded-full transition-all duration-300",
                                 mounted && currentTheme === "dark" 
