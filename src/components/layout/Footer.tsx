@@ -131,6 +131,7 @@ export function Footer() {
                                         <li><Link href="/#services" className={cn("py-2.5 md:py-0 block hover:text-accent hover:underline decoration-accent underline-offset-4 transition-colors", mounted && currentTheme === "dark" ? "text-white/70" : "text-muted-foreground")}>{t("common.footer.services")}</Link></li>
                                         <li><Link href="/#about" className={cn("py-2.5 md:py-0 block hover:text-accent hover:underline decoration-accent underline-offset-4 transition-colors", mounted && currentTheme === "dark" ? "text-white/70" : "text-muted-foreground")}>{t("common.footer.aboutUs")}</Link></li>
                                         <li><Link href="/destinations" className={cn("py-2.5 md:py-0 block hover:text-accent hover:underline decoration-accent underline-offset-4 transition-colors", mounted && currentTheme === "dark" ? "text-white/70" : "text-muted-foreground")}>{t("common.footer.destinations")}</Link></li>
+                                        <li><Link href="/track" className={cn("py-2.5 md:py-0 block hover:text-accent hover:underline decoration-accent underline-offset-4 transition-colors", mounted && currentTheme === "dark" ? "text-white/70" : "text-muted-foreground")}>Track Application</Link></li>
                                     </motion.ul>
                                 )}
                             </AnimatePresence>
