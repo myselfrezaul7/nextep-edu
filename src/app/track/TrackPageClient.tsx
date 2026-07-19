@@ -7,6 +7,8 @@ import { Search, ArrowLeft, Loader2, AlertCircle, Radio } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useTranslation } from "@/i18n/LanguageContext";
 import { ApplicationTimeline } from "@/components/tracker/ApplicationTimeline";
+import { DocumentUpload } from "@/components/tracker/DocumentUpload";
+import ConfettiExplosion from "react-confetti-explosion";
 import { supabase } from "@/lib/supabase";
 import type { Application } from "@/lib/supabase";
 
@@ -379,7 +381,22 @@ export function TrackPageClient() {
                                     steps={data.notes}
                                     currentStep={data.current_step}
                                 />
+                                {data.current_step <= 2 && (
+                                    <DocumentUpload trackingCode={data.tracking_code} />
+                                )}
                             </div>
+
+                            {/* Celebration overlay */}
+                            {(data.current_step === 6 || data.current_step === 7) && (
+                                <div className="fixed left-1/2 top-1/4 -translate-x-1/2 pointer-events-none z-50">
+                                    <ConfettiExplosion
+                                        force={0.8}
+                                        duration={3500}
+                                        particleCount={250}
+                                        width={1600}
+                                    />
+                                </div>
+                            )}
 
                             {/* Check Another button */}
                             <motion.button
