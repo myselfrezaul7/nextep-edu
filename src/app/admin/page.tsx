@@ -18,12 +18,22 @@ import {
     Loader2,
     Shield,
     StickyNote,
+    Sparkles,
+    Users,
 } from "lucide-react";
 import { ApplicationTimeline } from "@/components/tracker/ApplicationTimeline";
 import { destinations } from "@/data/destinations";
 import type { Application, ApplicationStep } from "@/lib/supabase";
 
 const EASE_OUT_EXPO = [0.16, 1, 0.3, 1] as const;
+
+// ─── Step color helper ────────────────────────────────────────
+function getStepColor(step: number) {
+    if (step <= 2) return { bg: "bg-emerald-500/10", text: "text-emerald-500", border: "border-emerald-500/20" };
+    if (step <= 4) return { bg: "bg-blue-500/10", text: "text-blue-500", border: "border-blue-500/20" };
+    if (step <= 6) return { bg: "bg-purple-500/10", text: "text-purple-500", border: "border-purple-500/20" };
+    return { bg: "bg-accent/10", text: "text-accent", border: "border-accent/20" };
+}
 
 // ─── Destination options for dropdown ─────────────────────────
 const DESTINATION_OPTIONS = Object.values(destinations).map((d) => ({
@@ -80,6 +90,7 @@ export default function AdminPage() {
     const [advanceNote, setAdvanceNote] = useState("");
     const [advanceLoading, setAdvanceLoading] = useState(false);
     const [notifyLoading, setNotifyLoading] = useState(false);
+    const [showSparkle, setShowSparkle] = useState(false);
 
     const isDark = mounted && resolvedTheme === "dark";
 
@@ -210,6 +221,8 @@ export default function AdminPage() {
             if (res.ok) {
                 setSelectedApp(data.application);
                 setAdvanceNote("");
+                setShowSparkle(true);
+                setTimeout(() => setShowSparkle(false), 1500);
                 fetchApplications();
             }
         } catch {
@@ -434,15 +447,23 @@ export default function AdminPage() {
                             </div>
                         ) : filteredApps.length === 0 ? (
                             <div className="text-center py-20">
+                                <div className="inline-flex items-center justify-center w-20 h-20 rounded-full bg-accent/5 border border-accent/10 mb-5">
+                                    <Users className="w-10 h-10 text-accent/40" />
+                                </div>
                                 <p className="text-muted-foreground text-lg">
                                     {searchQuery
                                         ? "No applicants match your search."
                                         : "No applications yet."}
                                 </p>
+                                <p className="text-sm text-muted-foreground/60 mt-1">
+                                    {searchQuery
+                                        ? "Try a different name, code, or destination."
+                                        : "Applications from bookings will appear here automatically."}
+                                </p>
                                 {!searchQuery && (
                                     <button
                                         onClick={() => setView("add")}
-                                        className="mt-4 inline-flex items-center gap-2 text-accent hover:underline text-sm font-medium"
+                                        className="mt-5 inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-accent text-accent-foreground hover:brightness-110 text-sm font-semibold transition-all"
                                     >
                                         <Plus className="w-4 h-4" />
                                         Add your first applicant
@@ -486,7 +507,7 @@ export default function AdminPage() {
                                             </div>
                                             <div className="flex items-center gap-3 flex-shrink-0">
                                                 <div className="text-right hidden sm:block">
-                                                    <span className="inline-block px-2.5 py-1 rounded-full text-xs font-medium bg-accent/10 text-accent border border-accent/20">
+                                                    <span className={`inline-block px-2.5 py-1 rounded-full text-xs font-medium border ${getStepColor(app.current_step).bg} ${getStepColor(app.current_step).text} ${getStepColor(app.current_step).border}`}>
                                                         Step{" "}
                                                         {app.current_step}/7
                                                     </span>
@@ -501,7 +522,7 @@ export default function AdminPage() {
                                         </div>
                                         {/* Mobile step indicator */}
                                         <div className="flex items-center justify-between mt-3 sm:hidden">
-                                            <span className="inline-block px-2.5 py-1 rounded-full text-xs font-medium bg-accent/10 text-accent border border-accent/20">
+                                            <span className={`inline-block px-2.5 py-1 rounded-full text-xs font-medium border ${getStepColor(app.current_step).bg} ${getStepColor(app.current_step).text} ${getStepColor(app.current_step).border}`}>
                                                 Step {app.current_step}/7
                                             </span>
                                             <p className="text-xs text-muted-foreground">
@@ -856,21 +877,38 @@ export default function AdminPage() {
                                             : "bg-white/50 border border-black/10 text-foreground placeholder:text-muted-foreground focus:border-accent/50"
                                     }`}
                                 />
-                                <button
-                                    onClick={handleAdvance}
-                                    disabled={advanceLoading}
-                                    className="w-full py-3 rounded-xl bg-accent text-accent-foreground font-semibold text-sm transition-all duration-200 hover:brightness-110 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
-                                >
-                                    {advanceLoading ? (
-                                        <Loader2 className="w-4 h-4 animate-spin" />
-                                    ) : (
-                                        <>
-                                            <ChevronRight className="w-4 h-4" />
-                                            Advance to Step{" "}
-                                            {selectedApp.current_step + 1}
-                                        </>
-                                    )}
-                                </button>
+                                <div className="relative">
+                                    <button
+                                        onClick={handleAdvance}
+                                        disabled={advanceLoading}
+                                        className="w-full py-3 rounded-xl bg-accent text-accent-foreground font-semibold text-sm transition-all duration-200 hover:brightness-110 hover:shadow-lg hover:shadow-accent/20 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                                    >
+                                        {advanceLoading ? (
+                                            <Loader2 className="w-4 h-4 animate-spin" />
+                                        ) : (
+                                            <>
+                                                <ChevronRight className="w-4 h-4" />
+                                                Advance to Step{" "}
+                                                {selectedApp.current_step + 1}
+                                            </>
+                                        )}
+                                    </button>
+                                    {/* Sparkle celebration */}
+                                    <AnimatePresence>
+                                        {showSparkle && (
+                                            <motion.div
+                                                initial={{ opacity: 0, scale: 0.5 }}
+                                                animate={{ opacity: 1, scale: 1 }}
+                                                exit={{ opacity: 0, scale: 0.5 }}
+                                                transition={{ duration: 0.5, ease: EASE_OUT_EXPO }}
+                                                className="absolute -top-8 left-1/2 -translate-x-1/2 flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-accent/10 border border-accent/20 text-accent text-xs font-semibold whitespace-nowrap"
+                                            >
+                                                <Sparkles className="w-3.5 h-3.5" />
+                                                Step advanced!
+                                            </motion.div>
+                                        )}
+                                    </AnimatePresence>
+                                </div>
                             </div>
                         )}
 

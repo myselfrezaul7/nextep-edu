@@ -3,7 +3,8 @@
 import { useState, useEffect, useRef, useCallback } from "react";
 import { useForm } from "react-hook-form";
 import toast from "react-hot-toast";
-import { X, Calendar, Clock, BookOpen, User, Mail, Phone, GraduationCap, CheckCircle, ChevronLeft } from "lucide-react";
+import { X, Calendar, Clock, BookOpen, User, Mail, Phone, GraduationCap, CheckCircle, ChevronLeft, Copy, Check } from "lucide-react";
+import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { useTheme } from "next-themes";
 import { cn } from "@/lib/utils";
@@ -84,6 +85,8 @@ function StepIndicator({ step, totalSteps }: { step: number; totalSteps: number 
 export function BookingModal() {
     const [isOpen, setIsOpen] = useState(false);
     const [isSuccess, setIsSuccess] = useState(false);
+    const [trackingCode, setTrackingCode] = useState<string | null>(null);
+    const [codeCopied, setCodeCopied] = useState(false);
     const [step, setStep] = useState(1);
     const [direction, setDirection] = useState(1); // 1 for forward, -1 for backward
     
@@ -154,6 +157,8 @@ export function BookingModal() {
         setIsOpen(false);
         setTimeout(() => {
             setIsSuccess(false);
+            setTrackingCode(null);
+            setCodeCopied(false);
             setStep(1);
             setDirection(1);
             reset();
@@ -198,6 +203,21 @@ export function BookingModal() {
             }
 
             setIsSuccess(true);
+
+            // Auto-register in the tracking system (fire-and-forget)
+            try {
+                const regRes = await fetch("/api/applications/register", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ name: data.name, phone: data.phone, email: data.email }),
+                });
+                const regData = (await regRes.json()) as { success: boolean; trackingCode?: string };
+                if (regData.success && regData.trackingCode) {
+                    setTrackingCode(regData.trackingCode);
+                }
+            } catch {
+                // Registration failure must not break the booking flow
+            }
         } catch {
             toast.error("Something went wrong. Please try again.");
         }
@@ -317,7 +337,7 @@ export function BookingModal() {
                                         initial={{ opacity: 0, scale: 0.9 }}
                                         animate={{ opacity: 1, scale: 1 }}
                                         transition={{ type: "spring", duration: 0.6 }}
-                                        className="absolute inset-0 flex flex-col items-center text-center p-6 justify-center h-full"
+                                        className="absolute inset-0 flex flex-col items-center text-center p-6 justify-center h-full overflow-y-auto"
                                     >
                                         <ConfettiExplosion />
                                         <div className={cn(
@@ -330,7 +350,50 @@ export function BookingModal() {
                                         <p className="text-muted-foreground text-lg max-w-sm mx-auto mt-2 relative z-10">
                                             {t("common.modal.successDesc", undefined, "Our team will reach out within 24 hours.")}
                                         </p>
-                                        <motion.div whileTap={{ scale: 0.97 }} className="w-full max-w-xs mt-8 relative z-10">
+
+                                        {trackingCode && (
+                                            <motion.div
+                                                initial={{ opacity: 0, y: 10 }}
+                                                animate={{ opacity: 1, y: 0 }}
+                                                transition={{ delay: 0.3, duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
+                                                className="w-full max-w-xs mt-5 relative z-10 space-y-2"
+                                            >
+                                                <div className={cn(
+                                                    "flex items-center justify-center gap-2 px-4 py-2.5 rounded-full border",
+                                                    "bg-accent/10 border-accent/20"
+                                                )}>
+                                                    <span className="text-accent font-bold text-lg tracking-wider">{trackingCode}</span>
+                                                    <button
+                                                        type="button"
+                                                        onClick={() => {
+                                                            navigator.clipboard.writeText(trackingCode);
+                                                            setCodeCopied(true);
+                                                            setTimeout(() => setCodeCopied(false), 2000);
+                                                        }}
+                                                        className={cn(
+                                                            "p-1.5 rounded-full transition-colors",
+                                                            isDark ? "hover:bg-white/10" : "hover:bg-black/5"
+                                                        )}
+                                                        aria-label="Copy tracking code"
+                                                    >
+                                                        {codeCopied
+                                                            ? <Check className="w-4 h-4 text-green-500" />
+                                                            : <Copy className="w-4 h-4 text-accent" />}
+                                                    </button>
+                                                </div>
+                                                <p className="text-muted-foreground text-sm">
+                                                    Your tracking code is <span className="font-semibold text-accent">{trackingCode}</span>. Use this to check your progress anytime.
+                                                </p>
+                                                <Link
+                                                    href="/track"
+                                                    className="inline-flex items-center gap-1 text-sm font-semibold text-accent hover:text-accent/80 transition-colors"
+                                                >
+                                                    Track Your Application →
+                                                </Link>
+                                            </motion.div>
+                                        )}
+
+                                        <motion.div whileTap={{ scale: 0.97 }} className="w-full max-w-xs mt-6 relative z-10">
                                             <Button onClick={closeModal} size="lg" className="w-full rounded-xl text-lg font-bold">
                                                 {t("common.modal.closeWindow", undefined, "Close Window")}
                                             </Button>

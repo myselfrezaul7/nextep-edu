@@ -3,13 +3,33 @@
 import { useState, useEffect, FormEvent } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useTheme } from "next-themes";
-import { Search, ArrowLeft, Loader2, AlertCircle } from "lucide-react";
+import { Search, ArrowLeft, Loader2, AlertCircle, Radio } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useTranslation } from "@/i18n/LanguageContext";
 import { ApplicationTimeline } from "@/components/tracker/ApplicationTimeline";
+import { supabase } from "@/lib/supabase";
 import type { Application } from "@/lib/supabase";
 
 const EASE_OUT_EXPO = [0.16, 1, 0.3, 1] as const;
+
+/** Skeleton shimmer bar for loading state */
+function SkeletonBar({
+    width,
+    className,
+}: {
+    width: string;
+    className?: string;
+}) {
+    return (
+        <div
+            className={cn(
+                "h-3 rounded-full animate-pulse bg-muted-foreground/10",
+                className
+            )}
+            style={{ width }}
+        />
+    );
+}
 
 export function TrackPageClient() {
     const { theme, systemTheme } = useTheme();
@@ -24,9 +44,39 @@ export function TrackPageClient() {
     const [error, setError] = useState<string | null>(null);
     const [data, setData] = useState<Application | null>(null);
 
+    // Realtime state
+    const [justUpdated, setJustUpdated] = useState(false);
+
     useEffect(() => {
         setMounted(true);
     }, []);
+
+    // ── Supabase Realtime subscription ──
+    useEffect(() => {
+        if (!data) return;
+
+        const channel = supabase
+            .channel(`app-${data.id}`)
+            .on(
+                "postgres_changes",
+                {
+                    event: "UPDATE",
+                    schema: "public",
+                    table: "applications",
+                    filter: `id=eq.${data.id}`,
+                },
+                (payload) => {
+                    setData(payload.new as Application);
+                    setJustUpdated(true);
+                    setTimeout(() => setJustUpdated(false), 3000);
+                }
+            )
+            .subscribe();
+
+        return () => {
+            supabase.removeChannel(channel);
+        };
+    }, [data?.id]); // eslint-disable-line react-hooks/exhaustive-deps
 
     const handleSubmit = async (e: FormEvent) => {
         e.preventDefault();
@@ -62,6 +112,7 @@ export function TrackPageClient() {
         setError(null);
         setTrackingCode("");
         setPhone("");
+        setJustUpdated(false);
     };
 
     const isDark = mounted && currentTheme === "dark";
@@ -70,6 +121,20 @@ export function TrackPageClient() {
         <section className="relative min-h-[80vh] flex items-center justify-center py-16 md:py-24 px-4">
             {/* Background accent glow */}
             <div className="absolute top-[10%] left-[50%] -translate-x-1/2 w-[500px] h-[500px] bg-[radial-gradient(circle,_rgba(212,175,55,0.12)_0%,_transparent_70%)] -z-10 pointer-events-none" />
+
+            {/* Floating gradient orbs */}
+            <div
+                className="absolute top-[20%] left-[20%] w-[300px] h-[300px] bg-[radial-gradient(circle,_rgba(212,175,55,0.08)_0%,_transparent_70%)] -z-10 pointer-events-none animate-pulse"
+                style={{ animationDuration: "4s" }}
+            />
+            <div
+                className="absolute bottom-[10%] right-[20%] w-[250px] h-[250px] bg-[radial-gradient(circle,_rgba(212,175,55,0.06)_0%,_transparent_70%)] -z-10 pointer-events-none animate-pulse"
+                style={{ animationDuration: "6s" }}
+            />
+            <div
+                className="absolute top-[60%] right-[10%] w-[200px] h-[200px] bg-[radial-gradient(circle,_rgba(212,175,55,0.05)_0%,_transparent_70%)] -z-10 pointer-events-none animate-pulse"
+                style={{ animationDuration: "5s" }}
+            />
 
             <div className="w-full max-w-md">
                 <AnimatePresence mode="wait">
@@ -193,6 +258,40 @@ export function TrackPageClient() {
                                         )}
                                     </button>
                                 </form>
+
+                                {/* Loading skeleton — timeline shimmer */}
+                                <AnimatePresence>
+                                    {loading && (
+                                        <motion.div
+                                            initial={{ opacity: 0 }}
+                                            animate={{ opacity: 1 }}
+                                            exit={{ opacity: 0 }}
+                                            className="mt-8 space-y-5"
+                                        >
+                                            {[1, 2, 3, 4].map((i) => (
+                                                <div
+                                                    key={i}
+                                                    className="flex items-start gap-4"
+                                                >
+                                                    <div className="w-10 h-10 rounded-full bg-muted-foreground/10 animate-pulse flex-shrink-0" />
+                                                    <div className="flex-1 space-y-2 pt-1">
+                                                        <SkeletonBar
+                                                            width={
+                                                                i % 2 === 0
+                                                                    ? "60%"
+                                                                    : "75%"
+                                                            }
+                                                        />
+                                                        <SkeletonBar
+                                                            width="40%"
+                                                            className="h-2"
+                                                        />
+                                                    </div>
+                                                </div>
+                                            ))}
+                                        </motion.div>
+                                    )}
+                                </AnimatePresence>
                             </div>
                         </motion.div>
                     ) : (
@@ -228,10 +327,40 @@ export function TrackPageClient() {
                                             </p>
                                         )}
                                     </div>
-                                    <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold bg-accent/10 text-accent border border-accent/20 whitespace-nowrap">
-                                        {data.tracking_code}
-                                    </span>
+                                    <div className="flex items-center gap-2 flex-shrink-0">
+                                        {/* Live indicator */}
+                                        <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium bg-green-500/10 text-green-600 dark:text-green-400 border border-green-500/20">
+                                            <span className="relative flex h-2 w-2">
+                                                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75" />
+                                                <span className="relative inline-flex rounded-full h-2 w-2 bg-green-500" />
+                                            </span>
+                                            Live
+                                        </span>
+                                        {/* Tracking code badge */}
+                                        <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold bg-accent/10 text-accent border border-accent/20 whitespace-nowrap">
+                                            {data.tracking_code}
+                                        </span>
+                                    </div>
                                 </div>
+
+                                {/* "Status updated just now" toast */}
+                                <AnimatePresence>
+                                    {justUpdated && (
+                                        <motion.div
+                                            initial={{ opacity: 0, y: -8 }}
+                                            animate={{ opacity: 1, y: 0 }}
+                                            exit={{ opacity: 0, y: -8 }}
+                                            transition={{
+                                                duration: 0.4,
+                                                ease: EASE_OUT_EXPO,
+                                            }}
+                                            className="mt-3 flex items-center gap-2 text-xs font-medium text-accent bg-accent/10 border border-accent/20 rounded-lg px-3 py-2"
+                                        >
+                                            <Radio className="w-3.5 h-3.5" />
+                                            Status updated just now
+                                        </motion.div>
+                                    )}
+                                </AnimatePresence>
                             </div>
 
                             {/* Timeline Card */}
