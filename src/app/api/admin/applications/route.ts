@@ -175,7 +175,7 @@ export async function PATCH(request: NextRequest) {
                 try {
                     const stepName = updatedNotes[newStep - 1].label;
                     await resend.emails.send({
-                        from: 'NexTep Edu <onboarding@resend.dev>',
+                        from: 'NexTep Edu <onboarding@nextepedu.com>',
                         to: currentApp.email,
                         subject: `Status Update: ${stepName} - NexTep Edu`,
                         html: `
