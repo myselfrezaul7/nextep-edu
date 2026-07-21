@@ -3,6 +3,7 @@
 import { useState, useEffect, useCallback, useMemo } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useTheme } from "next-themes";
+import toast from "react-hot-toast";
 import {
     Search,
     Plus,
@@ -20,8 +21,10 @@ import {
     StickyNote,
     Sparkles,
     Users,
+    X,
 } from "lucide-react";
 import { ApplicationTimeline } from "@/components/tracker/ApplicationTimeline";
+import { DocumentViewer } from "@/components/admin/DocumentViewer";
 import { destinations } from "@/data/destinations";
 import type { Application, ApplicationStep } from "@/lib/supabase";
 
@@ -65,6 +68,7 @@ export default function AdminPage() {
     const [mounted, setMounted] = useState(false);
 
     const [isAuthenticated, setIsAuthenticated] = useState(false);
+    const [token, setToken] = useState("");
     const [password, setPassword] = useState("");
     const [authError, setAuthError] = useState("");
     const [authLoading, setAuthLoading] = useState(false);
@@ -74,6 +78,9 @@ export default function AdminPage() {
     const [selectedApp, setSelectedApp] = useState<Application | null>(null);
     const [searchQuery, setSearchQuery] = useState("");
     const [loading, setLoading] = useState(false);
+    const [currentPage, setCurrentPage] = useState(1);
+    const [totalCount, setTotalCount] = useState(0);
+    const itemsPerPage = 25;
 
     // Add form
     const [addForm, setAddForm] = useState({
@@ -92,6 +99,14 @@ export default function AdminPage() {
     const [notifyLoading, setNotifyLoading] = useState(false);
     const [showSparkle, setShowSparkle] = useState(false);
 
+    // New UI features state
+    const [filterStep, setFilterStep] = useState<number | "all">("all");
+    const [sortOrder, setSortOrder] = useState<"newest" | "oldest">("newest");
+    const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+    const [editForm, setEditForm] = useState({ name: "", phone: "", email: "", destination: "" });
+    const [deleteLoading, setDeleteLoading] = useState(false);
+    const [undoLoading, setUndoLoading] = useState(false);
+
     const isDark = mounted && resolvedTheme === "dark";
 
     useEffect(() => {
@@ -102,8 +117,9 @@ export default function AdminPage() {
         meta.content = "noindex, nofollow";
         document.head.appendChild(meta);
         // Check stored auth
-        const token = localStorage.getItem("admin_token");
-        if (token === "admin-authenticated") {
+        const storedToken = localStorage.getItem("admin_token");
+        if (storedToken && storedToken.length > 20) {
+            setToken(storedToken);
             setIsAuthenticated(true);
         }
         return () => {
@@ -111,30 +127,32 @@ export default function AdminPage() {
         };
     }, []);
 
-    const token = useMemo(() => {
-        if (typeof window !== "undefined") {
-            return localStorage.getItem("admin_token") || "";
-        }
-        return "";
-    }, [isAuthenticated]);
 
     // ─── Fetch applications ───────────────────────────────────
     const fetchApplications = useCallback(async () => {
         setLoading(true);
         try {
-            const res = await fetch("/api/admin/applications", {
-                headers: { Authorization: token },
+            const params = new URLSearchParams({
+                page: currentPage.toString(),
+                limit: itemsPerPage.toString(),
+                sortOrder: sortOrder,
+            });
+            const res = await fetch(`/api/admin/applications?${params}`, {
+                headers: { Authorization: `Bearer ${token}` },
             });
             if (res.ok) {
                 const data = await res.json();
                 setApplications(data.applications || []);
+                setTotalCount(data.total || 0);
+            } else {
+                toast.error("Failed to fetch applications.");
             }
         } catch {
-            /* swallow */
+            toast.error("Network error while fetching applications.");
         } finally {
             setLoading(false);
         }
-    }, [token]);
+    }, [token, currentPage, sortOrder]);
 
     useEffect(() => {
         if (isAuthenticated) {
@@ -156,6 +174,7 @@ export default function AdminPage() {
             const data = await res.json();
             if (data.success) {
                 localStorage.setItem("admin_token", data.token);
+                setToken(data.token);
                 setIsAuthenticated(true);
                 setPassword("");
             } else {
@@ -170,9 +189,11 @@ export default function AdminPage() {
 
     const handleLogout = () => {
         localStorage.removeItem("admin_token");
+        setToken("");
         setIsAuthenticated(false);
         setApplications([]);
         setView("list");
+        setSearchQuery("");
     };
 
     // ─── Add application handler ──────────────────────────────
@@ -184,17 +205,20 @@ export default function AdminPage() {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
-                    Authorization: token,
+                    Authorization: `Bearer ${token}`,
                 },
                 body: JSON.stringify(addForm),
             });
             const data = await res.json();
-            if (res.ok) {
+            if (res.ok && data.application) {
                 setCreatedApp(data.application);
                 setAddForm({ name: "", phone: "", email: "", destination: "" });
+                toast.success("Application created successfully!");
+            } else {
+                toast.error(data.error || "Failed to create application.");
             }
         } catch {
-            /* swallow */
+            toast.error("Network error while creating application.");
         } finally {
             setAddLoading(false);
         }
@@ -209,7 +233,7 @@ export default function AdminPage() {
                 method: "PATCH",
                 headers: {
                     "Content-Type": "application/json",
-                    Authorization: token,
+                    Authorization: `Bearer ${token}`,
                 },
                 body: JSON.stringify({
                     id: selectedApp.id,
@@ -218,17 +242,112 @@ export default function AdminPage() {
                 }),
             });
             const data = await res.json();
-            if (res.ok) {
-                setSelectedApp(data.application);
+            if (res.ok && data.application) {
+                setSelectedApp(data.application); // Optimistic update
                 setAdvanceNote("");
                 setShowSparkle(true);
                 setTimeout(() => setShowSparkle(false), 1500);
-                fetchApplications();
+                toast.success("Step advanced successfully!");
+                fetchApplications(); // Refresh list in background
+            } else {
+                toast.error(data.error || "Failed to advance step.");
             }
         } catch {
-            /* swallow */
+            toast.error("Network error while advancing step.");
         } finally {
             setAdvanceLoading(false);
+        }
+    };
+
+    const handleUndo = async () => {
+        if (!selectedApp) return;
+        setUndoLoading(true);
+        try {
+            const res = await fetch("/api/admin/applications", {
+                method: "PATCH",
+                headers: {
+                    "Content-Type": "application/json",
+                    Authorization: `Bearer ${token}`,
+                },
+                body: JSON.stringify({
+                    id: selectedApp.id,
+                    action: "undo",
+                }),
+            });
+            const data = await res.json();
+            if (res.ok && data.application) {
+                setSelectedApp(data.application);
+                toast.success("Step undone successfully!");
+                fetchApplications();
+            } else {
+                toast.error(data.error || "Failed to undo step.");
+            }
+        } catch {
+            toast.error("Network error while undoing step.");
+        } finally {
+            setUndoLoading(false);
+        }
+    };
+
+    const handleEdit = async (e: React.FormEvent) => {
+        e.preventDefault();
+        if (!selectedApp) return;
+        try {
+            const res = await fetch("/api/admin/applications", {
+                method: "PATCH",
+                headers: {
+                    "Content-Type": "application/json",
+                    Authorization: `Bearer ${token}`,
+                },
+                body: JSON.stringify({
+                    id: selectedApp.id,
+                    action: "edit",
+                    ...editForm,
+                }),
+            });
+            const data = await res.json();
+            if (res.ok && data.application) {
+                setSelectedApp(data.application);
+                setIsEditModalOpen(false);
+                toast.success("Application updated successfully!");
+                fetchApplications();
+            } else {
+                toast.error(data.error || "Failed to update application.");
+            }
+        } catch {
+            toast.error("Network error while updating application.");
+        }
+    };
+
+    const handleDelete = async () => {
+        if (!selectedApp) return;
+        if (!window.confirm("Are you sure you want to permanently delete this application? This action cannot be undone.")) return;
+        
+        setDeleteLoading(true);
+        try {
+            const res = await fetch("/api/admin/applications", {
+                method: "DELETE",
+                headers: {
+                    "Content-Type": "application/json",
+                    Authorization: `Bearer ${token}`,
+                },
+                body: JSON.stringify({
+                    id: selectedApp.id,
+                }),
+            });
+            const data = await res.json();
+            if (res.ok && data.success) {
+                setSelectedApp(null);
+                setView("list");
+                toast.success("Application deleted successfully!");
+                fetchApplications();
+            } else {
+                toast.error(data.error || "Failed to delete application.");
+            }
+        } catch {
+            toast.error("Network error while deleting application.");
+        } finally {
+            setDeleteLoading(false);
         }
     };
 
@@ -238,6 +357,10 @@ export default function AdminPage() {
         const stepLabel = currentStep?.label || `Step ${app.current_step}`;
         const text = `Hi ${app.name}! 🎓 Your NexTep Edu application (${app.tracking_code}) has been updated to: *${stepLabel}* (Step ${app.current_step}/7). Track your progress anytime!`;
         const phone = app.phone.replace(/[^0-9]/g, "");
+        if (phone.length < 10) {
+            toast.error("Invalid phone number format.");
+            return;
+        }
         window.open(
             `https://wa.me/${phone}?text=${encodeURIComponent(text)}`,
             "_blank"
@@ -248,41 +371,71 @@ export default function AdminPage() {
         if (!selectedApp?.email) return;
         setNotifyLoading(true);
         try {
-            await fetch("/api/admin/notify", {
+            const res = await fetch("/api/admin/notify", {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
-                    Authorization: token,
+                    Authorization: `Bearer ${token}`,
                 },
                 body: JSON.stringify({
                     applicationId: selectedApp.id,
                     type: "email",
                 }),
             });
+            const data = await res.json();
+            if (res.ok && data.success) {
+                toast.success("Email sent successfully!");
+            } else {
+                toast.error(data.error || "Failed to send email.");
+            }
         } catch {
-            /* swallow */
+            toast.error("Network error while sending email.");
         } finally {
             setNotifyLoading(false);
         }
     };
 
-    const handleCopyCode = (code: string) => {
-        navigator.clipboard.writeText(code);
-        setCodeCopied(true);
-        setTimeout(() => setCodeCopied(false), 2000);
+    const handleCopyCode = async (code: string) => {
+        try {
+            await navigator.clipboard.writeText(code);
+            setCodeCopied(true);
+            setTimeout(() => setCodeCopied(false), 2000);
+            toast.success("Tracking code copied!");
+        } catch {
+            toast.error("Failed to copy to clipboard.");
+        }
     };
 
     // ─── Filtered apps ────────────────────────────────────────
+    // Note: With server-side pagination and sorting, we only do client-side filtering 
+    // for search and step to keep things fast, but ideally these would also move to the server.
     const filteredApps = useMemo(() => {
-        if (!searchQuery.trim()) return applications;
-        const q = searchQuery.toLowerCase();
-        return applications.filter(
-            (app) =>
-                app.name.toLowerCase().includes(q) ||
-                app.tracking_code.toLowerCase().includes(q) ||
-                (app.destination && app.destination.toLowerCase().includes(q))
-        );
-    }, [applications, searchQuery]);
+        let result = applications;
+
+        // 1. Filter by step
+        if (filterStep !== "all") {
+            result = result.filter(app => app.current_step === filterStep);
+        }
+
+        // 2. Filter by search
+        if (searchQuery.trim()) {
+            const q = searchQuery.toLowerCase();
+            result = result.filter(
+                (app) =>
+                    app.name.toLowerCase().includes(q) ||
+                    app.tracking_code.toLowerCase().includes(q) ||
+                    (app.destination && app.destination.toLowerCase().includes(q))
+            );
+        }
+
+        // The array is already sorted by the backend query!
+        return result;
+    }, [applications, searchQuery, filterStep]);
+
+    // Reset page to 1 when filters or sort change
+    useEffect(() => {
+        setCurrentPage(1);
+    }, [searchQuery, filterStep, sortOrder]);
 
     // ─── Glass card classes ───────────────────────────────────
     const glassCard = isDark
@@ -424,20 +577,51 @@ export default function AdminPage() {
                             </div>
                         </div>
 
-                        {/* Search */}
-                        <div className="relative mb-6">
-                            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-                            <input
-                                type="text"
-                                value={searchQuery}
-                                onChange={(e) => setSearchQuery(e.target.value)}
-                                placeholder="Search by name, code, or destination..."
-                                className={`w-full pl-10 pr-4 py-3 rounded-xl text-sm transition-all duration-200 outline-none ${
-                                    isDark
-                                        ? "bg-white/5 border border-white/10 text-foreground placeholder:text-muted-foreground focus:border-accent/50"
-                                        : "bg-white/50 border border-black/10 text-foreground placeholder:text-muted-foreground focus:border-accent/50"
-                                }`}
-                            />
+                        {/* Search, Filter, and Sort */}
+                        <div className="flex flex-col md:flex-row gap-4 mb-6">
+                            <div className="relative flex-1">
+                                <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+                                <input
+                                    type="text"
+                                    value={searchQuery}
+                                    onChange={(e) => setSearchQuery(e.target.value)}
+                                    placeholder="Search by name, code, or destination..."
+                                    aria-label="Search applications"
+                                    className={`w-full pl-10 pr-4 py-3 rounded-xl text-sm transition-all duration-200 outline-none ${
+                                        isDark
+                                            ? "bg-white/5 border border-white/10 text-foreground placeholder:text-muted-foreground focus:border-accent/50"
+                                            : "bg-white/50 border border-black/10 text-foreground placeholder:text-muted-foreground focus:border-accent/50"
+                                    }`}
+                                />
+                            </div>
+                            <div className="flex gap-4">
+                                <select
+                                    value={filterStep}
+                                    onChange={(e) => setFilterStep(e.target.value === "all" ? "all" : Number(e.target.value))}
+                                    className={`px-4 py-3 rounded-xl text-sm outline-none transition-all ${
+                                        isDark
+                                            ? "bg-white/5 border border-white/10 text-foreground focus:border-accent/50"
+                                            : "bg-white/50 border border-black/10 text-foreground focus:border-accent/50"
+                                    }`}
+                                >
+                                    <option value="all">All Steps</option>
+                                    {[1,2,3,4,5,6,7].map(step => (
+                                        <option key={step} value={step}>Step {step}</option>
+                                    ))}
+                                </select>
+                                <select
+                                    value={sortOrder}
+                                    onChange={(e) => setSortOrder(e.target.value as "newest" | "oldest")}
+                                    className={`px-4 py-3 rounded-xl text-sm outline-none transition-all ${
+                                        isDark
+                                            ? "bg-white/5 border border-white/10 text-foreground focus:border-accent/50"
+                                            : "bg-white/50 border border-black/10 text-foreground focus:border-accent/50"
+                                    }`}
+                                >
+                                    <option value="newest">Newest First</option>
+                                    <option value="oldest">Oldest First</option>
+                                </select>
+                            </div>
                         </div>
 
                         {/* Application Cards */}
@@ -479,7 +663,7 @@ export default function AdminPage() {
                                         animate={{ opacity: 1, y: 0 }}
                                         transition={{
                                             duration: 0.4,
-                                            delay: index * 0.03,
+                                            delay: Math.min(index * 0.03, 0.5),
                                             ease: EASE_OUT_EXPO,
                                         }}
                                         onClick={() => {
@@ -531,6 +715,31 @@ export default function AdminPage() {
                                         </div>
                                     </motion.button>
                                 ))}
+                            </div>
+                        )}
+
+                        {/* Pagination Controls */}
+                        {!loading && filteredApps.length > 0 && (
+                            <div className="flex flex-col sm:flex-row items-center justify-between mt-8 gap-4">
+                                <p className="text-sm text-muted-foreground">
+                                    Showing {filteredApps.length} of {totalCount} applications
+                                </p>
+                                <div className="flex gap-2">
+                                    <button
+                                        onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
+                                        disabled={currentPage === 1}
+                                        className={`px-4 py-2 rounded-xl text-sm font-medium border transition-colors disabled:opacity-50 disabled:cursor-not-allowed ${isDark ? "border-white/10 hover:bg-white/10 text-foreground" : "border-black/10 hover:bg-black/5 text-foreground"}`}
+                                    >
+                                        Previous
+                                    </button>
+                                    <button
+                                        onClick={() => setCurrentPage(p => p + 1)}
+                                        disabled={currentPage * itemsPerPage >= totalCount}
+                                        className={`px-4 py-2 rounded-xl text-sm font-medium border transition-colors disabled:opacity-50 disabled:cursor-not-allowed ${isDark ? "border-white/10 hover:bg-white/10 text-foreground" : "border-black/10 hover:bg-black/5 text-foreground"}`}
+                                    >
+                                        Next
+                                    </button>
+                                </div>
                             </div>
                         )}
                     </motion.div>
@@ -812,7 +1021,7 @@ export default function AdminPage() {
 
                         {/* Applicant Header */}
                         <div
-                            className={`rounded-2xl p-5 md:p-6 mb-6 ${glassCard} shadow-lg`}
+                            className={`rounded-2xl p-5 md:p-6 mb-6 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 ${glassCard} shadow-lg`}
                         >
                             <div className="flex items-center gap-4">
                                 <span className="text-4xl">
@@ -840,6 +1049,29 @@ export default function AdminPage() {
                                     </div>
                                 </div>
                             </div>
+                            <div className="flex gap-2">
+                                <button
+                                    onClick={() => {
+                                        setEditForm({
+                                            name: selectedApp.name,
+                                            phone: selectedApp.phone,
+                                            email: selectedApp.email || "",
+                                            destination: selectedApp.destination || "",
+                                        });
+                                        setIsEditModalOpen(true);
+                                    }}
+                                    className="px-4 py-2 rounded-xl text-sm font-medium border transition-colors border-white/10 text-foreground hover:bg-white/10"
+                                >
+                                    Edit
+                                </button>
+                                <button
+                                    onClick={handleDelete}
+                                    disabled={deleteLoading}
+                                    className="px-4 py-2 rounded-xl text-sm font-medium border transition-colors border-red-500/20 text-red-500 hover:bg-red-500/10 disabled:opacity-50"
+                                >
+                                    {deleteLoading ? <Loader2 className="w-4 h-4 animate-spin" /> : "Delete"}
+                                </button>
+                            </div>
                         </div>
 
                         {/* Timeline */}
@@ -853,6 +1085,14 @@ export default function AdminPage() {
                                 steps={selectedApp.notes}
                                 currentStep={selectedApp.current_step}
                             />
+                        </div>
+
+                        {/* Documents */}
+                        <div className={`rounded-2xl p-5 md:p-6 mb-6 ${glassCard} shadow-lg`}>
+                            <h3 className="text-base font-semibold text-foreground mb-4">
+                                Uploaded Documents
+                            </h3>
+                            <DocumentViewer trackingCode={selectedApp.tracking_code} token={token} />
                         </div>
 
                         {/* Advance Step */}
@@ -877,11 +1117,24 @@ export default function AdminPage() {
                                             : "bg-white/50 border border-black/10 text-foreground placeholder:text-muted-foreground focus:border-accent/50"
                                     }`}
                                 />
-                                <div className="relative">
+                                <div className="relative flex gap-3">
+                                    {selectedApp.current_step > 1 && (
+                                        <button
+                                            onClick={handleUndo}
+                                            disabled={undoLoading}
+                                            className="px-6 py-3 rounded-xl border border-white/10 text-foreground font-semibold text-sm transition-all hover:bg-white/5 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center"
+                                        >
+                                            {undoLoading ? <Loader2 className="w-4 h-4 animate-spin" /> : "Undo Step"}
+                                        </button>
+                                    )}
                                     <button
-                                        onClick={handleAdvance}
+                                        onClick={() => {
+                                            if (window.confirm(`Are you sure you want to advance to Step ${selectedApp.current_step + 1}? This will send an email notification to the applicant.`)) {
+                                                handleAdvance();
+                                            }
+                                        }}
                                         disabled={advanceLoading}
-                                        className="w-full py-3 rounded-xl bg-accent text-accent-foreground font-semibold text-sm transition-all duration-200 hover:brightness-110 hover:shadow-lg hover:shadow-accent/20 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                                        className="flex-1 py-3 rounded-xl bg-accent text-accent-foreground font-semibold text-sm transition-all duration-200 hover:brightness-110 hover:shadow-lg hover:shadow-accent/20 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
                                     >
                                         {advanceLoading ? (
                                             <Loader2 className="w-4 h-4 animate-spin" />
@@ -959,6 +1212,110 @@ export default function AdminPage() {
                                 </div>
                             </div>
                         </div>
+                    </motion.div>
+                )}
+
+                {/* ─── EDIT MODAL ─── */}
+                {isEditModalOpen && selectedApp && (
+                    <motion.div
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        exit={{ opacity: 0 }}
+                        className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm"
+                    >
+                        <motion.div
+                            initial={{ scale: 0.95 }}
+                            animate={{ scale: 1 }}
+                            exit={{ scale: 0.95 }}
+                            className={`w-full max-w-lg rounded-2xl p-6 ${glassCard} shadow-2xl relative`}
+                        >
+                            <button
+                                onClick={() => setIsEditModalOpen(false)}
+                                className="absolute top-4 right-4 p-2 rounded-full hover:bg-black/5 dark:hover:bg-white/10 transition-colors"
+                            >
+                                <X className="w-5 h-5 text-muted-foreground" />
+                            </button>
+                            <h2 className="text-2xl font-bold font-heading text-foreground mb-6">
+                                Edit Application
+                            </h2>
+                            <form onSubmit={handleEdit} className="space-y-4">
+                                <div>
+                                    <label className="block text-sm font-medium text-foreground mb-1.5">
+                                        Applicant Name
+                                    </label>
+                                    <input
+                                        type="text"
+                                        value={editForm.name}
+                                        onChange={(e) => setEditForm({ ...editForm, name: e.target.value })}
+                                        className={`w-full px-4 py-3 rounded-xl text-sm transition-all outline-none ${
+                                            isDark ? "bg-white/5 border-white/10" : "bg-black/5 border-black/10"
+                                        }`}
+                                        required
+                                    />
+                                </div>
+                                <div>
+                                    <label className="block text-sm font-medium text-foreground mb-1.5">
+                                        Phone Number
+                                    </label>
+                                    <input
+                                        type="tel"
+                                        value={editForm.phone}
+                                        onChange={(e) => setEditForm({ ...editForm, phone: e.target.value })}
+                                        className={`w-full px-4 py-3 rounded-xl text-sm transition-all outline-none ${
+                                            isDark ? "bg-white/5 border-white/10" : "bg-black/5 border-black/10"
+                                        }`}
+                                        required
+                                    />
+                                </div>
+                                <div>
+                                    <label className="block text-sm font-medium text-foreground mb-1.5">
+                                        Email Address
+                                    </label>
+                                    <input
+                                        type="email"
+                                        value={editForm.email}
+                                        onChange={(e) => setEditForm({ ...editForm, email: e.target.value })}
+                                        className={`w-full px-4 py-3 rounded-xl text-sm transition-all outline-none ${
+                                            isDark ? "bg-white/5 border-white/10" : "bg-black/5 border-black/10"
+                                        }`}
+                                    />
+                                </div>
+                                <div>
+                                    <label className="block text-sm font-medium text-foreground mb-1.5">
+                                        Destination
+                                    </label>
+                                    <select
+                                        value={editForm.destination}
+                                        onChange={(e) => setEditForm({ ...editForm, destination: e.target.value })}
+                                        className={`w-full px-4 py-3 rounded-xl text-sm outline-none transition-all ${
+                                            isDark ? "bg-white/5 border-white/10" : "bg-black/5 border-black/10"
+                                        }`}
+                                    >
+                                        <option value="">Select Destination</option>
+                                        {DESTINATION_OPTIONS.map((d) => (
+                                            <option key={d.slug} value={d.slug}>
+                                                {d.flag} {d.name}
+                                            </option>
+                                        ))}
+                                    </select>
+                                </div>
+                                <div className="pt-4 flex gap-3">
+                                    <button
+                                        type="button"
+                                        onClick={() => setIsEditModalOpen(false)}
+                                        className="flex-1 py-3 rounded-xl text-sm font-medium border border-white/10 hover:bg-white/5 transition-colors"
+                                    >
+                                        Cancel
+                                    </button>
+                                    <button
+                                        type="submit"
+                                        className="flex-1 py-3 rounded-xl bg-accent text-accent-foreground font-semibold text-sm hover:brightness-110 transition-all"
+                                    >
+                                        Save Changes
+                                    </button>
+                                </div>
+                            </form>
+                        </motion.div>
                     </motion.div>
                 )}
             </AnimatePresence>

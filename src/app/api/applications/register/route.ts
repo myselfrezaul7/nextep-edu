@@ -1,5 +1,7 @@
-import { NextResponse } from "next/server";
-import { supabase, DEFAULT_STEPS, generateTrackingCode } from "@/lib/supabase";
+import { NextRequest, NextResponse } from "next/server";
+import { DEFAULT_STEPS, generateTrackingCode } from "@/lib/supabase";
+import { supabaseAdmin } from "@/lib/supabase-server";
+import { rateLimit, getClientIp } from "@/lib/rate-limit";
 
 interface RegisterBody {
     name: string;
@@ -7,8 +9,17 @@ interface RegisterBody {
     email: string;
 }
 
-export async function POST(request: Request) {
+export async function POST(request: NextRequest) {
     try {
+        const ip = getClientIp(request.headers);
+        const rateLimitResult = rateLimit("register", ip, { maxRequests: 5, windowMs: 60000 });
+        if (!rateLimitResult.success) {
+            return NextResponse.json(
+                { success: false, error: "Too many requests. Please try again later." },
+                { status: 429 }
+            );
+        }
+
         const body = (await request.json()) as RegisterBody;
         const { name, phone, email } = body;
 
@@ -20,7 +31,7 @@ export async function POST(request: Request) {
         }
 
         // Check if an application already exists for this phone number
-        const { data: existing, error: lookupError } = await supabase
+        const { data: existing, error: lookupError } = await supabaseAdmin
             .from("applications")
             .select("tracking_code")
             .eq("phone", phone)
@@ -43,14 +54,25 @@ export async function POST(request: Request) {
         }
 
         // Generate a new tracking code and create the application at Step 1
-        const trackingCode = generateTrackingCode();
+        let trackingCode = generateTrackingCode();
+        let retries = 0;
+        while (retries < 5) {
+            const { data: existingCode } = await supabaseAdmin
+                .from("applications")
+                .select("id")
+                .eq("tracking_code", trackingCode)
+                .maybeSingle();
+            if (!existingCode) break;
+            trackingCode = generateTrackingCode();
+            retries++;
+        }
         const now = new Date().toISOString();
 
         const stepsWithFirstCompleted = DEFAULT_STEPS.map((s) =>
             s.step === 1 ? { ...s, date: now } : s
         );
 
-        const { error: insertError } = await supabase
+        const { error: insertError } = await supabaseAdmin
             .from("applications")
             .insert({
                 tracking_code: trackingCode,

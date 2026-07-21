@@ -37,8 +37,12 @@ export const DEFAULT_STEPS: ApplicationStep[] = [
     { step: 7, label: "Pre-Departure Briefing", note: "", date: null },
 ];
 
-// Generate a unique tracking code like "NX-4829"
+// Generate a unique tracking code like "NX-A7K2M9X1" (8-char alphanumeric)
 export function generateTrackingCode(): string {
-    const num = Math.floor(1000 + Math.random() * 9000);
-    return `NX-${num}`;
+    const chars = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789"; // no I/O/0/1 to avoid confusion
+    let code = "";
+    for (let i = 0; i < 8; i++) {
+        code += chars.charAt(Math.floor(Math.random() * chars.length));
+    }
+    return `NX-${code}`;
 }

@@ -3,13 +3,13 @@
 import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { useTheme } from "next-themes";
-import { Check, Calendar, FileCheck, Building2, Mail, Stamp, BadgeCheck, Luggage, Loader2, Clock } from "lucide-react";
+import { Check, Calendar, FileCheck, Building2, Mail, Stamp, BadgeCheck, Luggage, Clock } from "lucide-react";
 import { cn } from "@/lib/utils";
 import type { ApplicationStep } from "@/lib/supabase";
 
 const EASE_OUT_EXPO = [0.16, 1, 0.3, 1] as const;
 
-const STEP_ICONS: Record<number, any> = {
+const STEP_ICONS: Record<number, React.ElementType> = {
     1: Calendar,
     2: FileCheck,
     3: Building2,
@@ -70,7 +70,7 @@ export function ApplicationTimeline({ steps, currentStep, className }: Applicati
                             animate={{ opacity: 1, y: 0 }}
                             transition={{
                                 duration: 0.5,
-                                delay: index * 0.05,
+                                delay: Math.min(index * 0.05, 0.5),
                                 ease: EASE_OUT_EXPO,
                             }}
                             className={cn(

@@ -1,8 +1,18 @@
-import { NextResponse } from "next/server";
-import { supabase } from "@/lib/supabase";
+import { NextRequest, NextResponse } from "next/server";
+import { supabaseAdmin } from "@/lib/supabase-server";
+import { rateLimit, getClientIp } from "@/lib/rate-limit";
 
-export async function POST(request: Request) {
+export async function POST(request: NextRequest) {
     try {
+        const ip = getClientIp(request.headers);
+        const rateLimitResult = rateLimit("track", ip, { maxRequests: 10, windowMs: 60000 });
+        if (!rateLimitResult.success) {
+            return NextResponse.json(
+                { success: false, error: "Too many requests. Please try again later." },
+                { status: 429 }
+            );
+        }
+
         const body = await request.json();
         const { trackingCode, phone } = body as {
             trackingCode: string;
@@ -19,7 +29,7 @@ export async function POST(request: Request) {
             );
         }
 
-        const { data, error } = await supabase
+        const { data, error } = await supabaseAdmin
             .from("applications")
             .select("*")
             .eq("tracking_code", trackingCode.toUpperCase())

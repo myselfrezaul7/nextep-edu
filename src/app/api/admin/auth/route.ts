@@ -1,7 +1,19 @@
 import { NextRequest, NextResponse } from "next/server";
+import { signToken } from "@/lib/auth";
+import { rateLimit, getClientIp } from "@/lib/rate-limit";
 
 export async function POST(request: NextRequest) {
     try {
+        const ip = getClientIp(request.headers);
+        const rateLimitResult = rateLimit("login", ip, { maxRequests: 5, windowMs: 60000 });
+        
+        if (!rateLimitResult.success) {
+            return NextResponse.json(
+                { success: false, error: "Too many login attempts. Please try again later." },
+                { status: 429 }
+            );
+        }
+
         const { password } = await request.json();
 
         if (!password) {
@@ -23,7 +35,7 @@ export async function POST(request: NextRequest) {
         if (password === adminPassword) {
             return NextResponse.json({
                 success: true,
-                token: "admin-authenticated",
+                token: signToken({ role: "admin" }),
             });
         }
 

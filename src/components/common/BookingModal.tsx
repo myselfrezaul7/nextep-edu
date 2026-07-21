@@ -188,7 +188,11 @@ export function BookingModal() {
         const formData = new FormData();
         Object.entries(data).forEach(([key, value]) => formData.append(key, value));
 
-        const accessKey = process.env.NEXT_PUBLIC_WEB3FORMS_KEY || "0bb2085c-f181-4e50-986e-c4c62cfdfc75";
+        const accessKey = process.env.NEXT_PUBLIC_WEB3FORMS_KEY || "";
+        if (!accessKey) {
+            toast.error("Booking service is temporarily unavailable.");
+            return;
+        }
         formData.append("access_key", accessKey);
 
         try {

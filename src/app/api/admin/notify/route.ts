@@ -1,14 +1,11 @@
 import { NextRequest, NextResponse } from "next/server";
-import { supabase } from "@/lib/supabase";
 import type { Application } from "@/lib/supabase";
-
-function isAuthorized(request: NextRequest): boolean {
-    const auth = request.headers.get("Authorization");
-    return auth === "admin-authenticated";
-}
+import { isAuthorized } from "@/lib/auth";
+import { supabaseAdmin } from "@/lib/supabase-server";
+import { escapeHtml } from "@/lib/sanitize";
 
 export async function POST(request: NextRequest) {
-    if (!isAuthorized(request)) {
+    if (!isAuthorized(request.headers.get("Authorization"))) {
         return NextResponse.json(
             { error: "Unauthorized" },
             { status: 401 }
@@ -26,7 +23,7 @@ export async function POST(request: NextRequest) {
         }
 
         // Fetch the application
-        const { data: app, error: fetchError } = await supabase
+        const { data: app, error: fetchError } = await supabaseAdmin
             .from("applications")
             .select("*")
             .eq("id", applicationId)
@@ -65,7 +62,7 @@ export async function POST(request: NextRequest) {
             currentStepData?.label || `Step ${application.current_step}`;
 
         const { error: emailError } = await resend.emails.send({
-            from: "NexTep Edu <onboarding@resend.dev>",
+            from: "NexTep Edu <onboarding@nextepedu.com>",
             to: application.email,
             subject: `Application Update - ${currentStepLabel}`,
             html: `
@@ -75,18 +72,18 @@ export async function POST(request: NextRequest) {
                         <p style="margin: 8px 0 0; font-size: 14px; color: #94A3B8;">Application Status Update</p>
                     </div>
                     <div style="padding: 32px;">
-                        <p style="font-size: 16px; margin: 0 0 16px;">Hi <strong>${application.name}</strong>,</p>
+                        <p style="font-size: 16px; margin: 0 0 16px;">Hi <strong>${escapeHtml(application.name)}</strong>,</p>
                         <p style="font-size: 14px; color: #CBD5E1; margin: 0 0 24px;">
-                            Great news! Your application <strong style="color: #D4AF37;">${application.tracking_code}</strong> has been updated.
+                            Great news! Your application <strong style="color: #D4AF37;">${escapeHtml(application.tracking_code)}</strong> has been updated.
                         </p>
                         <div style="background: rgba(212, 175, 55, 0.1); border: 1px solid rgba(212, 175, 55, 0.3); border-radius: 8px; padding: 20px; text-align: center; margin: 0 0 24px;">
                             <p style="margin: 0 0 8px; font-size: 12px; color: #94A3B8; text-transform: uppercase; letter-spacing: 1px;">Current Stage</p>
-                            <p style="margin: 0; font-size: 20px; font-weight: bold; color: #D4AF37;">${currentStepLabel}</p>
+                            <p style="margin: 0; font-size: 20px; font-weight: bold; color: #D4AF37;">${escapeHtml(currentStepLabel)}</p>
                             <p style="margin: 8px 0 0; font-size: 14px; color: #CBD5E1;">Step ${application.current_step} of 7</p>
                         </div>
                         ${currentStepData?.note ? `<div style="background: #1E293B; border-radius: 8px; padding: 16px; margin: 0 0 24px;">
                             <p style="margin: 0 0 4px; font-size: 12px; color: #94A3B8;">Note from your counselor:</p>
-                            <p style="margin: 0; font-size: 14px; color: #F8FAFC;">${currentStepData.note}</p>
+                            <p style="margin: 0; font-size: 14px; color: #F8FAFC;">${escapeHtml(currentStepData.note)}</p>
                         </div>` : ""}
                         <p style="font-size: 14px; color: #CBD5E1; margin: 0 0 8px;">
                             If you have any questions, don't hesitate to reach out to us.

@@ -87,10 +87,11 @@ export function DocumentUpload({ trackingCode }: DocumentUploadProps) {
 
             setUploadSuccess(true);
             setFile(null);
+            if (fileInputRef.current) fileInputRef.current.value = "";
             
             // Reset success message after 5 seconds
             setTimeout(() => setUploadSuccess(false), 5000);
-        } catch (err: any) {
+        } catch (err: unknown) {
             console.error("Upload failed:", err);
             setError("Upload failed. Please try again or check your connection.");
         } finally {
@@ -104,7 +105,7 @@ export function DocumentUpload({ trackingCode }: DocumentUploadProps) {
                 <h3 className="text-sm font-semibold text-foreground uppercase tracking-wider">
                     Submit Documents
                 </h3>
-                <p className="text-xs text-red-500 font-medium mt-1">
+                <p className="text-xs text-muted-foreground font-medium mt-1">
                     Maximum file size: 5 MB. Supported formats: PDF, JPG, PNG.
                 </p>
             </div>
