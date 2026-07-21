@@ -39,3 +39,10 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# scratch / debug files (NEVER commit these)
+*_search*.txt
+*_output*.txt
+claude_search.txt
+search.js
+*.log.txt
