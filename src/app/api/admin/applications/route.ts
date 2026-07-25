@@ -189,13 +189,21 @@ export async function PATCH(request: NextRequest) {
                     updated_at: now,
                 })
                 .eq("id", id)
+                .eq("updated_at", currentApp.updated_at)
                 .select()
-                .single();
+                .maybeSingle();
 
             if (error) {
                 return NextResponse.json(
                     { error: error.message },
                     { status: 500 }
+                );
+            }
+
+            if (!data) {
+                return NextResponse.json(
+                    { error: "Data was modified by another user." },
+                    { status: 409 }
                 );
             }
 
@@ -249,13 +257,21 @@ export async function PATCH(request: NextRequest) {
                     updated_at: now,
                 })
                 .eq("id", id)
+                .eq("updated_at", currentApp.updated_at)
                 .select()
-                .single();
+                .maybeSingle();
 
             if (error) {
                 return NextResponse.json(
                     { error: error.message },
                     { status: 500 }
+                );
+            }
+
+            if (!data) {
+                return NextResponse.json(
+                    { error: "Data was modified by another user." },
+                    { status: 409 }
                 );
             }
 
@@ -274,13 +290,21 @@ export async function PATCH(request: NextRequest) {
                     updated_at: now,
                 })
                 .eq("id", id)
+                .eq("updated_at", currentApp.updated_at)
                 .select()
-                .single();
+                .maybeSingle();
 
             if (error) {
                 return NextResponse.json(
                     { error: error.message },
                     { status: 500 }
+                );
+            }
+
+            if (!data) {
+                return NextResponse.json(
+                    { error: "Data was modified by another user." },
+                    { status: 409 }
                 );
             }
 

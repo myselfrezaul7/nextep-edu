@@ -242,6 +242,12 @@ export default function AdminPage() {
                 }),
             });
             const data = await res.json();
+            if (res.status === 409) {
+                toast.error("Data was modified by another user. Refreshing...");
+                fetchApplications();
+                setSelectedApp(null);
+                return;
+            }
             if (res.ok && data.application) {
                 setSelectedApp(data.application); // Optimistic update
                 setAdvanceNote("");
@@ -275,6 +281,12 @@ export default function AdminPage() {
                 }),
             });
             const data = await res.json();
+            if (res.status === 409) {
+                toast.error("Data was modified by another user. Refreshing...");
+                fetchApplications();
+                setSelectedApp(null);
+                return;
+            }
             if (res.ok && data.application) {
                 setSelectedApp(data.application);
                 toast.success("Step undone successfully!");
@@ -306,6 +318,13 @@ export default function AdminPage() {
                 }),
             });
             const data = await res.json();
+            if (res.status === 409) {
+                toast.error("Data was modified by another user. Refreshing...");
+                fetchApplications();
+                setIsEditModalOpen(false);
+                setSelectedApp(null);
+                return;
+            }
             if (res.ok && data.application) {
                 setSelectedApp(data.application);
                 setIsEditModalOpen(false);
