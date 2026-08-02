@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect, FormEvent } from "react";
+import { useSearchParams } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
 import { useTheme } from "next-themes";
 import { Search, ArrowLeft, Loader2, AlertCircle, Radio } from "lucide-react";
@@ -38,9 +39,10 @@ export function TrackPageClient() {
     const [mounted, setMounted] = useState(false);
     const { t } = useTranslation();
     const currentTheme = theme === "system" ? systemTheme : theme;
+    const searchParams = useSearchParams();
 
     // Form state
-    const [trackingCode, setTrackingCode] = useState("");
+    const [trackingCode, setTrackingCode] = useState(searchParams.get("code") || "");
     const [phone, setPhone] = useState("");
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);

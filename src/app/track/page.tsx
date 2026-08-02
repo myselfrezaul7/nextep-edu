@@ -1,3 +1,4 @@
+import { Suspense } from "react";
 import { Metadata } from "next";
 import { TrackPageClient } from "./TrackPageClient";
 
@@ -11,5 +12,9 @@ export const metadata: Metadata = {
 };
 
 export default function TrackPage() {
-    return <TrackPageClient />;
+    return (
+        <Suspense fallback={null}>
+            <TrackPageClient />
+        </Suspense>
+    );
 }

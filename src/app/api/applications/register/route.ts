@@ -91,6 +91,51 @@ export async function POST(request: NextRequest) {
             );
         }
 
+        // Try to send the welcome email
+        if (process.env.RESEND_API_KEY) {
+            try {
+                const { Resend } = await import("resend");
+                const resend = new Resend(process.env.RESEND_API_KEY);
+                const baseUrl = process.env.NEXT_PUBLIC_APP_URL || "https://www.nextepedu.com";
+                const trackingUrl = `${baseUrl}/track?code=${trackingCode}`;
+                
+                await resend.emails.send({
+                    from: "NexTep Edu <onboarding@nextepedu.com>",
+                    to: email,
+                    subject: "Your NexTep Edu Tracking Code",
+                    html: `
+                        <div style="font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; max-width: 600px; margin: 0 auto; background-color: #0F172A; color: #F8FAFC; border-radius: 12px; overflow: hidden;">
+                            <div style="background: linear-gradient(135deg, #0F172A 0%, #1E293B 100%); padding: 32px; text-align: center; border-bottom: 2px solid #D4AF37;">
+                                <h1 style="margin: 0; font-size: 24px; color: #D4AF37;">🎓 NexTep Edu</h1>
+                                <p style="margin: 8px 0 0; font-size: 14px; color: #94A3B8;">Consultation Request Received</p>
+                            </div>
+                            <div style="padding: 32px;">
+                                <p style="font-size: 16px; margin: 0 0 16px;">Hi <strong>${name}</strong>,</p>
+                                <p style="font-size: 14px; color: #CBD5E1; margin: 0 0 24px;">
+                                    Thank you for booking a free consultation with NexTep Edu! We've received your request and our team will contact you shortly.
+                                </p>
+                                <div style="background: rgba(212, 175, 55, 0.1); border: 1px solid rgba(212, 175, 55, 0.3); border-radius: 8px; padding: 20px; text-align: center; margin: 0 0 24px;">
+                                    <p style="margin: 0 0 8px; font-size: 12px; color: #94A3B8; text-transform: uppercase; letter-spacing: 1px;">Your Tracking Code</p>
+                                    <p style="margin: 0; font-size: 24px; font-weight: bold; color: #D4AF37; letter-spacing: 2px;">${trackingCode}</p>
+                                </div>
+                                <p style="font-size: 14px; color: #CBD5E1; margin: 0 0 16px;">
+                                    You can track the progress of your application at any time by clicking the button below:
+                                </p>
+                                <div style="text-align: center; margin: 32px 0;">
+                                    <a href="${trackingUrl}" style="background-color: #D4AF37; color: #0F172A; text-decoration: none; padding: 12px 24px; border-radius: 8px; font-weight: bold; font-size: 16px; display: inline-block;">Track My Application</a>
+                                </div>
+                                <p style="font-size: 14px; color: #94A3B8; margin: 0;">
+                                    — The NexTep Edu Team
+                                </p>
+                            </div>
+                        </div>
+                    `,
+                });
+            } catch (emailError) {
+                console.error("Failed to send welcome email:", emailError);
+            }
+        }
+
         return NextResponse.json({
             success: true,
             trackingCode,

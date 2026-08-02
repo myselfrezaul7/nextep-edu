@@ -15,7 +15,7 @@ interface DocumentUploadProps {
 
 export function DocumentUpload({ trackingCode }: DocumentUploadProps) {
     const [isDragging, setIsDragging] = useState(false);
-    const [file, setFile] = useState<File | null>(null);
+    const [files, setFiles] = useState<File[]>([]);
     const [isUploading, setIsUploading] = useState(false);
     const [uploadSuccess, setUploadSuccess] = useState(false);
     const [error, setError] = useState<string | null>(null);
@@ -31,62 +31,68 @@ export function DocumentUpload({ trackingCode }: DocumentUploadProps) {
         setIsDragging(false);
     };
 
-    const validateFile = (selectedFile: File) => {
+    const handleFiles = (selectedFiles: FileList | File[]) => {
         setError(null);
         setUploadSuccess(false);
+        
+        const validFiles: File[] = [];
+        let hasError = false;
 
-        if (!ALLOWED_TYPES.includes(selectedFile.type)) {
-            setError("Invalid file type. Please upload a PDF, JPG, or PNG.");
-            setFile(null);
-            return false;
+        Array.from(selectedFiles).forEach(f => {
+            if (!ALLOWED_TYPES.includes(f.type)) {
+                setError("One or more files have an invalid type. Please upload PDF, JPG, or PNG.");
+                hasError = true;
+            } else if (f.size > MAX_FILE_SIZE) {
+                setError("One or more files are too large. Maximum size is 5 MB each.");
+                hasError = true;
+            } else {
+                validFiles.push(f);
+            }
+        });
+
+        if (!hasError && validFiles.length > 0) {
+            setFiles(prev => [...prev, ...validFiles]);
         }
-
-        if (selectedFile.size > MAX_FILE_SIZE) {
-            setError("File is too large. Maximum size is 5 MB.");
-            setFile(null);
-            return false;
-        }
-
-        setFile(selectedFile);
-        return true;
     };
 
     const handleDrop = (e: React.DragEvent) => {
         e.preventDefault();
         setIsDragging(false);
         
-        if (e.dataTransfer.files && e.dataTransfer.files[0]) {
-            validateFile(e.dataTransfer.files[0]);
+        if (e.dataTransfer.files && e.dataTransfer.files.length > 0) {
+            handleFiles(e.dataTransfer.files);
         }
     };
 
     const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
-        if (e.target.files && e.target.files[0]) {
-            validateFile(e.target.files[0]);
+        if (e.target.files && e.target.files.length > 0) {
+            handleFiles(e.target.files);
         }
     };
 
     const handleUpload = async () => {
-        if (!file) return;
+        if (files.length === 0) return;
 
         setIsUploading(true);
         setError(null);
 
         try {
-            const fileExt = file.name.split('.').pop();
-            const fileName = `${trackingCode}/${Date.now()}_${Math.random().toString(36).substring(7)}.${fileExt}`;
+            await Promise.all(files.map(async (f) => {
+                const fileExt = f.name.split('.').pop();
+                const fileName = `${trackingCode}/${Date.now()}_${Math.random().toString(36).substring(7)}.${fileExt}`;
 
-            const { error: uploadError } = await supabase.storage
-                .from('documents')
-                .upload(fileName, file, {
-                    cacheControl: '3600',
-                    upsert: false
-                });
+                const { error: uploadError } = await supabase.storage
+                    .from('documents')
+                    .upload(fileName, f, {
+                        cacheControl: '3600',
+                        upsert: false
+                    });
 
-            if (uploadError) throw uploadError;
+                if (uploadError) throw uploadError;
+            }));
 
             setUploadSuccess(true);
-            setFile(null);
+            setFiles([]);
             if (fileInputRef.current) fileInputRef.current.value = "";
             
             // Reset success message after 5 seconds
@@ -106,7 +112,10 @@ export function DocumentUpload({ trackingCode }: DocumentUploadProps) {
                     Submit Documents
                 </h3>
                 <p className="text-xs text-muted-foreground font-medium mt-1">
-                    Maximum file size: 5 MB. Supported formats: PDF, JPG, PNG.
+                    You can add multiple files. Supported formats: PDF, JPG, PNG.
+                </p>
+                <p className="text-xs text-red-500 font-bold mt-1">
+                    Maximum file size: 5 MB each.
                 </p>
             </div>
 
@@ -121,10 +130,11 @@ export function DocumentUpload({ trackingCode }: DocumentUploadProps) {
                 onDragOver={handleDragOver}
                 onDragLeave={handleDragLeave}
                 onDrop={handleDrop}
-                onClick={() => !file && !isUploading && fileInputRef.current?.click()}
+                onClick={() => files.length === 0 && !isUploading && fileInputRef.current?.click()}
             >
                 <input
                     type="file"
+                    multiple
                     ref={fileInputRef}
                     onChange={handleFileSelect}
                     accept=".pdf,.jpg,.jpeg,.png"
@@ -132,7 +142,7 @@ export function DocumentUpload({ trackingCode }: DocumentUploadProps) {
                 />
 
                 <AnimatePresence mode="wait">
-                    {!file && !uploadSuccess ? (
+                    {files.length === 0 && !uploadSuccess ? (
                         <motion.div
                             key="empty"
                             initial={{ opacity: 0 }}
@@ -168,7 +178,7 @@ export function DocumentUpload({ trackingCode }: DocumentUploadProps) {
                                 Our team will review it shortly.
                             </p>
                         </motion.div>
-                    ) : file ? (
+                    ) : files.length > 0 ? (
                         <motion.div
                             key="file"
                             initial={{ opacity: 0, y: 10 }}
@@ -176,27 +186,42 @@ export function DocumentUpload({ trackingCode }: DocumentUploadProps) {
                             exit={{ opacity: 0 }}
                             className="flex flex-col items-center"
                         >
-                            <div className="w-full max-w-sm flex items-center gap-4 p-3 rounded-xl bg-background border shadow-sm mb-6 relative">
-                                <div className="w-10 h-10 rounded-lg bg-accent/10 flex items-center justify-center flex-shrink-0">
-                                    <File className="w-5 h-5 text-accent" />
-                                </div>
-                                <div className="flex-1 min-w-0 text-left">
-                                    <p className="text-sm font-medium text-foreground truncate">
-                                        {file.name}
-                                    </p>
-                                    <p className="text-xs text-muted-foreground">
-                                        {(file.size / 1024 / 1024).toFixed(2)} MB
-                                    </p>
-                                </div>
+                            <div className="w-full max-w-sm space-y-3 mb-6">
+                                {files.map((f, i) => (
+                                    <div key={i} className="flex items-center gap-4 p-3 rounded-xl bg-background border shadow-sm relative">
+                                        <div className="w-10 h-10 rounded-lg bg-accent/10 flex items-center justify-center flex-shrink-0">
+                                            <File className="w-5 h-5 text-accent" />
+                                        </div>
+                                        <div className="flex-1 min-w-0 text-left">
+                                            <p className="text-sm font-medium text-foreground truncate">
+                                                {f.name}
+                                            </p>
+                                            <p className="text-xs text-muted-foreground">
+                                                {(f.size / 1024 / 1024).toFixed(2)} MB
+                                            </p>
+                                        </div>
+                                        {!isUploading && (
+                                            <button
+                                                onClick={(e) => {
+                                                    e.stopPropagation();
+                                                    setFiles(prev => prev.filter((_, index) => index !== i));
+                                                }}
+                                                className="p-1.5 hover:bg-muted rounded-md transition-colors"
+                                            >
+                                                <X className="w-4 h-4 text-muted-foreground" />
+                                            </button>
+                                        )}
+                                    </div>
+                                ))}
                                 {!isUploading && (
                                     <button
                                         onClick={(e) => {
                                             e.stopPropagation();
-                                            setFile(null);
+                                            fileInputRef.current?.click();
                                         }}
-                                        className="p-1.5 hover:bg-muted rounded-md transition-colors"
+                                        className="w-full text-sm text-accent hover:underline mt-2 font-medium"
                                     >
-                                        <X className="w-4 h-4 text-muted-foreground" />
+                                        + Add more files
                                     </button>
                                 )}
                             </div>
