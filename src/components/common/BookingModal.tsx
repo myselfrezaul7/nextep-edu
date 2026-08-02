@@ -190,6 +190,7 @@ export function BookingModal() {
 
         const accessKey = process.env.NEXT_PUBLIC_WEB3FORMS_KEY || "";
         if (!accessKey) {
+            console.error("[BookingModal] NEXT_PUBLIC_WEB3FORMS_KEY is not configured. Booking submissions will fail. Add this key to .env.local and Vercel environment variables.");
             toast.error("Booking service is temporarily unavailable.");
             return;
         }
