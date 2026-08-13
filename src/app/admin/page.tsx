@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useCallback, useMemo } from "react";
+import { useState, useEffect, useCallback, useMemo, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useTheme } from "next-themes";
 import toast from "react-hot-toast";
@@ -108,9 +108,11 @@ export default function AdminPage() {
     const [undoLoading, setUndoLoading] = useState(false);
 
     const isDark = mounted && resolvedTheme === "dark";
+    const mountedRef = useRef(true);
 
     useEffect(() => {
         setMounted(true);
+        mountedRef.current = true;
         // Set noindex meta tag for admin page
         const meta = document.createElement("meta");
         meta.name = "robots";
@@ -123,6 +125,7 @@ export default function AdminPage() {
             setIsAuthenticated(true);
         }
         return () => {
+            mountedRef.current = false;
             document.head.removeChild(meta);
         };
     }, []);
@@ -252,7 +255,7 @@ export default function AdminPage() {
                 setSelectedApp(data.application); // Optimistic update
                 setAdvanceNote("");
                 setShowSparkle(true);
-                setTimeout(() => setShowSparkle(false), 1500);
+                setTimeout(() => { if (mountedRef.current) setShowSparkle(false); }, 1500);
                 toast.success("Step advanced successfully!");
                 fetchApplications(); // Refresh list in background
             } else {
@@ -418,7 +421,7 @@ export default function AdminPage() {
         try {
             await navigator.clipboard.writeText(code);
             setCodeCopied(true);
-            setTimeout(() => setCodeCopied(false), 2000);
+            setTimeout(() => { if (mountedRef.current) setCodeCopied(false); }, 2000);
             toast.success("Tracking code copied!");
         } catch {
             toast.error("Failed to copy to clipboard.");

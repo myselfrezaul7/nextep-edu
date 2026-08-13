@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { DEFAULT_STEPS, generateTrackingCode } from "@/lib/supabase";
 import { supabaseAdmin } from "@/lib/supabase-server";
 import { rateLimit, getClientIp } from "@/lib/rate-limit";
+import { escapeHtml } from "@/lib/sanitize";
 
 interface RegisterBody {
     name: string;
@@ -66,6 +67,12 @@ export async function POST(request: NextRequest) {
             trackingCode = generateTrackingCode();
             retries++;
         }
+        if (retries >= 5) {
+            return NextResponse.json(
+                { success: false, error: "Failed to generate a unique tracking code. Please try again." },
+                { status: 500 }
+            );
+        }
         const now = new Date().toISOString();
 
         const stepsWithFirstCompleted = DEFAULT_STEPS.map((s) =>
@@ -110,7 +117,7 @@ export async function POST(request: NextRequest) {
                                 <p style="margin: 8px 0 0; font-size: 14px; color: #94A3B8;">Consultation Request Received</p>
                             </div>
                             <div style="padding: 32px;">
-                                <p style="font-size: 16px; margin: 0 0 16px;">Hi <strong>${name}</strong>,</p>
+                                <p style="font-size: 16px; margin: 0 0 16px;">Hi <strong>${escapeHtml(name)}</strong>,</p>
                                 <p style="font-size: 14px; color: #CBD5E1; margin: 0 0 24px;">
                                     Thank you for booking a free consultation with NexTep Edu! We've received your request and our team will contact you shortly.
                                 </p>

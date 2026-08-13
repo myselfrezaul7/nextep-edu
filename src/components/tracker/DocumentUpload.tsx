@@ -50,7 +50,7 @@ export function DocumentUpload({ trackingCode }: DocumentUploadProps) {
             }
         });
 
-        if (!hasError && validFiles.length > 0) {
+        if (validFiles.length > 0) {
             setFiles(prev => [...prev, ...validFiles]);
         }
     };
@@ -68,6 +68,8 @@ export function DocumentUpload({ trackingCode }: DocumentUploadProps) {
         if (e.target.files && e.target.files.length > 0) {
             handleFiles(e.target.files);
         }
+        // Reset so the same file can be re-selected after removal
+        if (e.target) e.target.value = "";
     };
 
     const handleUpload = async () => {

@@ -88,6 +88,12 @@ export async function POST(request: NextRequest) {
             trackingCode = generateTrackingCode();
             retries++;
         }
+        if (retries >= 5) {
+            return NextResponse.json(
+                { error: "Failed to generate a unique tracking code. Please try again." },
+                { status: 500 }
+            );
+        }
         const now = new Date().toISOString();
 
         // Set step 1's date to today
@@ -166,7 +172,13 @@ export async function PATCH(request: NextRequest) {
         const currentApp = app as Application;
 
         if (action === "advance") {
-            const newStep = Math.min(currentApp.current_step + 1, 7);
+            if (currentApp.current_step >= 7) {
+                return NextResponse.json(
+                    { error: "Application is already at the final step." },
+                    { status: 400 }
+                );
+            }
+            const newStep = currentApp.current_step + 1;
             const now = new Date().toISOString();
 
             // Update the step's date and optional note
@@ -235,7 +247,13 @@ export async function PATCH(request: NextRequest) {
 
             return NextResponse.json({ application: data });
         } else if (action === "undo") {
-            const newStep = Math.max(currentApp.current_step - 1, 1);
+            if (currentApp.current_step <= 1) {
+                return NextResponse.json(
+                    { error: "Cannot undo past the first step." },
+                    { status: 400 }
+                );
+            }
+            const newStep = currentApp.current_step - 1;
             const now = new Date().toISOString();
 
             const updatedNotes = currentApp.notes.map((step, index) => {

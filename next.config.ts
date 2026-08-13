@@ -35,7 +35,7 @@ const securityHeaders = [
       "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
       "font-src 'self' https://fonts.gstatic.com",
       "img-src 'self' data: blob: https:",
-      "connect-src 'self' https://api.web3forms.com https://wa.me",
+      "connect-src 'self' https://api.web3forms.com https://wa.me https://amfpljwbvrdcbhfrzhrn.supabase.co wss://amfpljwbvrdcbhfrzhrn.supabase.co",
       "frame-src 'none'",
       "frame-ancestors 'self'",
       "form-action 'self' https://api.web3forms.com",

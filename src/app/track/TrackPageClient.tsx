@@ -48,6 +48,12 @@ export function TrackPageClient() {
     const [error, setError] = useState<string | null>(null);
     const [data, setData] = useState<Application | null>(null);
 
+    // Sync tracking code from URL on client-side navigation
+    useEffect(() => {
+        const code = searchParams.get("code");
+        if (code) setTrackingCode(code);
+    }, [searchParams]);
+
     // Realtime state
     const [justUpdated, setJustUpdated] = useState(false);
 

@@ -1,6 +1,13 @@
 import { createHmac } from "crypto";
 
-const SECRET = process.env.ADMIN_SECRET || "fallback-secret-change-me";
+function getSecret(): string {
+    const secret = process.env.ADMIN_SECRET;
+    if (!secret) {
+        throw new Error("ADMIN_SECRET environment variable is required. Set it in .env.local and Vercel.");
+    }
+    return secret;
+}
+const SECRET = getSecret();
 const TOKEN_EXPIRY_MS = 24 * 60 * 60 * 1000; // 24 hours
 
 interface TokenPayload {
