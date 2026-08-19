@@ -131,6 +131,15 @@ export default function AdminPage() {
     }, []);
 
 
+    const handleLogout = useCallback(() => {
+        localStorage.removeItem("admin_token");
+        setToken("");
+        setIsAuthenticated(false);
+        setApplications([]);
+        setView("list");
+        setSearchQuery("");
+    }, []);
+
     // ─── Fetch applications ───────────────────────────────────
     const fetchApplications = useCallback(async () => {
         setLoading(true);
@@ -143,6 +152,11 @@ export default function AdminPage() {
             const res = await fetch(`/api/admin/applications?${params}`, {
                 headers: { Authorization: `Bearer ${token}` },
             });
+            if (res.status === 401) {
+                handleLogout();
+                toast.error("Session expired. Please log in again.");
+                return;
+            }
             if (res.ok) {
                 const data = await res.json();
                 setApplications(data.applications || []);
@@ -155,7 +169,7 @@ export default function AdminPage() {
         } finally {
             setLoading(false);
         }
-    }, [token, currentPage, sortOrder]);
+    }, [token, currentPage, sortOrder, handleLogout]);
 
     useEffect(() => {
         if (isAuthenticated) {
@@ -190,14 +204,6 @@ export default function AdminPage() {
         }
     };
 
-    const handleLogout = () => {
-        localStorage.removeItem("admin_token");
-        setToken("");
-        setIsAuthenticated(false);
-        setApplications([]);
-        setView("list");
-        setSearchQuery("");
-    };
 
     // ─── Add application handler ──────────────────────────────
     const handleAddApplication = async (e: React.FormEvent) => {

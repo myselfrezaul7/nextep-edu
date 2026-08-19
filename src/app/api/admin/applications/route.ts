@@ -20,40 +20,49 @@ export async function GET(request: NextRequest) {
         );
     }
 
-    const { searchParams } = new URL(request.url);
-    const page = parseInt(searchParams.get("page") || "1", 10);
-    const limit = parseInt(searchParams.get("limit") || "25", 10);
-    const sortOrder = searchParams.get("sortOrder") || "newest";
+    try {
+        const { searchParams } = new URL(request.url);
+        const rawPage = parseInt(searchParams.get("page") || "1", 10);
+        const rawLimit = parseInt(searchParams.get("limit") || "25", 10);
+        const page = isNaN(rawPage) || rawPage < 1 ? 1 : rawPage;
+        const limit = isNaN(rawLimit) || rawLimit < 1 ? 25 : Math.min(rawLimit, 100);
+        const sortOrder = searchParams.get("sortOrder") || "newest";
 
-    let query = supabaseAdmin
-        .from("applications")
-        .select("*", { count: "exact" });
+        let query = supabaseAdmin
+            .from("applications")
+            .select("*", { count: "exact" });
 
-    if (sortOrder === "newest") {
-        query = query.order("updated_at", { ascending: false });
-    } else if (sortOrder === "oldest") {
-        query = query.order("updated_at", { ascending: true });
-    } else if (sortOrder === "name-asc") {
-        query = query.order("name", { ascending: true });
-    } else if (sortOrder === "name-desc") {
-        query = query.order("name", { ascending: false });
-    } else {
-        query = query.order("updated_at", { ascending: false });
-    }
+        if (sortOrder === "newest") {
+            query = query.order("updated_at", { ascending: false });
+        } else if (sortOrder === "oldest") {
+            query = query.order("updated_at", { ascending: true });
+        } else if (sortOrder === "name-asc") {
+            query = query.order("name", { ascending: true });
+        } else if (sortOrder === "name-desc") {
+            query = query.order("name", { ascending: false });
+        } else {
+            query = query.order("updated_at", { ascending: false });
+        }
 
-    const start = (page - 1) * limit;
-    const end = start + limit - 1;
+        const start = (page - 1) * limit;
+        const end = start + limit - 1;
 
-    const { data, count, error } = await query.range(start, end);
+        const { data, count, error } = await query.range(start, end);
 
-    if (error) {
+        if (error) {
+            return NextResponse.json(
+                { error: error.message },
+                { status: 500 }
+            );
+        }
+
+        return NextResponse.json({ applications: data || [], total: count || 0 });
+    } catch {
         return NextResponse.json(
-            { error: error.message },
+            { error: "Failed to fetch applications" },
             { status: 500 }
         );
     }
-
-    return NextResponse.json({ applications: data, total: count });
 }
 
 // POST: Create a new application
@@ -223,22 +232,48 @@ export async function PATCH(request: NextRequest) {
             if (currentApp.email && process.env.RESEND_API_KEY) {
                 try {
                     const stepName = updatedNotes[newStep - 1].label;
+                    const baseUrl = process.env.NEXT_PUBLIC_APP_URL || "https://www.nextepedu.com";
+                    const trackingUrl = `${baseUrl}/track?code=${currentApp.tracking_code}`;
+
                     await resend.emails.send({
-                        from: 'NexTep Edu <onboarding@nextepedu.com>',
+                        from: "NexTep Edu <onboarding@nextepedu.com>",
                         to: currentApp.email,
                         subject: `Status Update: ${stepName} - NexTep Edu`,
                         html: `
-                            <div style="font-family: sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
-                                <h2 style="color: #0F172A;">Great news, ${escapeHtml(currentApp.name)}!</h2>
-                                <p style="font-size: 16px; color: #333;">Your application has advanced to the next step:</p>
-                                <div style="background-color: #f8fafc; border-left: 4px solid #D4AF37; padding: 16px; margin: 20px 0;">
-                                    <h3 style="margin: 0; color: #0F172A;">${escapeHtml(stepName)}</h3>
-                                    ${note ? `<p style="margin: 8px 0 0; color: #64748b;"><em>"${escapeHtml(note)}"</em></p>` : ''}
+                            <div style="font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; max-width: 600px; margin: 0 auto; background-color: #0F172A; color: #F8FAFC; border-radius: 12px; overflow: hidden;">
+                                <div style="background: linear-gradient(135deg, #0F172A 0%, #1E293B 100%); padding: 32px; text-align: center; border-bottom: 2px solid #D4AF37;">
+                                    <h1 style="margin: 0; font-size: 24px; color: #D4AF37;">🎓 NexTep Edu</h1>
+                                    <p style="margin: 8px 0 0; font-size: 14px; color: #94A3B8;">Application Status Update</p>
                                 </div>
-                                <p style="font-size: 16px; color: #333;">You can track your full progress anytime using your tracking code: <strong>${escapeHtml(currentApp.tracking_code)}</strong></p>
-                                <p style="font-size: 14px; color: #64748b; margin-top: 30px;">Best regards,<br>The NexTep Team</p>
+                                <div style="padding: 32px;">
+                                    <p style="font-size: 16px; margin: 0 0 16px;">Hi <strong>${escapeHtml(currentApp.name)}</strong>,</p>
+                                    <p style="font-size: 14px; color: #CBD5E1; margin: 0 0 24px;">
+                                        Great news! Your application <strong style="color: #D4AF37;">${escapeHtml(currentApp.tracking_code)}</strong> has advanced to the next step.
+                                    </p>
+                                    <div style="background: rgba(212, 175, 55, 0.1); border: 1px solid rgba(212, 175, 55, 0.3); border-radius: 8px; padding: 20px; text-align: center; margin: 0 0 24px;">
+                                        <p style="margin: 0 0 8px; font-size: 12px; color: #94A3B8; text-transform: uppercase; letter-spacing: 1px;">Current Stage</p>
+                                        <p style="margin: 0; font-size: 20px; font-weight: bold; color: #D4AF37;">${escapeHtml(stepName)}</p>
+                                        <p style="margin: 8px 0 0; font-size: 14px; color: #CBD5E1;">Step ${newStep} of 7</p>
+                                    </div>
+                                    ${note ? `<div style="background: #1E293B; border-radius: 8px; padding: 16px; margin: 0 0 24px; border-left: 3px solid #D4AF37;">
+                                        <p style="margin: 0 0 4px; font-size: 12px; color: #94A3B8;">Note from counselor:</p>
+                                        <p style="margin: 0; font-size: 14px; color: #F8FAFC;">${escapeHtml(note)}</p>
+                                    </div>` : ""}
+                                    <p style="font-size: 14px; color: #CBD5E1; margin: 0 0 16px;">
+                                        You can track your live application progress at any time:
+                                    </p>
+                                    <div style="text-align: center; margin: 28px 0;">
+                                        <a href="${trackingUrl}" style="background-color: #D4AF37; color: #0F172A; text-decoration: none; padding: 12px 24px; border-radius: 8px; font-weight: bold; font-size: 16px; display: inline-block;">Track My Application →</a>
+                                    </div>
+                                    <p style="font-size: 14px; color: #94A3B8; margin: 0;">
+                                        — The NexTep Edu Team
+                                    </p>
+                                </div>
+                                <div style="background: #1E293B; padding: 16px; text-align: center; border-top: 1px solid rgba(212, 175, 55, 0.2);">
+                                    <p style="margin: 0; font-size: 12px; color: #64748B;">© ${new Date().getFullYear()} NexTep Edu. All rights reserved.</p>
+                                </div>
                             </div>
-                        `
+                        `,
                     });
                 } catch (e) {
                     console.error("Failed to send email:", e);

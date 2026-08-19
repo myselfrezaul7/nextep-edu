@@ -1,7 +1,8 @@
 /**
  * Escapes HTML special characters to prevent XSS in email templates.
  */
-export function escapeHtml(str: string): string {
+export function escapeHtml(str: unknown): string {
+    if (typeof str !== "string") return "";
     return str
         .replace(/&/g, "&amp;")
         .replace(/</g, "&lt;")

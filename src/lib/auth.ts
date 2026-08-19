@@ -1,4 +1,4 @@
-import { createHmac } from "crypto";
+import { createHmac, timingSafeEqual } from "crypto";
 
 function getSecret(): string {
     const secret = process.env.ADMIN_SECRET;
@@ -41,22 +41,29 @@ export function signToken(payload: Omit<TokenPayload, "iat" | "exp">): string {
  */
 export function verifyToken(token: string): TokenPayload | null {
     try {
+        if (!token || typeof token !== "string") return null;
         const [payloadStr, signature] = token.split(".");
         if (!payloadStr || !signature) return null;
 
-        // Verify signature
+        // Verify signature with constant-time comparison
         const expectedSignature = createHmac("sha256", SECRET)
             .update(payloadStr)
             .digest("base64url");
 
-        if (signature !== expectedSignature) return null;
+        const sigBuf = Buffer.from(signature);
+        const expBuf = Buffer.from(expectedSignature);
+        if (sigBuf.length !== expBuf.length || !timingSafeEqual(sigBuf, expBuf)) {
+            return null;
+        }
 
         // Decode and check expiry
         const payload: TokenPayload = JSON.parse(
             Buffer.from(payloadStr, "base64url").toString("utf-8")
         );
 
-        if (Date.now() > payload.exp) return null;
+        if (!payload || typeof payload.exp !== "number" || Date.now() > payload.exp) {
+            return null;
+        }
 
         return payload;
     } catch {
@@ -66,7 +73,7 @@ export function verifyToken(token: string): TokenPayload | null {
 
 /**
  * Extracts and verifies a Bearer token from an Authorization header.
- * Returns true if the token is valid.
+ * Returns true if the token is valid and has admin role.
  */
 export function isAuthorized(authHeader: string | null): boolean {
     if (!authHeader) return false;
@@ -76,5 +83,6 @@ export function isAuthorized(authHeader: string | null): boolean {
         ? authHeader.slice(7)
         : authHeader;
 
-    return verifyToken(token) !== null;
+    const payload = verifyToken(token);
+    return payload !== null && payload.role === "admin";
 }

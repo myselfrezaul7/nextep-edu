@@ -22,7 +22,9 @@ export async function POST(request: NextRequest) {
         }
 
         const body = (await request.json()) as RegisterBody;
-        const { name, phone, email } = body;
+        const name = typeof body?.name === "string" ? body.name.trim() : "";
+        const phone = typeof body?.phone === "string" ? body.phone.trim() : "";
+        const email = typeof body?.email === "string" ? body.email.trim() : "";
 
         if (!name || !phone || !email) {
             return NextResponse.json(

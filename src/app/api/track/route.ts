@@ -14,10 +14,8 @@ export async function POST(request: NextRequest) {
         }
 
         const body = await request.json();
-        const { trackingCode, phone } = body as {
-            trackingCode: string;
-            phone: string;
-        };
+        const trackingCode = typeof body?.trackingCode === "string" ? body.trackingCode.trim().toUpperCase() : "";
+        const phone = typeof body?.phone === "string" ? body.phone.trim() : "";
 
         if (!trackingCode || !phone) {
             return NextResponse.json(
@@ -32,9 +30,9 @@ export async function POST(request: NextRequest) {
         const { data, error } = await supabaseAdmin
             .from("applications")
             .select("*")
-            .eq("tracking_code", trackingCode.toUpperCase())
+            .eq("tracking_code", trackingCode)
             .eq("phone", phone)
-            .single();
+            .maybeSingle();
 
         if (error || !data) {
             return NextResponse.json(
