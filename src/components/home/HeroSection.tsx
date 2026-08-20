@@ -157,8 +157,8 @@ export function HeroSection() {
                         mounted && currentTheme === "dark" ? "bg-[rgba(15,23,42,0.85)] border-white/10" : "bg-white/80 border-white/20"
                     )}>
                         <Image
-                            src="/assets/hero-library.png"
-                            alt="Students studying in a modern library"
+                            src="/assets/hero-scholar.jpg"
+                            alt="Study abroad scholar workspace overlooking European university courtyard"
                             width={600}
                             height={400}
                             className="rounded-xl w-full h-auto object-cover"

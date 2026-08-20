@@ -49,7 +49,42 @@ export function StructuredData() {
             "@type": "ContactPoint",
             telephone: "+4915147483493",
             contactType: "customer service"
-        }
+        },
+        aggregateRating: {
+            "@type": "AggregateRating",
+            ratingValue: "5.0",
+            reviewCount: "58",
+            bestRating: "5",
+            worstRating: "1"
+        },
+        review: [
+            {
+                "@type": "Review",
+                author: {
+                    "@type": "Person",
+                    name: "Mehedi Drubok"
+                },
+                reviewRating: {
+                    "@type": "Rating",
+                    ratingValue: "5",
+                    bestRating: "5"
+                },
+                reviewBody: "NexTep Edu guided me through every step of my application to Germany. From document preparation to university selection, their support was invaluable."
+            },
+            {
+                "@type": "Review",
+                author: {
+                    "@type": "Person",
+                    name: "Jannatul Ferdous"
+                },
+                reviewRating: {
+                    "@type": "Rating",
+                    ratingValue: "5",
+                    bestRating: "5"
+                },
+                reviewBody: "I couldn't have imagined studying in Germany without NexTep Edu's help. They made the complex admission process feel simple and were always there to answer my questions."
+            }
+        ]
     };
 
     const localBusinessSchema = {
@@ -172,19 +207,6 @@ export function StructuredData() {
         ],
     };
 
-    const aggregateRatingSchema = {
-        "@context": "https://schema.org",
-        "@type": "EducationalOrganization",
-        "@id": "https://www.nextepedu.com/#organization",
-        aggregateRating: {
-            "@type": "AggregateRating",
-            ratingValue: "5.0",
-            reviewCount: "58",
-            bestRating: "5",
-            worstRating: "1"
-        }
-    };
-
     const serviceSchema = {
         "@context": "https://schema.org",
         "@type": "Service",
@@ -239,45 +261,6 @@ export function StructuredData() {
         }))
     };
 
-    const reviewsSchema = [
-        {
-            "@context": "https://schema.org",
-            "@type": "Review",
-            itemReviewed: {
-                "@type": "EducationalOrganization",
-                name: "NexTep Edu"
-            },
-            author: {
-                "@type": "Person",
-                name: "Mehedi Drubok"
-            },
-            reviewRating: {
-                "@type": "Rating",
-                ratingValue: "5",
-                bestRating: "5"
-            },
-            reviewBody: "NexTep Edu guided me through every step of my application to Germany. From document preparation to university selection, their support was invaluable."
-        },
-        {
-            "@context": "https://schema.org",
-            "@type": "Review",
-            itemReviewed: {
-                "@type": "EducationalOrganization",
-                name: "NexTep Edu"
-            },
-            author: {
-                "@type": "Person",
-                name: "Jannatul Ferdous"
-            },
-            reviewRating: {
-                "@type": "Rating",
-                ratingValue: "5",
-                bestRating: "5"
-            },
-            reviewBody: "I couldn't have imagined studying in Germany without NexTep Edu's help. They made the complex admission process feel simple and were always there to answer my questions."
-        }
-    ];
-
     return (
         <>
             <script
@@ -313,12 +296,6 @@ export function StructuredData() {
             <script
                 type="application/ld+json"
                 dangerouslySetInnerHTML={{
-                    __html: JSON.stringify(aggregateRatingSchema),
-                }}
-            />
-            <script
-                type="application/ld+json"
-                dangerouslySetInnerHTML={{
                     __html: JSON.stringify(serviceSchema),
                 }}
             />
@@ -328,15 +305,6 @@ export function StructuredData() {
                     __html: JSON.stringify(destinationListSchema),
                 }}
             />
-            {reviewsSchema.map((review, i) => (
-                <script
-                    key={i}
-                    type="application/ld+json"
-                    dangerouslySetInnerHTML={{
-                        __html: JSON.stringify(review),
-                    }}
-                />
-            ))}
         </>
     );
 }
