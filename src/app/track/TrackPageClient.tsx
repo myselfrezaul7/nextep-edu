@@ -88,6 +88,38 @@ export function TrackPageClient() {
         };
     }, [data?.id]); // eslint-disable-line react-hooks/exhaustive-deps
 
+    // ── Polling fallback for status updates when RLS limits direct anon table subscription ──
+    useEffect(() => {
+        if (!data || !trackingCode || !phone) return;
+
+        const interval = setInterval(async () => {
+            try {
+                const res = await fetch("/api/track", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({
+                        trackingCode: trackingCode.toUpperCase(),
+                        phone,
+                    }),
+                });
+                const json = await res.json();
+                if (json.success && json.data) {
+                    if (json.data.current_step !== data.current_step || json.data.updated_at !== data.updated_at) {
+                        setData(json.data);
+                        setJustUpdated(true);
+                        setTimeout(() => setJustUpdated(false), 3000);
+                    }
+                }
+            } catch {
+                // Ignore silent polling network errors
+            }
+        }, 30000);
+
+        return () => {
+            clearInterval(interval);
+        };
+    }, [data, trackingCode, phone]);
+
     const handleSubmit = async (e: FormEvent) => {
         e.preventDefault();
         setError(null);
@@ -269,7 +301,7 @@ export function TrackPageClient() {
                                     </button>
                                 </form>
 
-                                {/* Loading skeleton — timeline shimmer */}
+                                {/* Loading skeleton - timeline shimmer */}
                                 <AnimatePresence>
                                     {loading && (
                                         <motion.div

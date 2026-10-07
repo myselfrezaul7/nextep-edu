@@ -1,53 +1,64 @@
 import type { NextConfig } from "next";
 
+const isDev = process.env.NODE_ENV !== "production";
+
 const securityHeaders = [
-  // Prevent clickjacking — only allow your own site to frame itself
+  // Prevent clickjacking - site cannot be framed by any origin
   {
     key: "X-Frame-Options",
-    value: "SAMEORIGIN",
+    value: "DENY",
   },
   // Prevent MIME-type sniffing
   {
     key: "X-Content-Type-Options",
     value: "nosniff",
   },
-  // XSS protection (legacy but still useful for older browsers)
+  // Modern standard: disable deprecated and buggy browser XSS auditor
   {
     key: "X-XSS-Protection",
-    value: "1; mode=block",
+    value: "0",
   },
   // Control referrer information sent with requests
   {
     key: "Referrer-Policy",
     value: "strict-origin-when-cross-origin",
   },
-  // HTTP Strict Transport Security — force HTTPS for 2 years
+  // HTTP Strict Transport Security - force HTTPS
   {
     key: "Strict-Transport-Security",
     value: "max-age=63072000; includeSubDomains; preload",
   },
-  // Content Security Policy — restrict what resources can load
+  // Cross-Origin Isolation headers
+  {
+    key: "Cross-Origin-Opener-Policy",
+    value: "same-origin",
+  },
+  {
+    key: "Cross-Origin-Resource-Policy",
+    value: "same-origin",
+  },
+  // Content Security Policy - restrict what resources can load
   {
     key: "Content-Security-Policy",
     value: [
       "default-src 'self'",
-      "script-src 'self' 'unsafe-inline' 'unsafe-eval'",
+      `script-src 'self' 'unsafe-inline' ${isDev ? "'unsafe-eval'" : ""} https://va.vercel-scripts.com`.trim(),
       "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
-      "font-src 'self' https://fonts.gstatic.com",
+      "font-src 'self' https://fonts.gstatic.com data:",
       "img-src 'self' data: blob: https:",
-      "connect-src 'self' https://api.web3forms.com https://wa.me https://amfpljwbvrdcbhfrzhrn.supabase.co wss://amfpljwbvrdcbhfrzhrn.supabase.co",
+      "connect-src 'self' https://api.web3forms.com https://wa.me https://*.supabase.co wss://*.supabase.co https://vitals.vercel-insights.com",
       "frame-src 'none'",
-      "frame-ancestors 'self'",
+      "frame-ancestors 'none'",
       "form-action 'self' https://api.web3forms.com",
       "base-uri 'self'",
       "object-src 'none'",
       "upgrade-insecure-requests",
     ].join("; "),
   },
-  // Permissions Policy — disable unused browser APIs
+  // Permissions Policy - disable unused browser APIs
   {
     key: "Permissions-Policy",
-    value: "camera=(), microphone=(), geolocation=(), interest-cohort=()",
+    value: "camera=(), microphone=(), geolocation=()",
   },
   // Prevent DNS prefetch abuse
   {
@@ -81,6 +92,7 @@ const nextConfig: NextConfig = {
   // Production optimizations
   compress: true,
   poweredByHeader: false, // Remove "X-Powered-By: Next.js" header
+  productionBrowserSourceMaps: false,
 
   // Strict mode for catching bugs
   reactStrictMode: true,
@@ -88,7 +100,7 @@ const nextConfig: NextConfig = {
 
   experimental: {
     optimizeCss: true,
-    optimizePackageImports: ['lucide-react', 'framer-motion'],
+    optimizePackageImports: ['lucide-react'],
   },
 };
 

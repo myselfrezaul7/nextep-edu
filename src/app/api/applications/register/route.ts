@@ -8,7 +8,10 @@ interface RegisterBody {
     name: string;
     phone: string;
     email: string;
+    website_url?: string;
 }
+
+const EMAIL_REGEX = /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)+$/;
 
 export async function POST(request: NextRequest) {
     try {
@@ -22,21 +25,39 @@ export async function POST(request: NextRequest) {
         }
 
         const body = (await request.json()) as RegisterBody;
+
+        // Server-side honeypot trap: silently return 200 without DB or email action
+        if (body?.website_url) {
+            return NextResponse.json({
+                success: true,
+                message: "Registration received.",
+            });
+        }
+
         const name = typeof body?.name === "string" ? body.name.trim() : "";
         const phone = typeof body?.phone === "string" ? body.phone.trim() : "";
         const email = typeof body?.email === "string" ? body.email.trim() : "";
 
-        if (!name || !phone || !email) {
+        if (!name || name.length > 100 || !phone || phone.length < 6 || phone.length > 30 || !email || email.length > 254 || !EMAIL_REGEX.test(email)) {
             return NextResponse.json(
-                { success: false, error: "Name, phone, and email are required." },
+                { success: false, error: "Invalid registration details. Please provide a valid name, phone, and email." },
                 { status: 400 }
+            );
+        }
+
+        // Per-recipient email rate limit: max 3 emails per recipient per 24 hours
+        const emailRateLimitResult = rateLimit("register-email", email.toLowerCase(), { maxRequests: 3, windowMs: 86400000 });
+        if (!emailRateLimitResult.success) {
+            return NextResponse.json(
+                { success: false, error: "Too many registrations for this email address. Please check your inbox or try again tomorrow." },
+                { status: 429 }
             );
         }
 
         // Check if an application already exists for this phone number
         const { data: existing, error: lookupError } = await supabaseAdmin
             .from("applications")
-            .select("tracking_code")
+            .select("id")
             .eq("phone", phone)
             .maybeSingle();
 
@@ -48,11 +69,12 @@ export async function POST(request: NextRequest) {
             );
         }
 
-        // If already exists, return the existing tracking code
+        // If already exists, do NOT return tracking code to prevent PII enumeration
         if (existing) {
             return NextResponse.json({
                 success: true,
-                trackingCode: existing.tracking_code,
+                isExisting: true,
+                message: "An application with this phone number already exists. Your tracking code was previously emailed to you.",
             });
         }
 
@@ -134,7 +156,7 @@ export async function POST(request: NextRequest) {
                                     <a href="${trackingUrl}" style="background-color: #D4AF37; color: #0F172A; text-decoration: none; padding: 12px 24px; border-radius: 8px; font-weight: bold; font-size: 16px; display: inline-block;">Track My Application</a>
                                 </div>
                                 <p style="font-size: 14px; color: #94A3B8; margin: 0;">
-                                    — The NexTep Edu Team
+                                    - The NexTep Edu Team
                                 </p>
                             </div>
                         </div>

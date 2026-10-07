@@ -86,6 +86,7 @@ export function BookingModal() {
     const [isOpen, setIsOpen] = useState(false);
     const [isSuccess, setIsSuccess] = useState(false);
     const [trackingCode, setTrackingCode] = useState<string | null>(null);
+    const [isExistingApp, setIsExistingApp] = useState(false);
     const [codeCopied, setCodeCopied] = useState(false);
     const [step, setStep] = useState(1);
     const [direction, setDirection] = useState(1); // 1 for forward, -1 for backward
@@ -158,6 +159,7 @@ export function BookingModal() {
         setTimeout(() => {
             setIsSuccess(false);
             setTrackingCode(null);
+            setIsExistingApp(false);
             setCodeCopied(false);
             setStep(1);
             setDirection(1);
@@ -214,11 +216,20 @@ export function BookingModal() {
                 const regRes = await fetch("/api/applications/register", {
                     method: "POST",
                     headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify({ name: data.name, phone: data.phone, email: data.email }),
+                    body: JSON.stringify({
+                        name: data.name,
+                        phone: data.phone,
+                        email: data.email,
+                        website_url: data.website_url,
+                    }),
                 });
-                const regData = (await regRes.json()) as { success: boolean; trackingCode?: string };
-                if (regData.success && regData.trackingCode) {
-                    setTrackingCode(regData.trackingCode);
+                const regData = (await regRes.json()) as { success: boolean; trackingCode?: string; isExisting?: boolean };
+                if (regData.success) {
+                    if (regData.trackingCode) {
+                        setTrackingCode(regData.trackingCode);
+                    } else if (regData.isExisting) {
+                        setIsExistingApp(true);
+                    }
                 }
             } catch {
                 // Registration failure must not break the booking flow
@@ -388,6 +399,25 @@ export function BookingModal() {
                                                 </div>
                                                 <p className="text-muted-foreground text-sm">
                                                     Your tracking code is <span className="font-semibold text-accent">{trackingCode}</span>. Use this to check your progress anytime.
+                                                </p>
+                                                <Link
+                                                    href="/track"
+                                                    className="inline-flex items-center gap-1 text-sm font-semibold text-accent hover:text-accent/80 transition-colors"
+                                                >
+                                                    Track Your Application →
+                                                </Link>
+                                            </motion.div>
+                                        )}
+
+                                        {isExistingApp && (
+                                            <motion.div
+                                                initial={{ opacity: 0, y: 10 }}
+                                                animate={{ opacity: 1, y: 0 }}
+                                                transition={{ delay: 0.3, duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
+                                                className="w-full max-w-xs mt-5 relative z-10 space-y-2 p-4 rounded-xl bg-accent/10 border border-accent/20 text-center"
+                                            >
+                                                <p className="text-muted-foreground text-sm">
+                                                    An application with this phone number already exists. Your tracking code was previously emailed to you.
                                                 </p>
                                                 <Link
                                                     href="/track"

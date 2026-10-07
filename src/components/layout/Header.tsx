@@ -147,7 +147,7 @@ export function Header() {
                             {isDestinationsActive && <motion.div layoutId="nav-underline" className="absolute left-0 right-0 bottom-0 h-0.5 bg-accent" />}
                         </button>
 
-                        {/* Dropdown Menu — perfectly matches mobile glassmorphism */}
+                        {/* Dropdown Menu - perfectly matches mobile glassmorphism */}
                         <div
                             className={cn(
                                 "absolute top-full left-1/2 -translate-x-1/2 w-64 transition-all duration-200 origin-top mt-2 p-2 grid gap-1 overflow-hidden max-h-80 overflow-y-auto",

@@ -391,7 +391,8 @@ export default function AdminPage() {
         }
         window.open(
             `https://wa.me/${phone}?text=${encodeURIComponent(text)}`,
-            "_blank"
+            "_blank",
+            "noopener,noreferrer"
         );
     };
 
@@ -854,7 +855,8 @@ export default function AdminPage() {
                                                 );
                                             window.open(
                                                 `https://wa.me/${phone}?text=${encodeURIComponent(text)}`,
-                                                "_blank"
+                                                "_blank",
+                                                "noopener,noreferrer"
                                             );
                                         }}
                                         className="inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded-xl bg-green-600 text-white font-semibold text-sm hover:bg-green-700 transition-all"

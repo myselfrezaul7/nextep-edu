@@ -49,7 +49,7 @@ export function rateLimit(
     }
 
     if (!entry || now > entry.resetTime) {
-        // First request or window expired — start fresh
+        // First request or window expired - start fresh
         store.set(identifier, {
             count: 1,
             resetTime: now + options.windowMs,

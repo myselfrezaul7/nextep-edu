@@ -15,7 +15,7 @@
     "title": "What We ",
     "titleAccent": "Actually",
     "titleSuffix": " Do For You",
-    "subtitle": "Detailed SOPs, visa support, scholarship hunting—we handle the gritty details so you can focus on packing your bags.",
+    "subtitle": "Detailed SOPs, visa support, scholarship hunting - we handle the gritty details so you can focus on packing your bags.",
     "items": {
       "lom": {
         "title": "LOM / SOP Solution",
@@ -62,8 +62,8 @@
   "howItWorks": {
     "badge": "Simple Process",
     "title": "How It Works",
-    "subtitle": "From your first call to your flight — four simple steps to studying abroad.",
-    "ctaButton": "Start With Step 1 — It's Free",
+    "subtitle": "From your first call to your flight - four simple steps to studying abroad.",
+    "ctaButton": "Start With Step 1 - It's Free",
     "stepLabel": "STEP",
     "steps": {
       "call": {
@@ -80,7 +80,7 @@
       },
       "fly": {
         "title": "Fly Abroad",
-        "description": "Pre-departure briefing, blocked accounts, housing tips — you're fully ready for your new life."
+        "description": "Pre-departure briefing, blocked accounts, housing tips - you're fully ready for your new life."
       }
     }
   },

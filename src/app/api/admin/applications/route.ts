@@ -50,8 +50,9 @@ export async function GET(request: NextRequest) {
         const { data, count, error } = await query.range(start, end);
 
         if (error) {
+            console.error("Supabase query error:", error);
             return NextResponse.json(
-                { error: error.message },
+                { error: "Failed to fetch applications" },
                 { status: 500 }
             );
         }
@@ -129,8 +130,9 @@ export async function POST(request: NextRequest) {
             .single();
 
         if (error) {
+            console.error("Supabase insert error:", error);
             return NextResponse.json(
-                { error: error.message },
+                { error: "Failed to create application" },
                 { status: 500 }
             );
         }
@@ -215,8 +217,9 @@ export async function PATCH(request: NextRequest) {
                 .maybeSingle();
 
             if (error) {
+                console.error("Supabase update error:", error);
                 return NextResponse.json(
-                    { error: error.message },
+                    { error: "Failed to update step" },
                     { status: 500 }
                 );
             }
@@ -266,7 +269,7 @@ export async function PATCH(request: NextRequest) {
                                         <a href="${trackingUrl}" style="background-color: #D4AF37; color: #0F172A; text-decoration: none; padding: 12px 24px; border-radius: 8px; font-weight: bold; font-size: 16px; display: inline-block;">Track My Application →</a>
                                     </div>
                                     <p style="font-size: 14px; color: #94A3B8; margin: 0;">
-                                        — The NexTep Edu Team
+                                        - The NexTep Edu Team
                                     </p>
                                 </div>
                                 <div style="background: #1E293B; padding: 16px; text-align: center; border-top: 1px solid rgba(212, 175, 55, 0.2);">
@@ -315,8 +318,9 @@ export async function PATCH(request: NextRequest) {
                 .maybeSingle();
 
             if (error) {
+                console.error("Supabase update error:", error);
                 return NextResponse.json(
-                    { error: error.message },
+                    { error: "Failed to update notes" },
                     { status: 500 }
                 );
             }
@@ -348,8 +352,9 @@ export async function PATCH(request: NextRequest) {
                 .maybeSingle();
 
             if (error) {
+                console.error("Supabase update error:", error);
                 return NextResponse.json(
-                    { error: error.message },
+                    { error: "Failed to update application details" },
                     { status: 500 }
                 );
             }
@@ -402,8 +407,9 @@ export async function DELETE(request: NextRequest) {
             .eq("id", id);
 
         if (error) {
+            console.error("Supabase delete error:", error);
             return NextResponse.json(
-                { error: error.message },
+                { error: "Failed to delete application" },
                 { status: 500 }
             );
         }

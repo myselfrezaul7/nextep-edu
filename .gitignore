@@ -46,3 +46,10 @@ next-env.d.ts
 claude_search.txt
 search.js
 *.log.txt
+*.log
+
+# crypto and certificates
+*.key
+*.crt
+*.pfx
+*.p12

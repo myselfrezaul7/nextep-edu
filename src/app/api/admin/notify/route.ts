@@ -89,7 +89,7 @@ export async function POST(request: NextRequest) {
                             If you have any questions, don't hesitate to reach out to us.
                         </p>
                         <p style="font-size: 14px; color: #94A3B8; margin: 0;">
-                            — The NexTep Edu Team
+                            - The NexTep Edu Team
                         </p>
                     </div>
                     <div style="background: #1E293B; padding: 16px; text-align: center; border-top: 1px solid rgba(212, 175, 55, 0.2);">
@@ -100,8 +100,9 @@ export async function POST(request: NextRequest) {
         });
 
         if (emailError) {
+            console.error("Resend notification error:", emailError);
             return NextResponse.json(
-                { success: false, error: emailError.message },
+                { success: false, error: "Failed to deliver notification email." },
                 { status: 500 }
             );
         }

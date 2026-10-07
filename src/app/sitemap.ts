@@ -20,7 +20,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
         },
     ];
 
-    // Dynamic destination pages — all 13 countries
+    // Dynamic destination pages - all 13 countries
     const destinationPages: MetadataRoute.Sitemap = Object.values(destinations).map(
         (destination) => ({
             url: `${baseUrl}/destinations/${destination.slug}`,

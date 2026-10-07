@@ -13,7 +13,7 @@ interface BookingButtonProps {
 export function BookingButton({ children, className, variant = "default", size = "default" }: BookingButtonProps) {
     return (
         <div className="relative group inline-block">
-            {/* Liquid Glass buttons have built-in luminous edges — no glow wrapper needed */}
+            {/* Liquid Glass buttons have built-in luminous edges - no glow wrapper needed */}
             <Button
                 variant={variant}
                 size={size}

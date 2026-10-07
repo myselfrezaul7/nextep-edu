@@ -86,7 +86,7 @@ export function HowItWorksSection() {
                         transition={{ duration: 0.6, delay: 0.1, ease: EASE_OUT_EXPO }}
                         className="text-base md:text-xl text-muted-foreground max-w-2xl mx-auto"
                     >
-                        From your first call to your flight — four simple steps to studying abroad.
+                        From your first call to your flight - four simple steps to studying abroad.
                     </motion.p>
                 </div>
 

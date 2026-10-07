@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { signToken } from "@/lib/auth";
 import { rateLimit, getClientIp } from "@/lib/rate-limit";
+import { createHash, timingSafeEqual } from "crypto";
 
 export async function POST(request: NextRequest) {
     try {
@@ -32,11 +33,26 @@ export async function POST(request: NextRequest) {
             );
         }
 
-        if (password === adminPassword) {
-            return NextResponse.json({
+        const hashInput = createHash("sha256").update(typeof password === "string" ? password : "").digest();
+        const hashTarget = createHash("sha256").update(adminPassword).digest();
+        const isValid = timingSafeEqual(hashInput, hashTarget);
+
+        if (isValid) {
+            const token = signToken({ role: "admin" });
+            const response = NextResponse.json({
                 success: true,
-                token: signToken({ role: "admin" }),
+                token,
             });
+
+            response.cookies.set("admin_session", token, {
+                httpOnly: true,
+                secure: process.env.NODE_ENV === "production",
+                sameSite: "lax",
+                path: "/",
+                maxAge: 60 * 60 * 24, // 24 hours
+            });
+
+            return response;
         }
 
         return NextResponse.json(

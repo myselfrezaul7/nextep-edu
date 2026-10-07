@@ -356,7 +356,7 @@ export function DestinationPageClient({ destination, relatedDestinations = [] }:
                         viewport={{ once: true }}
                         className="relative p-8 md:p-12 rounded-3xl overflow-hidden border border-white/10 shadow-2xl"
                     >
-                        {/* Solid opaque dark background — no bleed-through */}
+                        {/* Solid opaque dark background - no bleed-through */}
                         <div className="absolute inset-0 bg-[#0F172A]" />
                         {/* Frosted glass inner glow */}
                         <div className="absolute inset-0 bg-gradient-to-br from-accent/10 via-transparent to-accent/5" />

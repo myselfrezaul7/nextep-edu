@@ -20,14 +20,15 @@ export async function GET(request: NextRequest) {
             .list(trackingCode);
 
         if (error) {
-            return NextResponse.json({ error: error.message }, { status: 500 });
+            console.error("Storage list error:", error);
+            return NextResponse.json({ error: "Failed to load documents." }, { status: 500 });
         }
 
         const documentsWithUrls = await Promise.all(
             data.map(async (file) => {
                 const { data: urlData, error: urlError } = await supabaseAdmin.storage
                     .from("documents")
-                    .createSignedUrl(`${trackingCode}/${file.name}`, 60 * 60);
+                    .createSignedUrl(`${trackingCode}/${file.name}`, 60 * 60, { download: true });
 
                 return {
                     name: file.name,

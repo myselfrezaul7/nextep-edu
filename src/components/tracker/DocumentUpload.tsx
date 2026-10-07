@@ -36,15 +36,12 @@ export function DocumentUpload({ trackingCode }: DocumentUploadProps) {
         setUploadSuccess(false);
         
         const validFiles: File[] = [];
-        let hasError = false;
 
         Array.from(selectedFiles).forEach(f => {
             if (!ALLOWED_TYPES.includes(f.type)) {
                 setError("One or more files have an invalid type. Please upload PDF, JPG, or PNG.");
-                hasError = true;
             } else if (f.size > MAX_FILE_SIZE) {
                 setError("One or more files are too large. Maximum size is 5 MB each.");
-                hasError = true;
             } else {
                 validFiles.push(f);
             }
@@ -80,14 +77,27 @@ export function DocumentUpload({ trackingCode }: DocumentUploadProps) {
 
         try {
             await Promise.all(files.map(async (f) => {
-                const fileExt = f.name.split('.').pop();
-                const fileName = `${trackingCode}/${Date.now()}_${Math.random().toString(36).substring(7)}.${fileExt}`;
+                const res = await fetch("/api/documents/upload-url", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({
+                        trackingCode,
+                        fileName: f.name,
+                        fileType: f.type,
+                        fileSize: f.size,
+                    }),
+                });
+
+                const creds = await res.json();
+                if (!res.ok || !creds.success || !creds.path || !creds.token) {
+                    throw new Error(creds.error || "Failed to authorize upload.");
+                }
 
                 const { error: uploadError } = await supabase.storage
-                    .from('documents')
-                    .upload(fileName, f, {
-                        cacheControl: '3600',
-                        upsert: false
+                    .from("documents")
+                    .uploadToSignedUrl(creds.path, creds.token, f, {
+                        cacheControl: "3600",
+                        upsert: false,
                     });
 
                 if (uploadError) throw uploadError;
@@ -101,7 +111,8 @@ export function DocumentUpload({ trackingCode }: DocumentUploadProps) {
             setTimeout(() => setUploadSuccess(false), 5000);
         } catch (err: unknown) {
             console.error("Upload failed:", err);
-            setError("Upload failed. Please try again or check your connection.");
+            const message = err instanceof Error ? err.message : "Upload failed. Please try again.";
+            setError(message);
         } finally {
             setIsUploading(false);
         }

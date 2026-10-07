@@ -92,7 +92,7 @@ export function StructuredData() {
         "@type": "LocalBusiness",
         "@id": "https://www.nextepedu.com/#localbusiness",
         name: "NexTep Edu - Study Abroad Consultancy Dhaka",
-        image: "https://www.nextepedu.com/assets/og-image.png",
+        image: "https://www.nextepedu.com/opengraph-image.png",
         url: "https://www.nextepedu.com",
         telephone: "+4915147483493",
         priceRange: "$$",

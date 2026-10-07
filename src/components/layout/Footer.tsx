@@ -36,7 +36,7 @@ export function Footer() {
         <footer className="relative z-10 bg-background transition-colors duration-300">
             {/* CTA Banner */}
             <div className="relative overflow-hidden">
-                {/* Solid opaque dark background — no bleed-through in light mode */}
+                {/* Solid opaque dark background - no bleed-through in light mode */}
                 <div className="absolute inset-0 bg-[#0F172A] pointer-events-none" />
                 {/* Frosted glass inner glow */}
                 <div className="absolute inset-0 bg-gradient-to-br from-accent/10 via-transparent to-accent/5 pointer-events-none" />
@@ -188,7 +188,7 @@ export function Footer() {
                                             </a>
                                         </li>
                                         <li>
-                                            <a href="https://mail.google.com/mail/?view=cm&fs=1&to=info@nextepedu.com" target="_blank" rel="noopener noreferrer" className={cn("flex items-start gap-3 py-2.5 md:py-0 hover:text-accent hover:underline decoration-accent underline-offset-4 transition-colors", mounted && currentTheme === "dark" ? "text-white/70" : "text-muted-foreground")}>
+                                            <a href="mailto:info@nextepedu.com" className={cn("flex items-start gap-3 py-2.5 md:py-0 hover:text-accent hover:underline decoration-accent underline-offset-4 transition-colors", mounted && currentTheme === "dark" ? "text-white/70" : "text-muted-foreground")}>
                                                 <Mail className="w-4 h-4 mt-1 text-accent shrink-0" />
                                                 info@nextepedu.com
                                             </a>
