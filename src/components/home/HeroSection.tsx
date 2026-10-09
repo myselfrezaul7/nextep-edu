@@ -6,9 +6,15 @@ import Image from "next/image";
 import { GraduationCap, Plane, Globe2 } from "lucide-react";
 import { useTheme } from "next-themes";
 import { useState, useEffect } from "react";
+import dynamic from "next/dynamic";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { useTranslation } from "@/i18n/LanguageContext";
+
+const HeroCanvas = dynamic(
+    () => import("@/components/home/HeroCanvas").then((mod) => mod.HeroCanvas),
+    { ssr: false }
+);
 
 const EASE_OUT_EXPO = [0.16, 1, 0.3, 1] as const;
 
@@ -25,11 +31,16 @@ export function HeroSection() {
     }, []);
 
     return (
-        <section className="relative min-h-[90vh] flex items-center overflow-hidden py-16 md:py-32">
+        <section className="relative min-h-[90vh] flex items-center overflow-hidden py-16 md:py-32 isolate">
+            {/* 3D Subtle Holographic Constellation */}
+            <div className="absolute inset-0 -z-10 pointer-events-none overflow-hidden" aria-hidden="true">
+                <HeroCanvas />
+            </div>
+
             {/* Background Blur Effect */}
             <div className="absolute top-[-10%] right-[-10%] w-[600px] h-[600px] bg-[radial-gradient(circle,_rgba(212,175,55,0.2)_0%,_transparent_70%)] -z-10 pointer-events-none" />
 
-            <div className="container mx-auto px-4 grid md:grid-cols-2 gap-12 items-center">
+            <div className="container mx-auto px-4 grid md:grid-cols-2 gap-12 items-center relative z-10">
                 {/* Text Content */}
                 <div className="space-y-6">
                     <h1 className="text-3xl md:text-6xl font-bold font-heading text-primary leading-tight flex flex-wrap gap-x-2 md:gap-x-3">
