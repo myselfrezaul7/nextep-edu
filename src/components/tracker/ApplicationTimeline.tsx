@@ -1,9 +1,9 @@
 "use client";
 
-import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { useTheme } from "next-themes";
 import { Check, Calendar, FileCheck, Building2, Mail, Stamp, BadgeCheck, Luggage, Clock } from "lucide-react";
+import { useMounted } from "@/lib/use-mounted";
 import { cn } from "@/lib/utils";
 import type { ApplicationStep } from "@/lib/supabase";
 
@@ -27,9 +27,7 @@ interface ApplicationTimelineProps {
 
 export function ApplicationTimeline({ steps, currentStep, className }: ApplicationTimelineProps) {
     const { resolvedTheme } = useTheme();
-    const [mounted, setMounted] = useState(false);
-
-    useEffect(() => setMounted(true), []);
+    const mounted = useMounted();
 
     const isDark = mounted && resolvedTheme === "dark";
     const percentage = Math.round(((currentStep - 1) / steps.length) * 100);
@@ -60,7 +58,6 @@ export function ApplicationTimeline({ steps, currentStep, className }: Applicati
                     const stepNum = index + 1;
                     const isCompleted = stepNum < currentStep;
                     const isActive = stepNum === currentStep;
-                    const isPending = stepNum > currentStep;
                     const Icon = STEP_ICONS[stepNum] || Clock;
 
                     return (

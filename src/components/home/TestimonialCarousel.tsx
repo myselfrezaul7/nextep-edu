@@ -3,8 +3,14 @@
 import { motion } from "framer-motion";
 import { Star, Quote } from "lucide-react";
 import { useTheme } from "next-themes";
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useSyncExternalStore } from "react";
+import { useMounted } from "@/lib/use-mounted";
 import { cn } from "@/lib/utils";
+
+const subscribeResize = (callback: () => void) => {
+    window.addEventListener("resize", callback);
+    return () => window.removeEventListener("resize", callback);
+};
 
 const testimonials = [
     {
@@ -66,23 +72,19 @@ const testimonials = [
 ];
 
 export function TestimonialCarousel() {
-    const [mounted, setMounted] = useState(false);
+    const mounted = useMounted();
     const [isHovered, setIsHovered] = useState(false);
     const scrollRef = useRef<HTMLDivElement>(null);
     const { theme, systemTheme } = useTheme();
 
     const currentTheme = theme === "system" ? systemTheme : theme;
 
-    const [isMobile, setIsMobile] = useState(false);
+    const isMobile = useSyncExternalStore(
+        subscribeResize,
+        () => window.innerWidth < 768,
+        () => false
+    );
     const [dragConstraints, setDragConstraints] = useState(0);
-
-    useEffect(() => {
-        setMounted(true);
-        const checkMobile = () => setIsMobile(window.innerWidth < 768);
-        checkMobile();
-        window.addEventListener('resize', checkMobile);
-        return () => window.removeEventListener('resize', checkMobile);
-    }, []);
 
     useEffect(() => {
         if (scrollRef.current && isMobile) {
@@ -116,7 +118,7 @@ export function TestimonialCarousel() {
                         transition={{ duration: 0.6, delay: 0.1 }}
                         className="text-3xl md:text-5xl font-bold font-heading mb-4 text-primary"
                     >
-                        From Students Who've Been There
+                        From Students Who&apos;ve Been There
                     </motion.h2>
                     <motion.p
                         initial={{ opacity: 0, y: 20 }}
@@ -196,7 +198,7 @@ export function TestimonialCarousel() {
                                     "italic mb-8 flex-grow leading-relaxed text-sm md:text-base",
                                     mounted && currentTheme === "dark" ? "text-white/70" : "text-muted-foreground"
                                 )}>
-                                    "{story.text}"
+                                    &ldquo;{story.text}&rdquo;
                                 </p>
 
                                 {/* Author Info */}

@@ -2,22 +2,22 @@
 
 import { motion } from "framer-motion";
 import { usePathname } from "next/navigation";
-import { useEffect, useRef } from "react";
+import { useState } from "react";
 
 const EASE_OUT_EXPO = [0.16, 1, 0.3, 1] as const;
 
 export function PageTransition({ children }: { children: React.ReactNode }) {
     const pathname = usePathname();
-    const prevPathname = useRef(pathname);
+    const [history, setHistory] = useState({ current: pathname, prev: pathname });
+
+    if (history.current !== pathname) {
+        setHistory({ current: pathname, prev: history.current });
+    }
 
     const currentDepth = pathname.split("/").filter(Boolean).length;
-    const prevDepth = prevPathname.current.split("/").filter(Boolean).length;
+    const prevDepth = history.prev.split("/").filter(Boolean).length;
     const isDeeper = currentDepth >= prevDepth;
     const startX = isDeeper ? 30 : -30;
-
-    useEffect(() => {
-        prevPathname.current = pathname;
-    }, [pathname]);
 
     return (
         <>

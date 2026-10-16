@@ -2,15 +2,11 @@
 import { useTranslation } from "@/i18n/LanguageContext";
 import { motion } from "framer-motion";
 import { cn } from "@/lib/utils";
-import { useEffect, useState } from "react";
+import { useMounted } from "@/lib/use-mounted";
 
 export function LanguageToggle() {
     const { locale, setLocale } = useTranslation();
-    const [mounted, setMounted] = useState(false);
-
-    useEffect(() => {
-        setMounted(true);
-    }, []);
+    const mounted = useMounted();
 
     if (!mounted) {
         return <div className="w-[42px] h-8" />; // Placeholder to prevent layout shift

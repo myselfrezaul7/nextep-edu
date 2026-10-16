@@ -6,7 +6,8 @@ import Link from "next/link";
 import { ArrowLeft, ArrowRight, GraduationCap, CheckCircle, Globe2, Trophy, Clock, Users, BookOpen, Wallet, Sun, Coffee, MapPin, Landmark, Train, Building2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useTheme } from "next-themes";
-import { useEffect, useState } from "react";
+import { useState } from "react";
+import { useMounted } from "@/lib/use-mounted";
 import { cn } from "@/lib/utils";
 import { useTranslation } from "@/i18n/LanguageContext";
 
@@ -87,13 +88,9 @@ const iconMap: Record<string, React.ComponentType<{ className?: string }>> = {
 
 export function DestinationPageClient({ destination, relatedDestinations = [] }: DestinationPageClientProps) {
     const { theme, systemTheme } = useTheme();
-    const [mounted, setMounted] = useState(false);
+    const mounted = useMounted();
     const [searchQuery, setSearchQuery] = useState("");
     const { t } = useTranslation();
-
-    useEffect(() => {
-        setMounted(true);
-    }, []);
 
     const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
         const card = e.currentTarget;

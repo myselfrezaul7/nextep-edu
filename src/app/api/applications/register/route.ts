@@ -54,6 +54,24 @@ export async function POST(request: NextRequest) {
             );
         }
 
+        // Database-backed persistent rate limit across serverless cold starts
+        const twentyFourHoursAgo = new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString();
+        const { count: recentEmailCount, error: rateCheckError } = await supabaseAdmin
+            .from("applications")
+            .select("id", { count: "exact", head: true })
+            .ilike("email", email)
+            .gte("created_at", twentyFourHoursAgo);
+
+        if (!rateCheckError && recentEmailCount !== null && recentEmailCount >= 3) {
+            return NextResponse.json(
+                {
+                    success: false,
+                    error: "Too many registrations for this email address. Please check your inbox or try again tomorrow.",
+                },
+                { status: 429 }
+            );
+        }
+
         // Check if an application already exists for this phone number
         const { data: existing, error: lookupError } = await supabaseAdmin
             .from("applications")

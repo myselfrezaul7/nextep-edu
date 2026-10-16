@@ -3,7 +3,8 @@
 import { motion, useScroll, useTransform } from "framer-motion";
 import { PhoneCall, ClipboardList, SendHorizonal, PlaneTakeoff } from "lucide-react";
 import { useTheme } from "next-themes";
-import { useState, useEffect, useRef } from "react";
+import { useRef } from "react";
+import { useMounted } from "@/lib/use-mounted";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { useTranslation } from "@/i18n/LanguageContext";
@@ -35,7 +36,7 @@ const stepsData = [
 
 export function HowItWorksSection() {
     const { theme, systemTheme } = useTheme();
-    const [mounted, setMounted] = useState(false);
+    const mounted = useMounted();
     const { t } = useTranslation();
     const currentTheme = theme === "system" ? systemTheme : theme;
     const containerRef = useRef<HTMLDivElement>(null);
@@ -44,10 +45,6 @@ export function HowItWorksSection() {
         offset: ["start center", "end center"]
     });
     const pathLength = useTransform(scrollYProgress, [0, 0.8], [0, 1]);
-
-    useEffect(() => {
-        setMounted(true);
-    }, []);
 
     return (
         <section className="py-12 md:py-28 bg-background relative overflow-hidden">

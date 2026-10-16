@@ -4,8 +4,9 @@ import { motion, useMotionValue, useSpring, useTransform } from "framer-motion";
 import Link from "next/link";
 import Image from "next/image";
 import { ArrowRight } from "lucide-react";
-import { useState, useRef, useEffect } from "react";
+import { useRef, useSyncExternalStore } from "react";
 import { useTheme } from "next-themes";
+import { useMounted } from "@/lib/use-mounted";
 import { cn } from "@/lib/utils";
 import { destinations } from "@/data/destinations";
 import { useTranslation } from "@/i18n/LanguageContext";
@@ -33,12 +34,21 @@ const item = {
     show: { opacity: 1, y: 0, transition: { duration: 0.5, ease: EASE_OUT_EXPO } }
 };
 
+const subscribeTouch = (callback: () => void) => {
+    const media = window.matchMedia("(hover: none)");
+    media.addEventListener("change", callback);
+    return () => media.removeEventListener("change", callback);
+};
+
 function Card3D({ children, href }: { children: React.ReactNode, href: string }) {
     const ref = useRef<HTMLDivElement>(null);
-    const [isHovered, setIsHovered] = useState(false);
-    const [isTouchDevice, setIsTouchDevice] = useState(false);
+    const isTouchDevice = useSyncExternalStore(
+        subscribeTouch,
+        () => window.matchMedia("(hover: none)").matches,
+        () => false
+    );
     const { theme, systemTheme } = useTheme();
-    const [mounted, setMounted] = useState(false);
+    const mounted = useMounted();
 
     const currentTheme = theme === "system" ? systemTheme : theme;
 
@@ -53,11 +63,6 @@ function Card3D({ children, href }: { children: React.ReactNode, href: string })
 
     const glareX = useTransform(mouseXSpring, [-0.5, 0.5], [0, 100]);
     const glareY = useTransform(mouseYSpring, [-0.5, 0.5], [0, 100]);
-
-    useEffect(() => {
-        setMounted(true);
-        setIsTouchDevice(window.matchMedia("(hover: none)").matches);
-    }, []);
 
     const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
         if (isTouchDevice || !ref.current) return;
@@ -78,7 +83,6 @@ function Card3D({ children, href }: { children: React.ReactNode, href: string })
     };
 
     const handleMouseLeave = () => {
-        setIsHovered(false);
         x.set(0);
         y.set(0);
     };
@@ -87,7 +91,6 @@ function Card3D({ children, href }: { children: React.ReactNode, href: string })
         <motion.div
             ref={ref}
             onMouseMove={handleMouseMove}
-            onMouseEnter={() => setIsHovered(true)}
             onMouseLeave={handleMouseLeave}
             style={{
                 perspective: 1000,
@@ -126,13 +129,10 @@ function Card3D({ children, href }: { children: React.ReactNode, href: string })
 
 export function DestinationsGrid({ featuredOnly = false }: { featuredOnly?: boolean }) {
     const { theme, systemTheme } = useTheme();
-    const [mounted, setMounted] = useState(false);
+    const mounted = useMounted();
     const { t } = useTranslation();
     const currentTheme = theme === "system" ? systemTheme : theme;
 
-    useEffect(() => {
-        setMounted(true);
-    }, []);
     const displayedDestinations = featuredOnly
         ? topDestinations
         : Object.values(destinations);

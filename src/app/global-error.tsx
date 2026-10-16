@@ -1,7 +1,6 @@
 "use client";
 
 export default function GlobalError({
-    error,
     reset,
 }: {
     error: Error & { digest?: string };
@@ -58,20 +57,27 @@ export default function GlobalError({
                     position: "relative",
                     overflow: "hidden"
                 }}>
-                    {[...Array(15)].map((_, i) => (
-                        <div
-                            key={i}
-                            className="particle"
-                            style={{
-                                width: Math.random() * 6 + 2 + "px",
-                                height: Math.random() * 6 + 2 + "px",
-                                left: Math.random() * 100 + "%",
-                                top: Math.random() * 100 + "%",
-                                animationDuration: Math.random() * 3 + 2 + "s",
-                                animationDelay: Math.random() * 2 + "s",
-                            }}
-                        />
-                    ))}
+                    {[...Array(15)].map((_, i) => {
+                        const size = ((i * 3) % 7) + 2;
+                        const left = ((i * 17) % 95) + 2;
+                        const top = ((i * 23) % 90) + 5;
+                        const duration = ((i * 7) % 30) / 10 + 2;
+                        const delay = ((i * 13) % 20) / 10;
+                        return (
+                            <div
+                                key={i}
+                                className="particle"
+                                style={{
+                                    width: size + "px",
+                                    height: size + "px",
+                                    left: left + "%",
+                                    top: top + "%",
+                                    animationDuration: duration + "s",
+                                    animationDelay: delay + "s",
+                                }}
+                            />
+                        );
+                    })}
                     <div className="error-container" style={{ textAlign: "center", maxWidth: "28rem", position: "relative", zIndex: 10 }}>
                         <h1 className="error-header" style={{ fontSize: "4rem", fontWeight: "bold", color: "#D4AF37", marginBottom: "1rem" }}>
                             Oops!

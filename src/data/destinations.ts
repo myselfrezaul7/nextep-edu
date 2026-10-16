@@ -1,4 +1,4 @@
-import { LucideIcon, MapPin, GraduationCap, Building2, Globe2, Wallet, Clock, Users, BookOpen, Trophy, Sun, Coffee, Landmark, Train, DollarSign, Briefcase, Award, Globe } from "lucide-react";
+import { LucideIcon, MapPin, Building2, Globe2, Wallet, Clock, Users, BookOpen, Trophy, Sun, Coffee, Landmark, Train, Award } from "lucide-react";
 
 export interface University {
     name: string;

@@ -9,7 +9,8 @@ import {
     Landmark
 } from "lucide-react";
 import { useTheme } from "next-themes";
-import { useState, useEffect, useRef } from "react";
+import { useState, useRef } from "react";
+import { useMounted } from "@/lib/use-mounted";
 import { cn } from "@/lib/utils";
 import { motion } from "framer-motion";
 import { useTranslation } from "@/i18n/LanguageContext";
@@ -18,7 +19,7 @@ const EASE_OUT_EXPO = [0.16, 1, 0.3, 1] as const;
 
 export function ServicesSection() {
     const { theme, systemTheme } = useTheme();
-    const [mounted, setMounted] = useState(false);
+    const mounted = useMounted();
     const { t } = useTranslation();
     const currentTheme = theme === "system" ? systemTheme : theme;
     const [expandedId, setExpandedId] = useState<number | null>(null);
@@ -32,9 +33,6 @@ export function ServicesSection() {
         setActiveDot(Math.round(scrollLeft / width));
     };
 
-    useEffect(() => {
-        setMounted(true);
-    }, []);
     return (
         <section id="services" className="py-24 bg-surface dark:bg-card relative overflow-hidden">
             {/* Decorative background elements */}

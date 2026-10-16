@@ -26,7 +26,8 @@ import {
 import { ApplicationTimeline } from "@/components/tracker/ApplicationTimeline";
 import { DocumentViewer } from "@/components/admin/DocumentViewer";
 import { destinations } from "@/data/destinations";
-import type { Application, ApplicationStep } from "@/lib/supabase";
+import type { Application } from "@/lib/supabase";
+import { useMounted } from "@/lib/use-mounted";
 
 const EASE_OUT_EXPO = [0.16, 1, 0.3, 1] as const;
 
@@ -65,10 +66,22 @@ function formatDate(dateStr: string) {
 // ─── Main Admin Page ──────────────────────────────────────────
 export default function AdminPage() {
     const { resolvedTheme } = useTheme();
-    const [mounted, setMounted] = useState(false);
+    const mounted = useMounted();
 
-    const [isAuthenticated, setIsAuthenticated] = useState(false);
-    const [token, setToken] = useState("");
+    const [isAuthenticated, setIsAuthenticated] = useState(() => {
+        if (typeof window !== "undefined") {
+            const storedToken = localStorage.getItem("admin_token");
+            return Boolean(storedToken && storedToken.length > 20);
+        }
+        return false;
+    });
+    const [token, setToken] = useState(() => {
+        if (typeof window !== "undefined") {
+            const storedToken = localStorage.getItem("admin_token");
+            if (storedToken && storedToken.length > 20) return storedToken;
+        }
+        return "";
+    });
     const [password, setPassword] = useState("");
     const [authError, setAuthError] = useState("");
     const [authLoading, setAuthLoading] = useState(false);
@@ -111,19 +124,12 @@ export default function AdminPage() {
     const mountedRef = useRef(true);
 
     useEffect(() => {
-        setMounted(true);
         mountedRef.current = true;
         // Set noindex meta tag for admin page
         const meta = document.createElement("meta");
         meta.name = "robots";
         meta.content = "noindex, nofollow";
         document.head.appendChild(meta);
-        // Check stored auth
-        const storedToken = localStorage.getItem("admin_token");
-        if (storedToken && storedToken.length > 20) {
-            setToken(storedToken);
-            setIsAuthenticated(true);
-        }
         return () => {
             mountedRef.current = false;
             document.head.removeChild(meta);
@@ -172,9 +178,18 @@ export default function AdminPage() {
     }, [token, currentPage, sortOrder, handleLogout]);
 
     useEffect(() => {
-        if (isAuthenticated) {
-            fetchApplications();
-        }
+        if (!isAuthenticated) return;
+        let isMounted = true;
+        const load = async () => {
+            await Promise.resolve();
+            if (isMounted) {
+                fetchApplications();
+            }
+        };
+        load();
+        return () => {
+            isMounted = false;
+        };
     }, [isAuthenticated, fetchApplications]);
 
     // ─── Auth handler ─────────────────────────────────────────
@@ -461,11 +476,6 @@ export default function AdminPage() {
         return result;
     }, [applications, searchQuery, filterStep]);
 
-    // Reset page to 1 when filters or sort change
-    useEffect(() => {
-        setCurrentPage(1);
-    }, [searchQuery, filterStep, sortOrder]);
-
     // ─── Glass card classes ───────────────────────────────────
     const glassCard = isDark
         ? "bg-[rgba(15,23,42,0.85)] border border-white/10 backdrop-blur-xl"
@@ -613,7 +623,10 @@ export default function AdminPage() {
                                 <input
                                     type="text"
                                     value={searchQuery}
-                                    onChange={(e) => setSearchQuery(e.target.value)}
+                                    onChange={(e) => {
+                                        setSearchQuery(e.target.value);
+                                        setCurrentPage(1);
+                                    }}
                                     placeholder="Search by name, code, or destination..."
                                     aria-label="Search applications"
                                     className={`w-full pl-10 pr-4 py-3 rounded-xl text-sm transition-all duration-200 outline-none ${
@@ -626,7 +639,10 @@ export default function AdminPage() {
                             <div className="flex gap-4">
                                 <select
                                     value={filterStep}
-                                    onChange={(e) => setFilterStep(e.target.value === "all" ? "all" : Number(e.target.value))}
+                                    onChange={(e) => {
+                                        setFilterStep(e.target.value === "all" ? "all" : Number(e.target.value));
+                                        setCurrentPage(1);
+                                    }}
                                     className={`px-4 py-3 rounded-xl text-sm outline-none transition-all ${
                                         isDark
                                             ? "bg-white/5 border border-white/10 text-foreground focus:border-accent/50"
@@ -640,7 +656,10 @@ export default function AdminPage() {
                                 </select>
                                 <select
                                     value={sortOrder}
-                                    onChange={(e) => setSortOrder(e.target.value as "newest" | "oldest")}
+                                    onChange={(e) => {
+                                        setSortOrder(e.target.value as "newest" | "oldest");
+                                        setCurrentPage(1);
+                                    }}
                                     className={`px-4 py-3 rounded-xl text-sm outline-none transition-all ${
                                         isDark
                                             ? "bg-white/5 border border-white/10 text-foreground focus:border-accent/50"

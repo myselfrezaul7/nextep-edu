@@ -53,3 +53,7 @@ search.js
 *.crt
 *.pfx
 *.p12
+
+# Next.js 16 auto-generated agent docs
+AGENTS.md
+CLAUDE.md

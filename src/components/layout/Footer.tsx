@@ -2,36 +2,37 @@
 
 import Link from "next/link";
 import Image from "next/image";
-import { Mail, Phone, MapPin, Facebook, Instagram, Linkedin, Twitter, ArrowRight, Heart, ChevronDown } from "lucide-react";
+import { Mail, Phone, MapPin, Facebook, Instagram, ChevronDown } from "lucide-react";
 import { useTheme } from "next-themes";
-import { useState, useEffect } from "react";
+import { useState, useSyncExternalStore } from "react";
+import { useMounted } from "@/lib/use-mounted";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { motion, AnimatePresence } from "framer-motion";
 import { useTranslation } from "@/i18n/LanguageContext";
 
+const subscribeResize = (callback: () => void) => {
+    window.addEventListener("resize", callback);
+    return () => window.removeEventListener("resize", callback);
+};
+
 export function Footer() {
     const { theme, systemTheme } = useTheme();
-    const [mounted, setMounted] = useState(false);
+    const mounted = useMounted();
     const [openSection, setOpenSection] = useState<string | null>(null);
-    const [isMobile, setIsMobile] = useState(false);
-    const { t, locale } = useTranslation();
+    const isMobile = useSyncExternalStore(
+        subscribeResize,
+        () => window.innerWidth < 768,
+        () => false
+    );
+    const { t } = useTranslation();
     const currentTheme = theme === "system" ? systemTheme : theme;
-
-    useEffect(() => {
-        setMounted(true);
-        const checkMobile = () => setIsMobile(window.innerWidth < 768);
-        checkMobile();
-        window.addEventListener('resize', checkMobile);
-        return () => window.removeEventListener('resize', checkMobile);
-    }, []);
 
     const toggleSection = (section: string) => {
         if (!isMobile) return;
         setOpenSection(openSection === section ? null : section);
     };
 
-    const currentYear = new Date().getFullYear();
     return (
         <footer className="relative z-10 bg-background transition-colors duration-300">
             {/* CTA Banner */}

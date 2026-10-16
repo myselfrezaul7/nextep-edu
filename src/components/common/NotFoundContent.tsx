@@ -11,25 +11,31 @@ export function NotFoundContent() {
         <div className="relative min-h-[70vh] flex items-center justify-center px-4 overflow-hidden">
             {/* Particle Dots */}
             <div className="absolute inset-0 pointer-events-none opacity-20">
-                {[...Array(20)].map((_, i) => (
-                    <motion.div
-                        key={i}
-                        className="absolute w-2 h-2 bg-accent rounded-full"
-                        style={{
-                            left: `${Math.random() * 100}%`,
-                            top: `${Math.random() * 100}%`,
-                        }}
-                        animate={{
-                            y: [0, -30, 0],
-                            opacity: [0.2, 0.8, 0.2],
-                        }}
-                        transition={{
-                            duration: 3 + Math.random() * 2,
-                            repeat: Infinity,
-                            delay: Math.random() * 2,
-                        }}
-                    />
-                ))}
+                {[...Array(20)].map((_, i) => {
+                    const left = ((i * 19) % 95) + 2;
+                    const top = ((i * 29) % 90) + 5;
+                    const duration = 3 + ((i * 7) % 20) / 10;
+                    const delay = ((i * 11) % 20) / 10;
+                    return (
+                        <motion.div
+                            key={i}
+                            className="absolute w-2 h-2 bg-accent rounded-full"
+                            style={{
+                                left: `${left}%`,
+                                top: `${top}%`,
+                            }}
+                            animate={{
+                                y: [0, -30, 0],
+                                opacity: [0.2, 0.8, 0.2],
+                            }}
+                            transition={{
+                                duration,
+                                repeat: Infinity,
+                                delay,
+                            }}
+                        />
+                    );
+                })}
             </div>
 
             <div className="relative z-10 text-center max-w-md">

@@ -5,7 +5,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { GraduationCap, Plane, Globe2 } from "lucide-react";
 import { useTheme } from "next-themes";
-import { useState, useEffect } from "react";
+import { useMounted } from "@/lib/use-mounted";
 import dynamic from "next/dynamic";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
@@ -20,15 +20,11 @@ const EASE_OUT_EXPO = [0.16, 1, 0.3, 1] as const;
 
 export function HeroSection() {
     const { theme, systemTheme } = useTheme();
-    const [mounted, setMounted] = useState(false);
+    const mounted = useMounted();
     const { t } = useTranslation();
     const currentTheme = theme === "system" ? systemTheme : theme;
     const { scrollY } = useScroll();
     const y = useTransform(scrollY, [0, 1000], [0, 150]);
-
-    useEffect(() => {
-        setMounted(true);
-    }, []);
 
     return (
         <section className="relative min-h-[90vh] flex items-center overflow-hidden py-16 md:py-32 isolate">

@@ -4,14 +4,16 @@ import { useState, useEffect, useRef } from "react";
 import { Home, BookOpen, CalendarCheck, Info } from "lucide-react";
 import { useTheme } from "next-themes";
 import { cn } from "@/lib/utils";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { motion } from "framer-motion";
 import { useTranslation } from "@/i18n/LanguageContext";
+import { useMounted } from "@/lib/use-mounted";
 
 export function MobileTabBar() {
     const { theme, systemTheme } = useTheme();
-    const [mounted, setMounted] = useState(false);
+    const mounted = useMounted();
     const pathname = usePathname();
+    const router = useRouter();
     const [activeHash, setActiveHash] = useState("");
     const { t } = useTranslation();
     const [tabVisible, setTabVisible] = useState(true);
@@ -22,8 +24,6 @@ export function MobileTabBar() {
     const isDark = mounted && currentTheme === "dark";
 
     useEffect(() => {
-        setMounted(true);
-        
         // Setup Intersection Observer for scroll-spy
         const observerCallback = (entries: IntersectionObserverEntry[]) => {
             // Find the most visible section
@@ -109,7 +109,7 @@ export function MobileTabBar() {
     
     const handleNavClick = (hash: string) => {
         if (pathname !== "/") {
-            window.location.href = `/${hash}`;
+            router.push(`/${hash}`);
         } else {
             if (hash === "") {
                 window.scrollTo({ top: 0, behavior: "smooth" });

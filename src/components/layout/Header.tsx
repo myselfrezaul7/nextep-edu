@@ -1,10 +1,10 @@
 "use client";
 
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useSyncExternalStore } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { useTheme } from "next-themes";
-import { Search, Moon, Sun, ChevronDown } from "lucide-react";
+import { Moon, Sun, ChevronDown } from "lucide-react";
 import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
@@ -12,6 +12,7 @@ import { LanguageToggle } from "@/components/common/LanguageToggle";
 import { useTranslation } from "@/i18n/LanguageContext";
 import dynamic from "next/dynamic";
 import { usePathname } from "next/navigation";
+import { useMounted } from "@/lib/use-mounted";
 
 const SearchModal = dynamic(() => import("@/components/common/SearchModal").then(mod => mod.SearchModal), { ssr: false });
 import { destinations as destinationsData } from "@/data/destinations";
@@ -23,22 +24,23 @@ const allDestinations = Object.values(destinationsData).map(d => ({
     flag: d.flag
 }));
 
-// Top 6 for mobile menu to avoid excessive scrolling
-const MOBILE_TOP_SLUGS = ["germany", "usa", "australia", "canada", "uk", "south-korea"];
-const mobileTopDestinations = MOBILE_TOP_SLUGS
-    .map(slug => destinationsData[slug])
-    .filter(Boolean)
-    .map(d => ({ name: `Study in ${d.name}`, href: `/destinations/${d.slug}` }));
+const subscribeHash = (callback: () => void) => {
+    window.addEventListener("hashchange", callback);
+    return () => window.removeEventListener("hashchange", callback);
+};
 
 export function Header() {
-    const [scrolled, setScrolled] = useState(false);
+    const mounted = useMounted();
     const [dropdownOpen, setDropdownOpen] = useState(false);
     const [navVisible, setNavVisible] = useState(true);
     const { theme, setTheme, systemTheme } = useTheme();
-    const [mounted, setMounted] = useState(false);
-    const { t, locale } = useTranslation();
+    const { t } = useTranslation();
     const pathname = usePathname();
-    const [activeHash, setActiveHash] = useState("");
+    const activeHash = useSyncExternalStore(
+        subscribeHash,
+        () => window.location.hash,
+        () => ""
+    );
     const [scrollY, setScrollY] = useState(0);
     const lastScrollY = useRef(0);
     const scrollTimeout = useRef<NodeJS.Timeout | null>(null);
@@ -46,15 +48,9 @@ export function Header() {
     const currentTheme = theme === "system" ? systemTheme : theme;
 
     useEffect(() => {
-        setMounted(true);
-        const handleHashChange = () => setActiveHash(window.location.hash);
-        window.addEventListener("hashchange", handleHashChange);
-        handleHashChange();
-
         const handleScroll = () => {
             const currentScrollY = window.scrollY;
             setScrollY(currentScrollY);
-            setScrolled(currentScrollY > 20);
 
             // Auto-hide logic
             if (currentScrollY <= 20) {
@@ -74,7 +70,6 @@ export function Header() {
         };
         window.addEventListener("scroll", handleScroll, { passive: true });
         return () => {
-            window.removeEventListener("hashchange", handleHashChange);
             window.removeEventListener("scroll", handleScroll);
             if (scrollTimeout.current) clearTimeout(scrollTimeout.current);
         };

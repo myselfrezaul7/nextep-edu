@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useMemo, useRef } from "react";
+import { useState, useEffect, useMemo, useRef, useCallback } from "react";
 import { Search, Globe, GraduationCap, MapPin, X, Clock } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useRouter } from "next/navigation";
@@ -47,6 +47,24 @@ export function SearchModal() {
     const inputRef = useRef<HTMLInputElement>(null);
     const resultsContainerRef = useRef<HTMLDivElement>(null);
 
+    const closeModal = useCallback(() => {
+        setIsOpen(false);
+        setTimeout(() => setQuery(""), 200); // Clear query after animation
+        setSelectedIndex(0);
+    }, []);
+
+    const navigateToResult = useCallback((href: string, result: SearchResult) => {
+        const recent = JSON.parse(localStorage.getItem("nextepedu_recent_searches") || "[]");
+        const resultToSave = { ...result };
+        delete resultToSave.isRecent;
+        
+        const newRecent = [resultToSave, ...recent.filter((r: SearchResult) => r.href !== href)].slice(0, 5);
+        localStorage.setItem("nextepedu_recent_searches", JSON.stringify(newRecent));
+
+        router.push(href);
+        closeModal();
+    }, [router, closeModal]);
+
     // Keyboard shortcut (Cmd/Ctrl + K)
     useEffect(() => {
         const handleKeyDown = (e: KeyboardEvent) => {
@@ -61,7 +79,7 @@ export function SearchModal() {
 
         window.addEventListener("keydown", handleKeyDown);
         return () => window.removeEventListener("keydown", handleKeyDown);
-    }, []);
+    }, [closeModal]);
 
     // Filter results based on query
     const results = useMemo(() => {
@@ -95,11 +113,6 @@ export function SearchModal() {
         ).slice(0, 10); // Limit results for performance
     }, [query]);
 
-    // Reset selected index when results change
-    useEffect(() => {
-        setSelectedIndex(0);
-    }, [results]);
-
     // Handle Keyboard Navigation within Modal
     useEffect(() => {
         if (!isOpen) return;
@@ -124,7 +137,7 @@ export function SearchModal() {
 
         window.addEventListener("keydown", handleModalKeyDown);
         return () => window.removeEventListener("keydown", handleModalKeyDown);
-    }, [isOpen, results, selectedIndex]);
+    }, [isOpen, results, selectedIndex, navigateToResult]);
 
     // Scroll selected item into view smoothly
     useEffect(() => {
@@ -135,25 +148,6 @@ export function SearchModal() {
             }
         }
     }, [selectedIndex, isOpen]);
-
-
-    const closeModal = () => {
-        setIsOpen(false);
-        setTimeout(() => setQuery(""), 200); // Clear query after animation
-        setSelectedIndex(0);
-    };
-
-    const navigateToResult = (href: string, result: SearchResult) => {
-        const recent = JSON.parse(localStorage.getItem("nextepedu_recent_searches") || "[]");
-        const resultToSave = { ...result };
-        delete resultToSave.isRecent;
-        
-        const newRecent = [resultToSave, ...recent.filter((r: SearchResult) => r.href !== href)].slice(0, 5);
-        localStorage.setItem("nextepedu_recent_searches", JSON.stringify(newRecent));
-
-        router.push(href);
-        closeModal();
-    };
 
     const getCategoryIcon = (category: string) => {
         switch (category) {
@@ -209,14 +203,20 @@ export function SearchModal() {
                                     ref={inputRef}
                                     type="text"
                                     value={query}
-                                    onChange={(e) => setQuery(e.target.value)}
+                                    onChange={(e) => {
+                                        setQuery(e.target.value);
+                                        setSelectedIndex(0);
+                                    }}
                                     placeholder="Search destinations, universities, services..."
                                     className="flex-1 bg-transparent outline-none text-foreground placeholder:text-muted-foreground text-lg md:text-xl font-medium"
                                     autoFocus
                                 />
                                 {query && (
                                     <button
-                                        onClick={() => setQuery("")}
+                                        onClick={() => {
+                                            setQuery("");
+                                            setSelectedIndex(0);
+                                        }}
                                         className="p-1 rounded-full hover:bg-muted text-muted-foreground transition-colors mr-1"
                                     >
                                         <X className="w-4 h-4" />
@@ -323,7 +323,7 @@ export function SearchModal() {
                                                 No results found
                                             </p>
                                             <p className="text-sm text-muted-foreground mt-1 max-w-[250px] mx-auto">
-                                                We couldn't find anything matching "<span className="text-foreground">{query}</span>".
+                                                We couldn&apos;t find anything matching &quot;<span className="text-foreground">{query}</span>&quot;.
                                             </p>
                                         </motion.div>
                                     )}

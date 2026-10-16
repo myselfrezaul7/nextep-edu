@@ -6,7 +6,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { useTheme } from "next-themes";
 import { Search, ArrowLeft, Loader2, AlertCircle, Radio } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { useTranslation } from "@/i18n/LanguageContext";
+import { useMounted } from "@/lib/use-mounted";
 import { ApplicationTimeline } from "@/components/tracker/ApplicationTimeline";
 import { DocumentUpload } from "@/components/tracker/DocumentUpload";
 import ConfettiExplosion from "react-confetti-explosion";
@@ -36,30 +36,19 @@ function SkeletonBar({
 
 export function TrackPageClient() {
     const { theme, systemTheme } = useTheme();
-    const [mounted, setMounted] = useState(false);
-    const { t } = useTranslation();
+    const mounted = useMounted();
     const currentTheme = theme === "system" ? systemTheme : theme;
     const searchParams = useSearchParams();
 
     // Form state
-    const [trackingCode, setTrackingCode] = useState(searchParams.get("code") || "");
+    const [trackingCode, setTrackingCode] = useState(() => searchParams.get("code") || "");
     const [phone, setPhone] = useState("");
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
     const [data, setData] = useState<Application | null>(null);
 
-    // Sync tracking code from URL on client-side navigation
-    useEffect(() => {
-        const code = searchParams.get("code");
-        if (code) setTrackingCode(code);
-    }, [searchParams]);
-
     // Realtime state
     const [justUpdated, setJustUpdated] = useState(false);
-
-    useEffect(() => {
-        setMounted(true);
-    }, []);
 
     // ── Supabase Realtime subscription ──
     useEffect(() => {

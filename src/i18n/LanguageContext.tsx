@@ -2,7 +2,8 @@
 import { createContext, useContext, useState, useEffect, useCallback, ReactNode } from "react";
 
 type Locale = "en" | "bn";
-type Dictionary = Record<string, any>;
+type TranslationValue = string | string[] | { [key: string]: TranslationValue };
+type Dictionary = Record<string, TranslationValue>;
 
 interface LanguageContextValue {
     locale: Locale;
@@ -27,7 +28,7 @@ const dictionaries: Record<Locale, Record<string, () => Promise<Dictionary>>> = 
 };
 
 export function LanguageProvider({ children }: { children: ReactNode }) {
-    const [locale, setLocaleState] = useState<Locale>("en");
+    const [locale, setLocaleState] = useState<Locale>(() => typeof window !== "undefined" && (localStorage.getItem("nextepedu-lang") === "bn") ? "bn" : "en");
     const [dict, setDict] = useState<Dictionary>({});
 
     // Load dictionaries when locale changes
@@ -52,23 +53,23 @@ export function LanguageProvider({ children }: { children: ReactNode }) {
         document.documentElement.lang = l;
     }, []);
 
-    // Restore from localStorage on mount
+    // Set document lang attribute on mount or locale change
     useEffect(() => {
-        const saved = localStorage.getItem("nextepedu-lang") as Locale | null;
-        if (saved && (saved === "en" || saved === "bn")) {
-            setLocaleState(saved);
-            document.documentElement.lang = saved;
-        }
-    }, []);
+        document.documentElement.lang = locale;
+    }, [locale]);
 
-    // t("home.hero.title") → looks up dict.home.hero.title
+    // t("home.hero.title") -> looks up dict.home.hero.title
     // t("common.nav.services")
     // Supports {{variable}} replacement: t("key", { name: "UK" })
     const t = useCallback((key: string, replacements?: Record<string, string>, fallback?: string): string => {
         const parts = key.split(".");
-        let value: any = dict;
+        let value: TranslationValue | undefined = dict;
         for (const part of parts) {
-            value = value?.[part];
+            if (value && typeof value === "object" && !Array.isArray(value)) {
+                value = (value as Record<string, TranslationValue>)[part];
+            } else {
+                value = undefined;
+            }
             if (value === undefined) return fallback ?? key; // Fallback: show the fallback or key itself
         }
         if (typeof value !== "string") return fallback ?? key;

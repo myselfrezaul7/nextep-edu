@@ -4,6 +4,7 @@ import { motion, useInView, useScroll, useTransform } from "framer-motion";
 import { useEffect, useRef, useState, memo } from "react";
 import { CheckCircle } from "lucide-react";
 import { useTheme } from "next-themes";
+import { useMounted } from "@/lib/use-mounted";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { useTranslation } from "@/i18n/LanguageContext";
@@ -138,15 +139,11 @@ function WorldMapDecor() {
 
 export function AboutSection() {
     const { theme, systemTheme } = useTheme();
-    const [mounted, setMounted] = useState(false);
+    const mounted = useMounted();
     const { t } = useTranslation();
     const currentTheme = theme === "system" ? systemTheme : theme;
     const isDark = mounted && currentTheme === "dark";
     const EASE_OUT_EXPO = [0.16, 1, 0.3, 1] as const;
-
-    useEffect(() => {
-        setMounted(true);
-    }, []);
 
     return (
         <section id="about" className="py-16 md:py-24 bg-background overflow-hidden">

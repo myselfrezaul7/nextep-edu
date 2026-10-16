@@ -10,6 +10,7 @@ import { useTheme } from "next-themes";
 import { cn } from "@/lib/utils";
 import { motion, AnimatePresence, useMotionValue, useTransform } from "framer-motion";
 import { useTranslation } from "@/i18n/LanguageContext";
+import { useMounted } from "@/lib/use-mounted";
 
 type FormData = {
     name: string;
@@ -29,21 +30,23 @@ function ConfettiExplosion() {
     return (
         <div className="absolute inset-0 overflow-hidden pointer-events-none flex items-center justify-center">
             {particles.map((_, i) => {
-                const angle = Math.random() * Math.PI * 2;
-                const distance = 50 + Math.random() * 250;
+                const angle = i * 2.399963;
+                const distance = 50 + ((i * 31) % 200) + (i / 50) * 50;
                 const tx = Math.cos(angle) * distance;
                 const ty = Math.sin(angle) * distance;
-                const color = colors[Math.floor(Math.random() * colors.length)];
-                const shape = Math.random() > 0.5 ? "rounded-full" : "rounded-sm";
-                const size = Math.random() * 8 + 4;
-                const rotate = Math.random() * 360;
+                const color = colors[i % colors.length];
+                const shape = i % 2 === 0 ? "rounded-full" : "rounded-sm";
+                const size = 4 + (i % 8);
+                const rotate = (i * 45) % 360;
+                const scale = 0.5 + ((i % 5) * 0.1);
+                const duration = 1 + ((i % 5) * 0.16);
                 
                 return (
                     <motion.div
                         key={i}
                         initial={{ x: 0, y: 0, scale: 0, opacity: 1, rotate: 0 }}
-                        animate={{ x: tx, y: ty, scale: Math.random() * 0.5 + 0.5, opacity: 0, rotate }}
-                        transition={{ duration: 1 + Math.random() * 0.8, ease: "easeOut" }}
+                        animate={{ x: tx, y: ty, scale, opacity: 0, rotate }}
+                        transition={{ duration, ease: "easeOut" }}
                         className={`absolute ${shape}`}
                         style={{ backgroundColor: color, width: size, height: size }}
                     />
@@ -92,18 +95,26 @@ export function BookingModal() {
     const [direction, setDirection] = useState(1); // 1 for forward, -1 for backward
     
     const { register, handleSubmit, trigger, reset, formState: { errors, isSubmitting } } = useForm<FormData>();
-    const [minDate, setMinDate] = useState("");
+    const [minDate] = useState(() => new Date().toISOString().split("T")[0]);
     const modalRef = useRef<HTMLDivElement>(null);
     const firstInputRef = useRef<HTMLInputElement | null>(null);
 
     const { theme, systemTheme } = useTheme();
-    const [mounted, setMounted] = useState(false);
+    const mounted = useMounted();
     const { t } = useTranslation();
 
-    useEffect(() => {
-        setMinDate(new Date().toISOString().split("T")[0]);
-        setMounted(true);
-    }, []);
+    const closeModal = useCallback(() => {
+        setIsOpen(false);
+        setTimeout(() => {
+            setIsSuccess(false);
+            setTrackingCode(null);
+            setIsExistingApp(false);
+            setCodeCopied(false);
+            setStep(1);
+            setDirection(1);
+            reset();
+        }, 300);
+    }, [reset]);
 
     useEffect(() => {
         const handleOpen = () => setIsOpen(true);
@@ -152,20 +163,7 @@ export function BookingModal() {
             document.removeEventListener("keydown", handleKeyDown);
             document.body.style.overflow = "";
         };
-    }, [isOpen]);
-
-    const closeModal = useCallback(() => {
-        setIsOpen(false);
-        setTimeout(() => {
-            setIsSuccess(false);
-            setTrackingCode(null);
-            setIsExistingApp(false);
-            setCodeCopied(false);
-            setStep(1);
-            setDirection(1);
-            reset();
-        }, 300);
-    }, [reset]);
+    }, [isOpen, closeModal]);
 
     const handleNextStep = async (currentStep: number) => {
         let fieldsToValidate: (keyof FormData)[] = [];
