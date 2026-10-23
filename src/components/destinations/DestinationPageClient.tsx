@@ -3,12 +3,9 @@
 import { motion } from "framer-motion";
 import Image from "next/image";
 import Link from "next/link";
-import { ArrowLeft, ArrowRight, GraduationCap, CheckCircle, Globe2, Trophy, Clock, Users, BookOpen, Wallet, Sun, Coffee, MapPin, Landmark, Train, Building2 } from "lucide-react";
+import { ArrowLeft, ArrowRight, GraduationCap, CheckCircle, Globe2, Trophy, Clock, Users, BookOpen, Wallet, Sun, Coffee, MapPin, Landmark, Train, Building2, Search, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { useTheme } from "next-themes";
 import { useState } from "react";
-import { useMounted } from "@/lib/use-mounted";
-import { cn } from "@/lib/utils";
 import { useTranslation } from "@/i18n/LanguageContext";
 
 interface SerializedDestination {
@@ -34,7 +31,6 @@ interface DestinationPageClientProps {
     relatedDestinations?: RelatedDestination[];
 }
 
-// Map benefit titles to icons
 const iconMap: Record<string, React.ComponentType<{ className?: string }>> = {
     "World-Class Education": Trophy,
     "Short Duration": Clock,
@@ -87,36 +83,17 @@ const iconMap: Record<string, React.ComponentType<{ className?: string }>> = {
 };
 
 export function DestinationPageClient({ destination, relatedDestinations = [] }: DestinationPageClientProps) {
-    const { theme, systemTheme } = useTheme();
-    const mounted = useMounted();
     const [searchQuery, setSearchQuery] = useState("");
     const { t } = useTranslation();
 
-    const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
-        const card = e.currentTarget;
-        card.style.transition = 'none';
-        const rect = card.getBoundingClientRect();
-        const x = e.clientX - rect.left;
-        const y = e.clientY - rect.top;
-        const centerX = rect.width / 2;
-        const centerY = rect.height / 2;
-        const rotateX = ((y - centerY) / centerY) * -10;
-        const rotateY = ((x - centerX) / centerX) * 10;
-        card.style.transform = `perspective(1000px) rotateX(${rotateX}deg) rotateY(${rotateY}deg) scale3d(1.02, 1.02, 1.02)`;
-    };
-
-    const handleMouseLeave = (e: React.MouseEvent<HTMLDivElement>) => {
-        const card = e.currentTarget;
-        card.style.transition = 'transform 0.5s ease';
-        card.style.transform = 'perspective(1000px) rotateX(0deg) rotateY(0deg) scale3d(1, 1, 1)';
-    };
-
-    const currentTheme = theme === "system" ? systemTheme : theme;
+    const filteredUniversities = destination.universities.filter(u =>
+        u.name.toLowerCase().includes(searchQuery.toLowerCase())
+    );
 
     return (
         <article className="min-h-screen">
             {/* Hero Section */}
-            <section className="relative h-[60vh] md:h-[70vh] flex items-end overflow-hidden">
+            <section className="relative h-[55vh] md:h-[65vh] flex items-end overflow-hidden">
                 <Image
                     src={destination.heroImage}
                     alt={`Study in ${destination.name} - Campus life and education opportunities for Bangladeshi students`}
@@ -125,31 +102,26 @@ export function DestinationPageClient({ destination, relatedDestinations = [] }:
                     priority
                     sizes="100vw"
                 />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/50 to-transparent" />
+                <div className="absolute inset-0 bg-gradient-to-t from-slate-950/90 via-slate-950/50 to-transparent" />
 
                 <div className="container mx-auto px-4 pb-12 md:pb-16 relative z-10">
                     <Link
-                        href="/#destinations"
-                        className="inline-flex items-center gap-2 text-white/80 hover:text-white mb-6 transition-colors"
+                        href="/destinations"
+                        className="inline-flex items-center gap-2 text-xs md:text-sm font-medium text-white/80 hover:text-accent mb-6 transition-colors bg-white/10 backdrop-blur-md border border-white/15 px-3.5 py-1.5 rounded-full"
                     >
-                        <ArrowLeft className="w-4 h-4" />
-                        Back to Destinations
+                        <ArrowLeft className="w-3.5 h-3.5" />
+                        <span>All Destinations</span>
                     </Link>
 
                     <motion.div
-                        initial={{ opacity: 0, y: 30 }}
+                        initial={{ opacity: 0, y: 24 }}
                         animate={{ opacity: 1, y: 0 }}
-                        transition={{ duration: 0.8 }}
+                        transition={{ duration: 0.7 }}
                     >
-                        <div className="flex items-center gap-3 mb-4">
-                            <div className="w-12 h-12 rounded-xl bg-accent/20 backdrop-blur-sm flex items-center justify-center text-accent">
-                                <Globe2 className="w-6 h-6" />
-                            </div>
-                        </div>
-                        <h1 className="text-4xl md:text-6xl font-bold font-heading text-white mb-4">
+                        <h1 className="text-3xl sm:text-4xl md:text-6xl font-bold font-heading text-white mb-4">
                             {t(`destinations.countries.${destination.slug}.heroTitle`, undefined, destination.heroTitle)}
                         </h1>
-                        <p className="text-lg md:text-xl text-white/90 max-w-2xl">
+                        <p className="text-base md:text-xl text-white/85 max-w-2xl leading-relaxed">
                             {t(`destinations.countries.${destination.slug}.heroDescription`, undefined, destination.heroDescription)}
                         </p>
                     </motion.div>
@@ -160,7 +132,7 @@ export function DestinationPageClient({ destination, relatedDestinations = [] }:
             <section className="py-16 md:py-24 bg-background">
                 <div className="container mx-auto px-4">
                     <motion.div
-                        initial={{ opacity: 0, y: 20 }}
+                        initial={{ opacity: 0, y: 18 }}
                         whileInView={{ opacity: 1, y: 0 }}
                         viewport={{ once: true }}
                         className="text-center mb-12"
@@ -179,25 +151,19 @@ export function DestinationPageClient({ destination, relatedDestinations = [] }:
                             return (
                                 <motion.div
                                     key={benefit.title}
-                                    initial={{ opacity: 0, y: 30 }}
+                                    initial={{ opacity: 0, y: 24 }}
                                     whileInView={{ opacity: 1, y: 0 }}
                                     viewport={{ once: true, amount: 0.3 }}
-                                    transition={{ delay: index * 0.15 }}
-                                    className={cn(
-                                        "backdrop-blur-xl p-6 rounded-2xl border hover:border-accent/30 shadow-lg transition-all duration-300",
-                                        mounted && currentTheme === "dark"
-                                            ? "bg-[rgba(15,23,42,0.85)] border-white/10"
-                                            : "bg-white/60 border-black/5"
-                                    )}
+                                    transition={{ delay: index * 0.1 }}
+                                    className="surface-card p-6 rounded-2xl"
                                 >
-                                    <div className="w-12 h-12 rounded-xl bg-accent/10 flex items-center justify-center text-accent mb-4">
-                                        <BenefitIcon className="w-6 h-6" />
+                                    <div className="w-11 h-11 rounded-xl bg-accent/10 border border-accent/20 flex items-center justify-center text-accent mb-4">
+                                        <BenefitIcon className="w-5 h-5" />
                                     </div>
-                                    <h3 className="text-lg font-bold text-primary mb-2">{t(`destinations.benefits.${benefit.title}.title`, undefined, benefit.title)}</h3>
-                                    <p className={cn(
-                                        "text-sm",
-                                        mounted && currentTheme === "dark" ? "text-white/70" : "text-muted-foreground"
-                                    )}>
+                                    <h3 className="text-lg font-bold font-heading text-primary mb-2">
+                                        {t(`destinations.benefits.${benefit.title}.title`, undefined, benefit.title)}
+                                    </h3>
+                                    <p className="text-sm text-muted-foreground leading-relaxed">
                                         {t(`destinations.benefits.${benefit.title}.desc`, undefined, benefit.description)}
                                     </p>
                                 </motion.div>
@@ -208,13 +174,13 @@ export function DestinationPageClient({ destination, relatedDestinations = [] }:
             </section>
 
             {/* Universities Section */}
-            <section className="py-16 md:py-24 bg-surface dark:bg-card/50">
+            <section className="py-16 md:py-24 bg-surface/60 dark:bg-card/40 border-y border-border/50">
                 <div className="container mx-auto px-4">
                     <motion.div
-                        initial={{ opacity: 0, y: 20 }}
+                        initial={{ opacity: 0, y: 18 }}
                         whileInView={{ opacity: 1, y: 0 }}
                         viewport={{ once: true }}
-                        className="text-center mb-12"
+                        className="text-center mb-10"
                     >
                         <h2 className="text-3xl md:text-4xl font-bold font-heading text-primary mb-4">
                             Top Universities in {destination.name}
@@ -225,41 +191,50 @@ export function DestinationPageClient({ destination, relatedDestinations = [] }:
                     </motion.div>
 
                     {destination.universities.length >= 5 && (
-                        <div className="max-w-md mx-auto mb-8 relative">
+                        <div className="max-w-md mx-auto mb-10 relative">
+                            <Search className="w-4 h-4 text-muted-foreground absolute left-4 top-1/2 -translate-y-1/2 pointer-events-none" />
                             <input
                                 type="text"
-                                placeholder="Search universities..."
+                                placeholder={`Search ${destination.universities.length} universities...`}
                                 value={searchQuery}
                                 onChange={(e) => setSearchQuery(e.target.value)}
-                                className="w-full px-4 py-3 rounded-xl border border-border bg-background/50 backdrop-blur-sm focus:outline-none focus:ring-2 focus:ring-accent"
+                                className="w-full pl-11 pr-10 py-3 rounded-full border border-border bg-background/80 backdrop-blur-sm text-sm focus:outline-none focus:ring-2 focus:ring-accent transition-all"
                             />
+                            {searchQuery && (
+                                <button
+                                    onClick={() => setSearchQuery("")}
+                                    className="absolute right-3.5 top-1/2 -translate-y-1/2 p-1 rounded-full hover:bg-muted text-muted-foreground hover:text-foreground transition-colors"
+                                    aria-label="Clear search"
+                                >
+                                    <X className="w-3.5 h-3.5" />
+                                </button>
+                            )}
                         </div>
                     )}
 
-                    <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
-                        {destination.universities
-                            .filter(u => u.name.toLowerCase().includes(searchQuery.toLowerCase()))
-                            .map((university, index) => (
-                            <motion.div
-                                key={university.name}
-                                initial={{ opacity: 0, x: -20 }}
-                                whileInView={{ opacity: 1, x: 0 }}
-                                viewport={{ once: true }}
-                                transition={{ delay: index * 0.05 }}
-                                className={cn(
-                                    "flex items-center gap-3 p-4 backdrop-blur-xl rounded-xl border",
-                                    mounted && currentTheme === "dark"
-                                        ? "bg-[rgba(15,23,42,0.85)] border-white/10"
-                                        : "bg-white/60 border-black/5"
-                                )}
-                            >
-                                <div className="w-10 h-10 rounded-lg bg-accent/10 flex items-center justify-center text-accent shrink-0">
-                                    <GraduationCap className="w-5 h-5" />
-                                </div>
-                                <span className="font-medium text-primary">{university.name}</span>
-                            </motion.div>
-                        ))}
-                    </div>
+                    {filteredUniversities.length === 0 ? (
+                        <div className="text-center py-8 text-sm text-muted-foreground">
+                            No universities matching &ldquo;{searchQuery}&rdquo;.
+                        </div>
+                    ) : (
+                        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4 max-w-6xl mx-auto">
+                            {filteredUniversities.map((university, index) => (
+                                <motion.div
+                                    key={university.name}
+                                    initial={{ opacity: 0, y: 12 }}
+                                    whileInView={{ opacity: 1, y: 0 }}
+                                    viewport={{ once: true }}
+                                    transition={{ delay: index * 0.04 }}
+                                    className="surface-card flex items-center gap-3.5 p-4 rounded-xl"
+                                >
+                                    <div className="w-10 h-10 rounded-lg bg-accent/10 border border-accent/20 flex items-center justify-center text-accent shrink-0">
+                                        <GraduationCap className="w-5 h-5" />
+                                    </div>
+                                    <span className="font-medium text-sm md:text-base text-primary">{university.name}</span>
+                                </motion.div>
+                            ))}
+                        </div>
+                    )}
                 </div>
             </section>
 
@@ -268,7 +243,7 @@ export function DestinationPageClient({ destination, relatedDestinations = [] }:
                 <section className="py-16 md:py-24 bg-background">
                     <div className="container mx-auto px-4">
                         <motion.div
-                            initial={{ opacity: 0, y: 20 }}
+                            initial={{ opacity: 0, y: 18 }}
                             whileInView={{ opacity: 1, y: 0 }}
                             viewport={{ once: true }}
                             className="text-center mb-12"
@@ -281,32 +256,28 @@ export function DestinationPageClient({ destination, relatedDestinations = [] }:
                             </p>
                         </motion.div>
 
-                        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-6xl mx-auto">
+                        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 md:gap-8 max-w-6xl mx-auto">
                             {relatedDestinations.map((related, index) => (
                                 <motion.div
                                     key={related.slug}
-                                    initial={{ opacity: 0, y: 30 }}
+                                    initial={{ opacity: 0, y: 24 }}
                                     whileInView={{ opacity: 1, y: 0 }}
                                     viewport={{ once: true }}
                                     transition={{ delay: index * 0.1 }}
                                     className="h-full"
                                 >
                                     <Link href={`/destinations/${related.slug}`} className="group block h-full">
-                                        <div 
-                                            className="relative h-full overflow-hidden rounded-2xl border border-border/30 bg-card/95 backdrop-blur-xl shadow-lg hover:shadow-2xl transition-shadow duration-500"
-                                            onMouseMove={handleMouseMove}
-                                            onMouseLeave={handleMouseLeave}
-                                        >
+                                        <div className="surface-card relative h-full overflow-hidden rounded-2xl hover:-translate-y-1 flex flex-col">
                                             {/* Image Wrapper */}
-                                            <div className="relative h-48 overflow-hidden">
+                                            <div className="relative h-48 overflow-hidden bg-slate-200/50 dark:bg-slate-800/50">
                                                 <Image
                                                     src={related.heroImage}
                                                     alt={related.name}
                                                     fill
-                                                    className="object-cover transition-transform duration-700 group-hover:scale-110"
+                                                    className="object-cover transition-transform duration-700 ease-out group-hover:scale-105"
                                                     sizes="(max-width: 768px) 100vw, 33vw"
                                                 />
-                                                <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent opacity-80 group-hover:opacity-60 transition-opacity" />
+                                                <div className="absolute inset-0 bg-gradient-to-t from-slate-950/85 via-slate-950/25 to-transparent" />
                                                 <div className="absolute bottom-4 left-4 text-white z-10">
                                                     <h3 className="text-xl font-bold font-heading flex items-center gap-2">
                                                         <span>{related.flag}</span> {related.name}
@@ -314,25 +285,26 @@ export function DestinationPageClient({ destination, relatedDestinations = [] }:
                                                 </div>
                                             </div>
 
-                                            <div className="p-5">
-                                                <div className="space-y-3 mb-6">
+                                            <div className="p-5 flex-grow flex flex-col justify-between">
+                                                <div className="space-y-3 mb-5">
                                                     {related.benefits.slice(0, 2).map((benefit, i) => {
                                                         const BenefitIcon = iconMap[benefit.title] || Globe2;
                                                         return (
                                                             <div key={i} className="flex items-start gap-3">
-                                                                <div className="w-8 h-8 rounded-lg bg-accent/10 flex items-center justify-center shrink-0 text-accent">
+                                                                <div className="w-8 h-8 rounded-lg bg-accent/10 border border-accent/20 flex items-center justify-center shrink-0 text-accent mt-0.5">
                                                                     <BenefitIcon className="w-4 h-4" />
                                                                 </div>
                                                                 <div>
-                                                                    <h4 className="font-bold text-sm text-foreground">{benefit.title}</h4>
-                                                                    <p className="text-xs text-muted-foreground line-clamp-1">{benefit.description}</p>
+                                                                    <h4 className="font-semibold text-sm text-foreground">{benefit.title}</h4>
+                                                                    <p className="text-xs text-muted-foreground line-clamp-1 mt-0.5">{benefit.description}</p>
                                                                 </div>
                                                             </div>
                                                         );
                                                     })}
                                                 </div>
-                                                <div className="flex items-center gap-2 text-sm font-bold text-accent group-hover:text-accent/80 transition-colors">
-                                                    View Guide <ArrowRight className="w-4 h-4 transform group-hover:translate-x-1 transition-transform" />
+                                                <div className="flex items-center gap-1.5 text-xs font-semibold text-accent group-hover:text-accent/80 transition-colors pt-3 border-t border-border/40">
+                                                    <span>View Country Guide</span>
+                                                    <ArrowRight className="w-3.5 h-3.5 transform group-hover:translate-x-1 transition-transform" />
                                                 </div>
                                             </div>
                                         </div>
@@ -348,37 +320,35 @@ export function DestinationPageClient({ destination, relatedDestinations = [] }:
             <section className="py-16 md:py-24 bg-background">
                 <div className="container mx-auto px-4">
                     <motion.div
-                        initial={{ opacity: 0, scale: 0.95 }}
-                        whileInView={{ opacity: 1, scale: 1 }}
+                        initial={{ opacity: 0, y: 18 }}
+                        whileInView={{ opacity: 1, y: 0 }}
                         viewport={{ once: true }}
-                        className="relative p-8 md:p-12 rounded-3xl overflow-hidden border border-white/10 shadow-2xl"
+                        className="relative p-8 md:p-12 rounded-3xl overflow-hidden border border-white/10 shadow-xl"
                     >
-                        {/* Solid opaque dark background - no bleed-through */}
                         <div className="absolute inset-0 bg-[#0F172A]" />
-                        {/* Frosted glass inner glow */}
-                        <div className="absolute inset-0 bg-gradient-to-br from-accent/10 via-transparent to-accent/5" />
-                        <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_50%,_rgba(212,175,55,0.12)_0%,_transparent_50%)]" />
+                        <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_0%,_rgba(212,175,55,0.12)_0%,_transparent_65%)]" />
 
                         <div className="relative z-10 text-center max-w-2xl mx-auto">
-                            <h2 className="text-3xl md:text-4xl font-bold font-heading text-white mb-4">
+                            <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold font-heading text-white mb-4">
                                 Ready to Start Your Journey to {destination.name}?
                             </h2>
-                            <p className="text-white/80 mb-8">
+                            <p className="text-white/75 mb-8 text-sm md:text-base">
                                 Book a free consultation with our expert counselors who specialize in {destination.name} admissions for Bangladeshi students.
                             </p>
 
-                            <div className="flex flex-col sm:flex-row gap-4 justify-center">
+                            <div className="flex flex-col sm:flex-row gap-3.5 justify-center">
                                 <Button
                                     size="lg"
-                                    className="rounded-full font-bold"
-                                    onClick={() => window.dispatchEvent(new CustomEvent('open-booking-modal'))}
+                                    variant="accent"
+                                    className="rounded-full font-bold px-8"
+                                    onClick={() => window.dispatchEvent(new CustomEvent("open-booking-modal"))}
                                 >
                                     Book Free Consultation
                                 </Button>
                                 <Button
                                     size="lg"
                                     variant="outline"
-                                    className="rounded-full border-white/30 text-white hover:bg-white/10"
+                                    className="rounded-full border-white/25 bg-white/[0.06] text-white hover:bg-white/15 hover:text-white px-8"
                                     asChild
                                 >
                                     <Link href="/#services">
@@ -387,18 +357,18 @@ export function DestinationPageClient({ destination, relatedDestinations = [] }:
                                 </Button>
                             </div>
 
-                            <div className="mt-8 flex flex-wrap justify-center gap-6 text-white/70 text-sm">
+                            <div className="mt-8 flex flex-wrap justify-center gap-6 text-white/70 text-xs md:text-sm">
                                 <div className="flex items-center gap-2">
                                     <CheckCircle className="w-4 h-4 text-accent" />
-                                    Free Consultation
+                                    <span>Free Consultation</span>
                                 </div>
                                 <div className="flex items-center gap-2">
                                     <CheckCircle className="w-4 h-4 text-accent" />
-                                    Expert Guidance
+                                    <span>Expert Guidance</span>
                                 </div>
                                 <div className="flex items-center gap-2">
                                     <CheckCircle className="w-4 h-4 text-accent" />
-                                    98% Visa Success
+                                    <span>98% Visa Success</span>
                                 </div>
                             </div>
                         </div>

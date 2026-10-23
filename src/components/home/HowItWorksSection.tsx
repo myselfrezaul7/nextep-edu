@@ -1,11 +1,8 @@
 "use client";
 
 import { motion, useScroll, useTransform } from "framer-motion";
-import { PhoneCall, ClipboardList, SendHorizonal, PlaneTakeoff } from "lucide-react";
-import { useTheme } from "next-themes";
+import { PhoneCall, ClipboardList, SendHorizonal, PlaneTakeoff, Clock } from "lucide-react";
 import { useRef } from "react";
-import { useMounted } from "@/lib/use-mounted";
-import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { useTranslation } from "@/i18n/LanguageContext";
 
@@ -16,29 +13,34 @@ const stepsData = [
         id: "call",
         icon: PhoneCall,
         timeEstimate: "15 mins",
+        fallbackTitle: "Book a Call",
+        fallbackDesc: "Schedule a free 30-minute consultation. We listen, understand your goals, and assess your profile.",
     },
     {
         id: "plan",
         icon: ClipboardList,
         timeEstimate: "1-2 days",
+        fallbackTitle: "Get Your Plan",
+        fallbackDesc: "Receive a personalized roadmap with university shortlists, timelines, and a clear checklist.",
     },
     {
         id: "apply",
         icon: SendHorizonal,
         timeEstimate: "2-4 weeks",
+        fallbackTitle: "Apply & Prepare",
+        fallbackDesc: "We handle SOPs, documents, visa applications, and mock interviews. You stay stress-free.",
     },
     {
         id: "fly",
         icon: PlaneTakeoff,
         timeEstimate: "3-6 months",
+        fallbackTitle: "Fly Abroad",
+        fallbackDesc: "Pre-departure briefing, blocked accounts, housing tips - you're fully ready for your new life.",
     },
 ];
 
 export function HowItWorksSection() {
-    const { theme, systemTheme } = useTheme();
-    const mounted = useMounted();
     const { t } = useTranslation();
-    const currentTheme = theme === "system" ? systemTheme : theme;
     const containerRef = useRef<HTMLDivElement>(null);
     const { scrollYProgress } = useScroll({
         target: containerRef,
@@ -47,43 +49,43 @@ export function HowItWorksSection() {
     const pathLength = useTransform(scrollYProgress, [0, 0.8], [0, 1]);
 
     return (
-        <section className="py-12 md:py-28 bg-background relative overflow-hidden">
+        <section className="py-20 md:py-28 bg-background relative overflow-hidden">
             {/* Subtle background accents */}
             <div className="absolute inset-0 pointer-events-none">
-                <div className="absolute top-[10%] left-[5%] w-[300px] h-[300px] bg-accent/5 rounded-full blur-3xl" />
-                <div className="absolute bottom-[10%] right-[5%] w-[250px] h-[250px] bg-primary/5 rounded-full blur-3xl" />
+                <div className="absolute top-[10%] left-[5%] w-[300px] h-[300px] bg-accent/[0.04] rounded-full blur-3xl" />
+                <div className="absolute bottom-[10%] right-[5%] w-[250px] h-[250px] bg-primary/[0.04] rounded-full blur-3xl" />
             </div>
 
             <div className="container mx-auto px-4 relative z-10">
                 {/* Header */}
-                <div className="text-center mb-10 md:mb-20">
+                <div className="text-center mb-12 md:mb-20">
                     <motion.div
-                        initial={{ opacity: 0, scale: 0.9 }}
-                        whileInView={{ opacity: 1, scale: 1 }}
+                        initial={{ opacity: 0, y: 12 }}
+                        whileInView={{ opacity: 1, y: 0 }}
                         viewport={{ once: true, amount: 0.2 }}
                         transition={{ duration: 0.5, ease: EASE_OUT_EXPO }}
                     >
-                        <span className="inline-block px-4 py-1.5 rounded-full bg-accent/10 border border-accent/20 text-accent text-sm md:text-base font-medium mb-4">
-                            Simple Process
+                        <span className="inline-block px-3.5 py-1.5 rounded-full bg-accent/10 border border-accent/20 text-accent text-xs font-semibold tracking-wider uppercase mb-4">
+                            {t("home.howItWorks.badge", undefined, "Simple Process")}
                         </span>
                     </motion.div>
                     <motion.h2
-                        initial={{ opacity: 0, y: 20 }}
+                        initial={{ opacity: 0, y: 18 }}
                         whileInView={{ opacity: 1, y: 0 }}
                         viewport={{ once: true, amount: 0.2 }}
                         transition={{ duration: 0.6, ease: EASE_OUT_EXPO }}
-                        className="text-3xl md:text-5xl font-bold font-heading mb-6 text-primary"
+                        className="text-3xl md:text-5xl font-bold font-heading mb-4 text-primary"
                     >
-                        How It Works
+                        {t("home.howItWorks.title", undefined, "How It Works")}
                     </motion.h2>
                     <motion.p
-                        initial={{ opacity: 0, y: 20 }}
+                        initial={{ opacity: 0, y: 18 }}
                         whileInView={{ opacity: 1, y: 0 }}
                         viewport={{ once: true, amount: 0.2 }}
                         transition={{ duration: 0.6, delay: 0.1, ease: EASE_OUT_EXPO }}
-                        className="text-base md:text-xl text-muted-foreground max-w-2xl mx-auto"
+                        className="text-base md:text-lg text-muted-foreground max-w-2xl mx-auto"
                     >
-                        From your first call to your flight - four simple steps to studying abroad.
+                        {t("home.howItWorks.subtitle", undefined, "From your first call to your flight - four simple steps to studying abroad.")}
                     </motion.p>
                 </div>
 
@@ -92,11 +94,11 @@ export function HowItWorksSection() {
                     {/* SVG Progress Line */}
                     <div className="hidden lg:block absolute top-20 left-[12.5%] w-[75%] h-[2px] z-0 pointer-events-none">
                         <svg className="w-full h-full" preserveAspectRatio="none">
-                            <line x1="0" y1="1" x2="100%" y2="1" stroke="currentColor" className="text-accent/20" strokeWidth="2" strokeDasharray="8 8" />
-                            <motion.line 
-                                x1="0" y1="1" x2="100%" y2="1" 
-                                stroke="currentColor" 
-                                className="text-accent" 
+                            <line x1="0" y1="1" x2="100%" y2="1" stroke="currentColor" className="text-accent/20" strokeWidth="2" strokeDasharray="6 6" />
+                            <motion.line
+                                x1="0" y1="1" x2="100%" y2="1"
+                                stroke="currentColor"
+                                className="text-accent"
                                 strokeWidth="2"
                                 style={{ pathLength }}
                             />
@@ -106,56 +108,35 @@ export function HowItWorksSection() {
                     {stepsData.map((step, i) => (
                         <motion.div
                             key={step.id}
-                            initial={{ opacity: 0, y: 30 }}
+                            initial={{ opacity: 0, y: 24 }}
                             whileInView={{ opacity: 1, y: 0 }}
                             viewport={{ once: true, amount: 0.2 }}
-                            whileTap={{ scale: 0.97 }}
-                            transition={{ duration: 0.6, delay: i * 0.15, ease: EASE_OUT_EXPO }}
-                            className="relative group w-[80vw] sm:w-[320px] md:w-auto shrink-0 md:shrink snap-center"
+                            transition={{ duration: 0.6, delay: i * 0.12, ease: EASE_OUT_EXPO }}
+                            className="relative group w-[78vw] sm:w-[300px] md:w-auto shrink-0 md:shrink snap-center"
                         >
-
-                            <div className={cn(
-                                "relative backdrop-blur-xl border rounded-2xl p-6 md:p-8 text-center hover:border-accent/40 shadow hover:shadow-xl transition-all duration-300 h-full flex flex-col items-center overflow-hidden",
-                                mounted && currentTheme === "dark"
-                                    ? "bg-[rgba(15,23,42,0.85)] border-white/10 hover:bg-white/10"
-                                    : "bg-white/60 border-black/5 hover:bg-white/80"
-                            )}>
-                                {/* Top glow line on hover */}
-                                <div className="absolute inset-x-0 top-0 h-1 bg-gradient-to-r from-transparent via-accent/60 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
-
+                            <div className="surface-card relative rounded-2xl p-6 md:p-7 text-center h-full flex flex-col items-center overflow-hidden">
                                 {/* Step number badge */}
-                                <div className="text-xs font-bold tracking-widest text-accent/60 mb-4 uppercase">
-                                    {t("home.howItWorks.stepLabel")} 0{i + 1}
+                                <div className="text-[11px] font-bold tracking-widest text-accent/70 mb-4 uppercase">
+                                    {t("home.howItWorks.stepLabel", undefined, "STEP")} 0{i + 1}
                                 </div>
 
                                 {/* Icon */}
-                                <motion.div 
-                                    whileInView={
-                                        step.id === "call" ? { rotate: [0, 15, -15, 0] } :
-                                        step.id === "plan" ? { scale: [1, 1.1, 1] } :
-                                        step.id === "apply" ? { x: [0, 5, 0] } :
-                                        { y: [0, -5, 0] }
-                                    }
-                                    transition={{ duration: 0.5, delay: 0.5 + i * 0.15 }}
-                                    className="w-16 h-16 rounded-2xl bg-accent/10 border border-accent/20 flex items-center justify-center mb-3 group-hover:scale-110 group-hover:bg-accent/20 transition-all duration-300"
-                                >
-                                    <step.icon className="w-7 h-7 text-accent" />
-                                </motion.div>
+                                <div className="w-14 h-14 rounded-2xl bg-accent/10 border border-accent/20 flex items-center justify-center mb-3.5 group-hover:scale-105 group-hover:bg-accent/15 transition-all duration-300">
+                                    <step.icon className="w-6 h-6 text-accent" />
+                                </div>
 
                                 {/* Time Estimate */}
-                                <div className="bg-accent/10 text-accent text-xs font-semibold px-3 py-1 rounded-full mb-4">
-                                    ⏱ {step.timeEstimate}
+                                <div className="inline-flex items-center gap-1.5 bg-accent/10 text-accent text-xs font-medium px-3 py-1 rounded-full mb-4">
+                                    <Clock className="w-3 h-3" />
+                                    <span>{step.timeEstimate}</span>
                                 </div>
 
                                 {/* Content */}
-                                <h3 className="font-heading font-bold text-xl text-primary mb-3">
-                                    {t(`home.howItWorks.steps.${step.id}.title`)}
+                                <h3 className="font-heading font-bold text-xl text-primary mb-2.5">
+                                    {t(`home.howItWorks.steps.${step.id}.title`, undefined, step.fallbackTitle)}
                                 </h3>
-                                <p className={cn(
-                                    "text-sm leading-relaxed flex-grow",
-                                    mounted && currentTheme === "dark" ? "text-white/70" : "text-muted-foreground"
-                                )}>
-                                    {t(`home.howItWorks.steps.${step.id}.description`)}
+                                <p className="text-sm text-muted-foreground leading-relaxed flex-grow">
+                                    {t(`home.howItWorks.steps.${step.id}.description`, undefined, step.fallbackDesc)}
                                 </p>
                             </div>
                         </motion.div>
@@ -164,18 +145,18 @@ export function HowItWorksSection() {
 
                 {/* CTA */}
                 <motion.div
-                    initial={{ opacity: 0, y: 20 }}
+                    initial={{ opacity: 0, y: 18 }}
                     whileInView={{ opacity: 1, y: 0 }}
                     viewport={{ once: true }}
-                    transition={{ delay: 0.6, duration: 0.5 }}
+                    transition={{ delay: 0.4, duration: 0.5 }}
                     className="text-center mt-12 md:mt-16"
                 >
                     <Button
                         size="lg"
-                        className="rounded-full text-base px-8 h-14 font-bold shadow-xl"
-                        onClick={() => window.dispatchEvent(new CustomEvent('open-booking-modal'))}
+                        className="rounded-full text-base px-8 h-12 font-semibold"
+                        onClick={() => window.dispatchEvent(new CustomEvent("open-booking-modal"))}
                     >
-                        {t("home.howItWorks.ctaButton")}
+                        {t("home.howItWorks.ctaButton", undefined, "Start With Step 1 - It's Free")}
                     </Button>
                 </motion.div>
             </div>

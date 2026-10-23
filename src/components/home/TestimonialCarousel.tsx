@@ -1,11 +1,12 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { Star, Quote } from "lucide-react";
+import { Star, Quote, CheckCircle2 } from "lucide-react";
 import { useTheme } from "next-themes";
 import { useState, useEffect, useRef, useSyncExternalStore } from "react";
 import { useMounted } from "@/lib/use-mounted";
 import { cn } from "@/lib/utils";
+import { useTranslation } from "@/i18n/LanguageContext";
 
 const subscribeResize = (callback: () => void) => {
     window.addEventListener("resize", callback);
@@ -76,8 +77,10 @@ export function TestimonialCarousel() {
     const [isHovered, setIsHovered] = useState(false);
     const scrollRef = useRef<HTMLDivElement>(null);
     const { theme, systemTheme } = useTheme();
+    const { t } = useTranslation();
 
     const currentTheme = theme === "system" ? systemTheme : theme;
+    const isDark = mounted && currentTheme === "dark";
 
     const isMobile = useSyncExternalStore(
         subscribeResize,
@@ -91,64 +94,62 @@ export function TestimonialCarousel() {
             setDragConstraints(scrollRef.current.scrollWidth - scrollRef.current.offsetWidth);
         }
     }, [isMobile]);
+
     return (
-        <section id="stories" className={cn(
-            "py-16 md:py-28 relative overflow-hidden",
-            mounted && currentTheme === "dark" ? "bg-[rgba(15,23,42,0.3)]" : "bg-surface"
-        )}>
+        <section id="stories" className="py-20 md:py-28 bg-surface/60 dark:bg-card/40 border-t border-border/50 relative overflow-hidden">
             {/* Soft Background Gradients */}
-            <div className="absolute inset-0 bg-[radial-gradient(circle_at_20%_80%,_rgba(212,175,55,0.05)_0%,_transparent_50%),_radial-gradient(circle_at_80%_20%,_rgba(212,175,55,0.05)_0%,_transparent_50%)] pointer-events-none" />
+            <div className="absolute inset-0 bg-[radial-gradient(circle_at_20%_80%,_rgba(212,175,55,0.04)_0%,_transparent_50%),_radial-gradient(circle_at_80%_20%,_rgba(212,175,55,0.04)_0%,_transparent_50%)] pointer-events-none" />
 
             <div className="container mx-auto px-4 relative z-10">
-                <div className="text-center mb-12 md:mb-20">
+                <div className="text-center mb-12 md:mb-16">
                     <motion.div
-                        initial={{ opacity: 0, scale: 0.9 }}
-                        whileInView={{ opacity: 1, scale: 1 }}
+                        initial={{ opacity: 0, y: 12 }}
+                        whileInView={{ opacity: 1, y: 0 }}
                         viewport={{ once: true }}
                         transition={{ duration: 0.5 }}
                     >
-                        <span className="inline-block px-4 py-1.5 rounded-full bg-accent/10 border border-accent/20 text-accent text-sm md:text-base font-medium mb-4">
-                            Real Stories
+                        <span className="inline-block px-3.5 py-1.5 rounded-full bg-accent/10 border border-accent/20 text-accent text-xs font-semibold tracking-wider uppercase mb-4">
+                            {t("home.testimonials.badge", undefined, "Real Stories")}
                         </span>
                     </motion.div>
                     <motion.h2
-                        initial={{ opacity: 0, y: 20 }}
+                        initial={{ opacity: 0, y: 18 }}
                         whileInView={{ opacity: 1, y: 0 }}
                         viewport={{ once: true }}
                         transition={{ duration: 0.6, delay: 0.1 }}
                         className="text-3xl md:text-5xl font-bold font-heading mb-4 text-primary"
                     >
-                        From Students Who&apos;ve Been There
+                        {t("home.testimonials.title", undefined, "From Students Who've Been There")}
                     </motion.h2>
                     <motion.p
-                        initial={{ opacity: 0, y: 20 }}
+                        initial={{ opacity: 0, y: 18 }}
                         whileInView={{ opacity: 1, y: 0 }}
                         viewport={{ once: true }}
                         transition={{ duration: 0.6, delay: 0.2 }}
-                        className="text-base md:text-xl text-muted-foreground max-w-2xl mx-auto"
+                        className="text-base md:text-lg text-muted-foreground max-w-2xl mx-auto"
                     >
-                        These stories say it better than we ever could.
+                        {t("home.testimonials.subtitle", undefined, "These stories say it better than we ever could.")}
                     </motion.p>
                 </div>
             </div>
 
             {/* Marquee Container */}
-            <div 
+            <div
                 className="relative w-full overflow-hidden flex flex-col gap-6 select-none group cursor-grab active:cursor-grabbing"
                 ref={scrollRef}
             >
                 {/* Edge Fades for smooth entry/exit */}
                 <div className={cn(
-                    "absolute left-0 top-0 bottom-0 w-8 md:w-32 z-10 pointer-events-none bg-gradient-to-r to-transparent",
-                    mounted && currentTheme === "dark" ? "from-[#0f172a]" : "from-surface"
+                    "absolute left-0 top-0 bottom-0 w-8 md:w-28 z-10 pointer-events-none bg-gradient-to-r to-transparent",
+                    isDark ? "from-[#0B1120]" : "from-[#F1F5F9]"
                 )} />
                 <div className={cn(
-                    "absolute right-0 top-0 bottom-0 w-8 md:w-32 z-10 pointer-events-none bg-gradient-to-l to-transparent",
-                    mounted && currentTheme === "dark" ? "from-[#0f172a]" : "from-surface"
+                    "absolute right-0 top-0 bottom-0 w-8 md:w-28 z-10 pointer-events-none bg-gradient-to-l to-transparent",
+                    isDark ? "from-[#0B1120]" : "from-[#F1F5F9]"
                 )} />
 
                 {/* Infinite Scrolling Track (Desktop) / Drag Track (Mobile) */}
-                <motion.div 
+                <motion.div
                     drag="x"
                     dragConstraints={{ right: 0, left: -dragConstraints }}
                     dragElastic={0.1}
@@ -160,70 +161,56 @@ export function TestimonialCarousel() {
                         isHovered && "pause"
                     )}
                 >
-                    {/* Duplicate the array 2 times to ensure the screen is always filled (only hide on mobile to bound drag) */}
                     {[...testimonials, ...testimonials].map((story, i) => (
-                        <motion.div
-                            whileTap={{ scale: 0.97 }}
+                        <div
                             key={i}
                             className={cn(
-                                "w-[85vw] md:w-[450px] shrink-0",
+                                "w-[84vw] sm:w-[360px] md:w-[420px] shrink-0",
                                 isMobile && i >= testimonials.length && "hidden"
                             )}
                         >
-                            {/* Glassmorphic Testimonial Card */}
-                            <div className={cn(
-                                "relative backdrop-blur-xl p-6 md:p-8 rounded-2xl border hover:border-accent/40 shadow-sm hover:shadow-xl transition-all duration-300 h-full flex flex-col group/card overflow-hidden",
-                                mounted && currentTheme === "dark"
-                                    ? "bg-[rgba(15,23,42,0.85)] border-white/10"
-                                    : "bg-white/70 border-black/5"
-                            )}>
-
-                                {/* Top Accent Glow on Hover */}
-                                <div className="absolute inset-x-0 top-0 h-1 bg-gradient-to-r from-transparent via-accent/60 to-transparent opacity-0 group-hover/card:opacity-100 transition-opacity duration-500" />
-
+                            <div className="surface-card relative p-6 md:p-7 rounded-2xl h-full flex flex-col overflow-hidden">
                                 {/* Header with Quote and Stars */}
-                                <div className="flex items-center justify-between mb-6">
-                                    <div className="w-10 h-10 md:w-12 md:h-12 bg-accent/10 rounded-xl flex items-center justify-center text-accent">
-                                        <Quote className="w-5 h-5 fill-current opacity-80" />
+                                <div className="flex items-center justify-between mb-5">
+                                    <div className="w-10 h-10 bg-accent/10 border border-accent/20 rounded-xl flex items-center justify-center text-accent">
+                                        <Quote className="w-4 h-4 fill-current opacity-85" />
                                     </div>
                                     <div className="flex gap-1 text-accent">
                                         {[1, 2, 3, 4, 5].map((s) => (
-                                            <Star key={s} className="w-4 h-4 fill-current opacity-90" />
+                                            <Star key={s} className="w-3.5 h-3.5 fill-current opacity-90" />
                                         ))}
                                     </div>
                                 </div>
 
                                 {/* Testimonial Text */}
-                                <p className={cn(
-                                    "italic mb-8 flex-grow leading-relaxed text-sm md:text-base",
-                                    mounted && currentTheme === "dark" ? "text-white/70" : "text-muted-foreground"
-                                )}>
+                                <p className="text-muted-foreground mb-6 flex-grow leading-relaxed text-sm md:text-[15px]">
                                     &ldquo;{story.text}&rdquo;
                                 </p>
 
                                 {/* Author Info */}
-                                <div className="flex items-center gap-4 pt-6 border-t border-border/40">
-                                    <div className="w-12 h-12 rounded-full bg-gradient-to-br from-accent/80 to-accent/40 flex items-center justify-center text-accent-foreground font-bold text-lg shadow-inner flex-shrink-0">
+                                <div className="flex items-center gap-3.5 pt-5 border-t border-border/50">
+                                    <div className="w-11 h-11 rounded-full bg-accent/15 border border-accent/30 flex items-center justify-center text-accent font-bold text-sm shrink-0">
                                         {story.initials}
                                     </div>
                                     <div className="min-w-0 flex-1">
-                                        <h4 className="font-bold text-primary text-base truncate flex items-center gap-2">
-                                            {story.author}
-                                            <span className="text-xs bg-muted border border-border/50 px-1.5 py-0.5 rounded-sm">{story.flag}</span>
+                                        <h4 className="font-semibold text-primary text-sm truncate flex items-center gap-2">
+                                            <span>{story.author}</span>
+                                            <span className="text-xs bg-muted border border-border/60 px-1.5 py-0.5 rounded">{story.flag}</span>
                                         </h4>
-                                        <p className="text-sm text-muted-foreground truncate mt-0.5">
+                                        <p className="text-xs text-muted-foreground truncate mt-0.5">
                                             {story.university}
                                         </p>
                                         <p className={cn(
-                                            "text-xs font-medium mt-1.5 flex items-center gap-1",
-                                            mounted && currentTheme === "dark" ? "text-green-400" : "text-green-600"
+                                            "text-[11px] font-medium mt-1.5 flex items-center gap-1",
+                                            isDark ? "text-emerald-400" : "text-emerald-600"
                                         )}>
-                                            Verified ✓ {story.visaDate}
+                                            <CheckCircle2 className="w-3 h-3 shrink-0" />
+                                            <span>{t("home.testimonials.visaLabel", undefined, "Visa Approved: ")}{story.visaDate}</span>
                                         </p>
                                     </div>
                                 </div>
                             </div>
-                        </motion.div>
+                        </div>
                     ))}
                 </motion.div>
             </div>

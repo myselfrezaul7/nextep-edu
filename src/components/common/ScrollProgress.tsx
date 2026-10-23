@@ -19,14 +19,12 @@ export function ScrollProgress() {
     }, []);
 
     return (
-        <div className="fixed top-0 left-0 w-full h-[3px] z-[60] pointer-events-none">
+        <div className="fixed top-0 left-0 w-full h-[2px] z-[60] pointer-events-none">
             <div
                 ref={progressRef}
-                className="h-full bg-gradient-to-r from-accent via-yellow-300 to-amber-400 transition-[width] duration-100 ease-out relative"
+                className="h-full bg-accent/85 transition-[width] duration-100 ease-out"
                 style={{ width: "0%" }}
-            >
-                <div className="absolute right-0 top-0 bottom-0 w-6 progress-glow blur-[4px]" />
-            </div>
+            />
         </div>
     );
 }

@@ -3,6 +3,7 @@
     "services": "Services",
     "about": "About",
     "destinations": "Destinations",
+    "trackApplication": "Track Status",
     "viewAllDestinations": "View All Destinations",
     "bookConsultation": "Book Consultation"
   },
@@ -22,6 +23,8 @@
   "tab": {
     "home": "Home",
     "services": "Services",
+    "countries": "Countries",
+    "track": "Track",
     "book": "Book",
     "about": "About"
   },

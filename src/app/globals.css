@@ -54,8 +54,8 @@
     /* Subtle off-white for cards */
     --card-foreground: #1E293B;
 
-    --surface: #F8F9FA;
-    /* Matches background for cohesion */
+    --surface: #F1F5F9;
+    /* Subtle architectural slate tint for alternating section rhythm */
 
     --border: #e2e8f0;
     --input: #e2e8f0;
@@ -87,7 +87,7 @@
     /* Slightly lighter than bg for hierarchy */
     --card-foreground: #F8FAFC;
 
-    --surface: #151F32;
+    --surface: #111A2E;
 
     --border: #1E293B;
     --input: #1E293B;
@@ -111,40 +111,63 @@ html[lang="bn"] .text-sm {
 
 *:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; border-radius: 4px; }
 
-/* Removed scroll-behavior: smooth as it conflicts with JS-based scrolling and framer-motion */
-
-/* Global button micro-animations */
+/* Subtle global button micro-animations */
 button:active {
-    transform: scale(0.95);
+    transform: scale(0.98);
     transition: transform 0.1s cubic-bezier(0.22, 1, 0.36, 1);
 }
 button {
     transition: transform 0.2s ease, background-color 0.2s ease, color 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
 }
 
-/* iOS 26 Liquid Glass Material */
+/* Standardized Institutional Card Surface */
+.surface-card {
+    background: rgba(255, 255, 255, 0.85);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border: 1px solid rgba(226, 232, 240, 0.9);
+    box-shadow: 0 2px 20px -4px rgba(15, 23, 42, 0.05);
+    transition: border-color 0.25s ease, box-shadow 0.25s ease, background-color 0.25s ease, transform 0.25s ease;
+}
+.surface-card:hover {
+    background: rgba(255, 255, 255, 0.95);
+    border-color: rgba(212, 175, 55, 0.45);
+    box-shadow: 0 8px 30px -6px rgba(15, 23, 42, 0.08);
+}
+.dark .surface-card {
+    background: rgba(15, 23, 42, 0.78);
+    border-color: rgba(255, 255, 255, 0.08);
+    box-shadow: 0 4px 24px -4px rgba(0, 0, 0, 0.35);
+}
+.dark .surface-card:hover {
+    background: rgba(15, 23, 42, 0.92);
+    border-color: rgba(212, 175, 55, 0.4);
+    box-shadow: 0 8px 32px -6px rgba(0, 0, 0, 0.5);
+}
+
+/* Liquid Glass Material */
 .liquid-glass {
-    background: rgba(255, 255, 255, 0.70);
+    background: rgba(255, 255, 255, 0.78);
     backdrop-filter: blur(20px);
     -webkit-backdrop-filter: blur(20px);
-    border: 1px solid rgba(212, 175, 55, 0.4);
+    border: 1px solid rgba(212, 175, 55, 0.35);
     box-shadow:
-        0 4px 30px rgba(0, 0, 0, 0.08),
+        0 4px 24px rgba(15, 23, 42, 0.06),
         inset 0 1px 0 rgba(255, 255, 255, 0.8);
-    transition: all 0.3s ease;
+    transition: all 0.25s ease;
 }
 .liquid-glass:hover {
-    background: rgba(255, 255, 255, 0.85);
-    border-color: rgba(212, 175, 55, 0.6);
+    background: rgba(255, 255, 255, 0.92);
+    border-color: rgba(212, 175, 55, 0.55);
     box-shadow:
-        0 4px 30px rgba(212, 175, 55, 0.12),
+        0 6px 28px rgba(212, 175, 55, 0.12),
         inset 0 1px 0 rgba(255, 255, 255, 0.9);
 }
 .dark .liquid-glass {
-    background: rgba(15, 23, 42, 0.8);
+    background: rgba(15, 23, 42, 0.82);
     border-color: rgba(212, 175, 55, 0.3);
     box-shadow:
-        0 4px 30px rgba(0, 0, 0, 0.3),
+        0 4px 24px rgba(0, 0, 0, 0.3),
         inset 0 1px 0 rgba(255, 255, 255, 0.05);
 }
 .dark .liquid-glass:hover {
@@ -171,7 +194,7 @@ button {
     animation-play-state: paused;
 }
 
-/* Portfolio Parity Glassmorphism */
+/* Glassmorphism Navigation */
 .glass-nav {
     backdrop-filter: blur(20px);
     -webkit-backdrop-filter: blur(20px);
@@ -200,16 +223,6 @@ button {
     100% { transform: translateX(100%); }
 }
 
-@keyframes glow-pulse {
-    0% { box-shadow: 0 0 12px 3px var(--accent); opacity: 0.8; }
-    50% { box-shadow: 0 0 20px 6px var(--accent); opacity: 1; }
-    100% { box-shadow: 0 0 12px 3px var(--accent); opacity: 0.8; }
-}
-
 .animate-shimmer {
     animation: shimmer 2s infinite;
 }
-
-.progress-glow {
-    animation: glow-pulse 2s infinite;
-}

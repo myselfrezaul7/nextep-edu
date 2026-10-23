@@ -1,5 +1,5 @@
 import type { Metadata, Viewport } from "next";
-import { IBM_Plex_Sans, Playfair_Display, Noto_Sans_Bengali, Dancing_Script } from "next/font/google";
+import { IBM_Plex_Sans, Playfair_Display, Noto_Sans_Bengali } from "next/font/google";
 import { ThemeProvider } from "@/components/theme-provider";
 import { Header } from "@/components/layout/Header";
 import { Footer } from "@/components/layout/Footer";
@@ -33,13 +33,6 @@ const notoBengali = Noto_Sans_Bengali({
     subsets: ["bengali"],
     weight: ["400", "600"],
     variable: "--font-bengali",
-    display: "swap",
-});
-
-const dancingScript = Dancing_Script({
-    subsets: ["latin"],
-    weight: ["400", "700"],
-    variable: "--font-script",
     display: "swap",
 });
 
@@ -131,7 +124,6 @@ export const metadata: Metadata = {
     // Verification (add your IDs after setting up)
     verification: {
         google: "-rite_oeT3HO65k-rhGykyzD6x-V05loAJ27NfqRteM",
-        // yandex: 'your-yandex-verification-code',
     },
     // Category
     category: "Education",
@@ -178,7 +170,7 @@ export default function RootLayout({
                 <link rel="alternate" hrefLang="bn" href="https://www.nextepedu.com" />
                 <link rel="alternate" hrefLang="x-default" href="https://www.nextepedu.com" />
             </head>
-            <body className={`${ibmPlexSans.variable} ${playfair.variable} ${notoBengali.variable} ${dancingScript.variable} font-sans antialiased min-h-screen flex flex-col selection:bg-accent/20 selection:text-foreground`}>
+            <body className={`${ibmPlexSans.variable} ${playfair.variable} ${notoBengali.variable} font-sans antialiased min-h-screen flex flex-col selection:bg-accent/20 selection:text-foreground`}>
                 <LanguageProvider>
                     <ThemeProvider
                         attribute="class"

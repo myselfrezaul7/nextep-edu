@@ -39,10 +39,9 @@ export function Footer() {
             <div className="relative overflow-hidden">
                 {/* Solid opaque dark background - no bleed-through in light mode */}
                 <div className="absolute inset-0 bg-[#0F172A] pointer-events-none" />
-                {/* Frosted glass inner glow */}
-                <div className="absolute inset-0 bg-gradient-to-br from-accent/10 via-transparent to-accent/5 pointer-events-none" />
-                <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_50%,_rgba(212,175,55,0.15)_0%,_transparent_60%)] pointer-events-none" />
-                <div className="container mx-auto px-4 py-10 md:py-16 relative z-10 text-center">
+                {/* Subtle radial highlight */}
+                <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_0%,_rgba(212,175,55,0.12)_0%,_transparent_65%)] pointer-events-none" />
+                <div className="container mx-auto px-4 py-12 md:py-16 relative z-10 text-center">
                     <motion.div
                         initial={{ opacity: 0, y: 20 }}
                         whileInView={{ opacity: 1, y: 0 }}
@@ -50,38 +49,39 @@ export function Footer() {
                         transition={{ duration: 0.5 }}
                     >
                         <h3 className="text-2xl md:text-3xl font-bold font-heading text-white mb-3">
-                            {t("common.footer.ctaTitle")}
+                            {t("common.footer.ctaTitle", undefined, "Ready to Begin Your Study Abroad Journey?")}
                         </h3>
                         <p className="text-white/70 mb-6 max-w-lg mx-auto text-sm md:text-base">
-                            {t("common.footer.ctaSubtitle")}
+                            {t("common.footer.ctaSubtitle", undefined, "Book a free 30-minute consultation with our counselors today.")}
                         </p>
-                        <div className="flex flex-wrap justify-center gap-4 text-white/80 text-sm font-medium mb-8">
+                        <div className="flex flex-wrap justify-center gap-4 text-white/75 text-xs md:text-sm font-medium mb-8">
                             <span>200+ Consultations</span>
-                            <span>&middot;</span>
+                            <span className="text-accent">&middot;</span>
                             <span>20+ Countries</span>
-                            <span>&middot;</span>
+                            <span className="text-accent">&middot;</span>
                             <span>98% Visa Rate</span>
                         </div>
-                        <motion.div whileTap={{ scale: 0.95 }} className="inline-block">
+                        <motion.div whileTap={{ scale: 0.98 }} className="inline-block">
                             <Button
                                 size="lg"
+                                variant="accent"
                                 className="rounded-full font-bold text-base px-8"
-                                onClick={() => window.dispatchEvent(new CustomEvent('open-booking-modal'))}
+                                onClick={() => window.dispatchEvent(new CustomEvent("open-booking-modal"))}
                             >
-                                {t("common.footer.ctaButton")}
+                                {t("common.footer.ctaButton", undefined, "Book Free Consultation")}
                             </Button>
                         </motion.div>
                     </motion.div>
                 </div>
             </div>
 
-            {/* Gold gradient divider */}
-            <div className="h-[2px] bg-gradient-to-r from-transparent via-accent/50 to-transparent" />
+            {/* Subtle Gold Hairline Divider */}
+            <div className="h-px bg-gradient-to-r from-transparent via-accent/40 to-transparent" />
 
             {/* Main Footer Content */}
             <div className={cn(
                 "backdrop-blur-xl py-10 md:py-16 border-t",
-                mounted && currentTheme === "dark" ? "bg-[rgba(15,23,42,0.85)] border-white/10" : "bg-white/60 border-black/5"
+                mounted && currentTheme === "dark" ? "bg-[rgba(15,23,42,0.85)] border-white/[0.08]" : "bg-white/70 border-slate-200/80"
             )}>
                 <div className="container mx-auto px-4">
                     {/* Brand */}
@@ -91,10 +91,10 @@ export function Footer() {
                         viewport={{ once: true }}
                         className="mb-8 md:mb-12"
                     >
-                        <div className="flex items-center gap-2 mb-4">
+                        <div className="flex items-center gap-2.5 mb-4">
                             <div className={cn(
                                 "relative w-10 h-10 md:w-8 md:h-8 rounded-md overflow-hidden p-0.5 border shrink-0",
-                                mounted && currentTheme === "dark" ? "bg-white/10 border-white/10" : "bg-white/50 border-black/5"
+                                mounted && currentTheme === "dark" ? "bg-white/10 border-white/10" : "bg-white/60 border-slate-200/80"
                             )}>
                                 <Image src="/assets/logo.png" alt="Logo" fill className="object-contain" />
                             </div>
@@ -114,9 +114,9 @@ export function Footer() {
                         <div className="border-b md:border-none border-border/30">
                             <button 
                                 onClick={() => toggleSection("quick-links")}
-                                className="w-full flex items-center justify-between py-4 md:py-0 md:mb-6 text-foreground font-bold hover:text-accent transition-colors"
+                                className="w-full flex items-center justify-between py-4 md:py-0 md:mb-6 text-foreground font-semibold hover:text-accent transition-colors"
                             >
-                                <span>{t("common.footer.quickLinks")}</span>
+                                <span>{t("common.footer.quickLinks", undefined, "Quick Links")}</span>
                                 <ChevronDown className={cn("w-4 h-4 md:hidden transition-transform duration-300", openSection === "quick-links" && "rotate-180")} />
                             </button>
                             <AnimatePresence initial={false}>
@@ -128,11 +128,11 @@ export function Footer() {
                                         transition={{ type: "spring", stiffness: 300, damping: 30 }}
                                         className="space-y-1 md:space-y-3 text-sm pb-4 md:pb-0 overflow-hidden"
                                     >
-                                        <li><Link href="/" className={cn("py-2.5 md:py-0 block hover:text-accent hover:underline decoration-accent underline-offset-4 transition-colors", mounted && currentTheme === "dark" ? "text-white/70" : "text-muted-foreground")}>{t("common.footer.home")}</Link></li>
-                                        <li><Link href="/#services" className={cn("py-2.5 md:py-0 block hover:text-accent hover:underline decoration-accent underline-offset-4 transition-colors", mounted && currentTheme === "dark" ? "text-white/70" : "text-muted-foreground")}>{t("common.footer.services")}</Link></li>
-                                        <li><Link href="/#about" className={cn("py-2.5 md:py-0 block hover:text-accent hover:underline decoration-accent underline-offset-4 transition-colors", mounted && currentTheme === "dark" ? "text-white/70" : "text-muted-foreground")}>{t("common.footer.aboutUs")}</Link></li>
-                                        <li><Link href="/destinations" className={cn("py-2.5 md:py-0 block hover:text-accent hover:underline decoration-accent underline-offset-4 transition-colors", mounted && currentTheme === "dark" ? "text-white/70" : "text-muted-foreground")}>{t("common.footer.destinations")}</Link></li>
-                                        <li><Link href="/track" className={cn("py-2.5 md:py-0 block hover:text-accent hover:underline decoration-accent underline-offset-4 transition-colors", mounted && currentTheme === "dark" ? "text-white/70" : "text-muted-foreground")}>Track Application</Link></li>
+                                        <li><Link href="/" className={cn("py-2.5 md:py-0 block hover:text-accent transition-colors", mounted && currentTheme === "dark" ? "text-white/70" : "text-muted-foreground")}>{t("common.footer.home", undefined, "Home")}</Link></li>
+                                        <li><Link href="/#services" className={cn("py-2.5 md:py-0 block hover:text-accent transition-colors", mounted && currentTheme === "dark" ? "text-white/70" : "text-muted-foreground")}>{t("common.footer.services", undefined, "Services")}</Link></li>
+                                        <li><Link href="/#about" className={cn("py-2.5 md:py-0 block hover:text-accent transition-colors", mounted && currentTheme === "dark" ? "text-white/70" : "text-muted-foreground")}>{t("common.footer.aboutUs", undefined, "About Us")}</Link></li>
+                                        <li><Link href="/destinations" className={cn("py-2.5 md:py-0 block hover:text-accent transition-colors", mounted && currentTheme === "dark" ? "text-white/70" : "text-muted-foreground")}>{t("common.footer.destinations", undefined, "Destinations")}</Link></li>
+                                        <li><Link href="/track" className={cn("py-2.5 md:py-0 block hover:text-accent transition-colors", mounted && currentTheme === "dark" ? "text-white/70" : "text-muted-foreground")}>Track Application</Link></li>
                                     </motion.ul>
                                 )}
                             </AnimatePresence>
@@ -142,9 +142,9 @@ export function Footer() {
                         <div className="border-b md:border-none border-border/30">
                             <button 
                                 onClick={() => toggleSection("destinations")}
-                                className="w-full flex items-center justify-between py-4 md:py-0 md:mb-6 text-foreground font-bold hover:text-accent transition-colors"
+                                className="w-full flex items-center justify-between py-4 md:py-0 md:mb-6 text-foreground font-semibold hover:text-accent transition-colors"
                             >
-                                <span>{t("common.footer.popularDestinations")}</span>
+                                <span>{t("common.footer.popularDestinations", undefined, "Popular Destinations")}</span>
                                 <ChevronDown className={cn("w-4 h-4 md:hidden transition-transform duration-300", openSection === "destinations" && "rotate-180")} />
                             </button>
                             <AnimatePresence initial={false}>
@@ -155,11 +155,11 @@ export function Footer() {
                                         exit={isMobile ? { height: 0, opacity: 0 } : undefined}
                                         className="space-y-1 md:space-y-3 text-sm pb-4 md:pb-0 overflow-hidden"
                                     >
-                                        <li><Link href="/destinations/uk" className={cn("py-2.5 md:py-0 block hover:text-accent hover:underline decoration-accent underline-offset-4 transition-colors", mounted && currentTheme === "dark" ? "text-white/70" : "text-muted-foreground")}>United Kingdom</Link></li>
-                                        <li><Link href="/destinations/usa" className={cn("py-2.5 md:py-0 block hover:text-accent hover:underline decoration-accent underline-offset-4 transition-colors", mounted && currentTheme === "dark" ? "text-white/70" : "text-muted-foreground")}>USA</Link></li>
-                                        <li><Link href="/destinations/canada" className={cn("py-2.5 md:py-0 block hover:text-accent hover:underline decoration-accent underline-offset-4 transition-colors", mounted && currentTheme === "dark" ? "text-white/70" : "text-muted-foreground")}>Canada</Link></li>
-                                        <li><Link href="/destinations/australia" className={cn("py-2.5 md:py-0 block hover:text-accent hover:underline decoration-accent underline-offset-4 transition-colors", mounted && currentTheme === "dark" ? "text-white/70" : "text-muted-foreground")}>Australia</Link></li>
-                                        <li><Link href="/destinations/germany" className={cn("py-2.5 md:py-0 block hover:text-accent hover:underline decoration-accent underline-offset-4 transition-colors", mounted && currentTheme === "dark" ? "text-white/70" : "text-muted-foreground")}>Germany</Link></li>
+                                        <li><Link href="/destinations/uk" className={cn("py-2.5 md:py-0 block hover:text-accent transition-colors", mounted && currentTheme === "dark" ? "text-white/70" : "text-muted-foreground")}>United Kingdom</Link></li>
+                                        <li><Link href="/destinations/usa" className={cn("py-2.5 md:py-0 block hover:text-accent transition-colors", mounted && currentTheme === "dark" ? "text-white/70" : "text-muted-foreground")}>USA</Link></li>
+                                        <li><Link href="/destinations/canada" className={cn("py-2.5 md:py-0 block hover:text-accent transition-colors", mounted && currentTheme === "dark" ? "text-white/70" : "text-muted-foreground")}>Canada</Link></li>
+                                        <li><Link href="/destinations/australia" className={cn("py-2.5 md:py-0 block hover:text-accent transition-colors", mounted && currentTheme === "dark" ? "text-white/70" : "text-muted-foreground")}>Australia</Link></li>
+                                        <li><Link href="/destinations/germany" className={cn("py-2.5 md:py-0 block hover:text-accent transition-colors", mounted && currentTheme === "dark" ? "text-white/70" : "text-muted-foreground")}>Germany</Link></li>
                                     </motion.ul>
                                 )}
                             </AnimatePresence>
@@ -169,9 +169,9 @@ export function Footer() {
                         <div className="border-b md:border-none border-border/30">
                             <button 
                                 onClick={() => toggleSection("contact")}
-                                className="w-full flex items-center justify-between py-4 md:py-0 md:mb-6 text-foreground font-bold hover:text-accent transition-colors"
+                                className="w-full flex items-center justify-between py-4 md:py-0 md:mb-6 text-foreground font-semibold hover:text-accent transition-colors"
                             >
-                                <span>{t("common.footer.contactUs")}</span>
+                                <span>{t("common.footer.contactUs", undefined, "Contact Us")}</span>
                                 <ChevronDown className={cn("w-4 h-4 md:hidden transition-transform duration-300", openSection === "contact" && "rotate-180")} />
                             </button>
                             <AnimatePresence initial={false}>
@@ -183,20 +183,20 @@ export function Footer() {
                                         className="space-y-1 md:space-y-4 text-sm pb-4 md:pb-0 overflow-hidden"
                                     >
                                         <li>
-                                            <a href="https://wa.me/4915147483493" target="_blank" rel="noopener noreferrer" className={cn("flex items-start gap-3 py-2.5 md:py-0 hover:text-accent hover:underline decoration-accent underline-offset-4 transition-colors", mounted && currentTheme === "dark" ? "text-white/70" : "text-muted-foreground")}>
-                                                <Phone className="w-4 h-4 mt-1 text-accent shrink-0" />
+                                            <a href="https://wa.me/4915147483493" target="_blank" rel="noopener noreferrer" className={cn("flex items-start gap-3 py-2.5 md:py-0 hover:text-accent transition-colors", mounted && currentTheme === "dark" ? "text-white/70" : "text-muted-foreground")}>
+                                                <Phone className="w-4 h-4 mt-0.5 text-accent shrink-0" />
                                                 +49 151 47483493
                                             </a>
                                         </li>
                                         <li>
-                                            <a href="mailto:info@nextepedu.com" className={cn("flex items-start gap-3 py-2.5 md:py-0 hover:text-accent hover:underline decoration-accent underline-offset-4 transition-colors", mounted && currentTheme === "dark" ? "text-white/70" : "text-muted-foreground")}>
-                                                <Mail className="w-4 h-4 mt-1 text-accent shrink-0" />
+                                            <a href="mailto:info@nextepedu.com" className={cn("flex items-start gap-3 py-2.5 md:py-0 hover:text-accent transition-colors", mounted && currentTheme === "dark" ? "text-white/70" : "text-muted-foreground")}>
+                                                <Mail className="w-4 h-4 mt-0.5 text-accent shrink-0" />
                                                 info@nextepedu.com
                                             </a>
                                         </li>
                                         <li>
                                             <span className={cn("flex items-start gap-3 py-2.5 md:py-0", mounted && currentTheme === "dark" ? "text-white/70" : "text-muted-foreground")}>
-                                                <MapPin className="w-4 h-4 mt-1 text-accent shrink-0" />
+                                                <MapPin className="w-4 h-4 mt-0.5 text-accent shrink-0" />
                                                 1500, Munshiganj, Dhaka, Bangladesh
                                             </span>
                                         </li>
@@ -217,36 +217,36 @@ export function Footer() {
                     )}>
                         &copy; {new Date().getFullYear()} NexTep Edu. All rights reserved.
                     </p>
-                    <div className="flex items-center justify-center gap-4">
+                    <div className="flex items-center justify-center gap-3">
                         <motion.a
-                            whileTap={{ scale: 0.9 }}
+                            whileTap={{ scale: 0.95 }}
                             href="https://facebook.com/nextepbd"
                             target="_blank"
                             rel="noopener noreferrer"
                             aria-label="Follow us on Facebook"
                             className={cn(
-                                "flex items-center justify-center w-10 h-10 md:w-8 md:h-8 rounded-full transition-all duration-300",
+                                "flex items-center justify-center w-9 h-9 rounded-full border transition-all duration-200",
                                 mounted && currentTheme === "dark" 
-                                    ? "bg-white/5 hover:bg-white/10 text-white/70 hover:text-[#1877F2]" 
-                                    : "bg-black/5 hover:bg-black/10 text-muted-foreground hover:text-[#1877F2]"
+                                    ? "bg-white/[0.04] border-white/10 hover:border-accent/40 text-white/70 hover:text-accent" 
+                                    : "bg-slate-100 border-slate-200/80 hover:border-accent/50 text-muted-foreground hover:text-primary"
                             )}
                         >
-                            <Facebook className="w-5 h-5 md:w-4 md:h-4" />
+                            <Facebook className="w-4 h-4" />
                         </motion.a>
                         <motion.a
-                            whileTap={{ scale: 0.9 }}
+                            whileTap={{ scale: 0.95 }}
                             href="https://instagram.com/nextepedu"
                             target="_blank"
                             rel="noopener noreferrer"
                             aria-label="Follow us on Instagram"
                             className={cn(
-                                "flex items-center justify-center w-10 h-10 md:w-8 md:h-8 rounded-full transition-all duration-300",
+                                "flex items-center justify-center w-9 h-9 rounded-full border transition-all duration-200",
                                 mounted && currentTheme === "dark" 
-                                    ? "bg-white/5 hover:bg-white/10 text-white/70 hover:text-[#E1306C]" 
-                                    : "bg-black/5 hover:bg-black/10 text-muted-foreground hover:text-[#E1306C]"
+                                    ? "bg-white/[0.04] border-white/10 hover:border-accent/40 text-white/70 hover:text-accent" 
+                                    : "bg-slate-100 border-slate-200/80 hover:border-accent/50 text-muted-foreground hover:text-primary"
                             )}
                         >
-                            <Instagram className="w-5 h-5 md:w-4 md:h-4" />
+                            <Instagram className="w-4 h-4" />
                         </motion.a>
                     </div>
                 </div>

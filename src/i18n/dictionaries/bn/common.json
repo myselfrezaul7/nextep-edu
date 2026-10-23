@@ -3,6 +3,7 @@
     "services": "সার্ভিস সমূহ",
     "about": "আমাদের সম্পর্কে",
     "destinations": "গন্তব্যসমূহ",
+    "trackApplication": "আবেদন ট্র্যাক",
     "viewAllDestinations": "সকল গন্তব্য দেখুন",
     "bookConsultation": "কনসালটেশন বুক করুন"
   },
@@ -22,6 +23,8 @@
   "tab": {
     "home": "হোম",
     "services": "সার্ভিস",
+    "countries": "গন্তব্য",
+    "track": "ট্র্যাক",
     "book": "বুকিং",
     "about": "সম্পর্কে"
   },

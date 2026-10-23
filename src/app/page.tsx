@@ -6,7 +6,6 @@ import { AboutSection } from "@/components/home/AboutSection";
 import { TestimonialCarousel } from "@/components/home/TestimonialCarousel";
 import { DestinationsGrid } from "@/components/destinations/DestinationsGrid";
 
-// Homepage-specific metadata (overrides layout defaults)
 export const metadata: Metadata = {
     title: "NexTep Edu | Study Abroad Consultancy Bangladesh | Expert Guidance for Bangladeshi Students",
     description:
@@ -23,17 +22,17 @@ export default function Home() {
             <ServicesSection />
             <HowItWorksSection />
 
-            {/* Destinations Section with SEO heading */}
-            <section id="destinations" className="py-16 md:py-24 bg-background">
+            {/* Destinations Section with distinct surface rhythm */}
+            <section id="destinations" className="py-20 md:py-28 bg-surface/60 dark:bg-card/40 border-y border-border/50">
                 <div className="container mx-auto px-4">
-                    <div className="text-center mb-12">
-                        <span className="inline-block px-4 py-2 rounded-full bg-accent/10 border border-accent/20 text-accent text-sm font-semibold mb-4">
+                    <div className="text-center mb-14">
+                        <span className="inline-block px-3.5 py-1.5 rounded-full bg-accent/10 border border-accent/20 text-accent text-xs font-semibold tracking-wider uppercase mb-4">
                             Study Abroad Destinations
                         </span>
                         <h2 className="text-3xl md:text-5xl font-bold font-heading text-primary mb-4">
                             Where Do You Want to Study?
                         </h2>
-                        <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
+                        <p className="text-base md:text-lg text-muted-foreground max-w-2xl mx-auto">
                             Explore top study destinations for Bangladeshi students. Each country offers unique opportunities for your academic journey.
                         </p>
                     </div>
