@@ -8,6 +8,10 @@ interface RegisterBody {
     name: string;
     phone: string;
     email: string;
+    date?: string;
+    time?: string;
+    education_level?: string;
+    topic?: string;
     website_url?: string;
 }
 
@@ -117,8 +121,23 @@ export async function POST(request: NextRequest) {
         }
         const now = new Date().toISOString();
 
+        // Format consultation details into Step 1 note if provided
+        const consultationParts: string[] = [];
+        if (body?.date && body?.time) {
+            consultationParts.push(`Slot: ${body.date} at ${body.time}`);
+        } else if (body?.date) {
+            consultationParts.push(`Date: ${body.date}`);
+        }
+        if (body?.education_level) {
+            consultationParts.push(`Level: ${body.education_level.replace(/_/g, " ")}`);
+        }
+        if (body?.topic) {
+            consultationParts.push(`Topic: ${body.topic.replace(/_/g, " ")}`);
+        }
+        const consultationNote = consultationParts.join(" | ");
+
         const stepsWithFirstCompleted = DEFAULT_STEPS.map((s) =>
-            s.step === 1 ? { ...s, date: now } : s
+            s.step === 1 ? { ...s, date: now, note: consultationNote || s.note } : s
         );
 
         const { error: insertError } = await supabaseAdmin

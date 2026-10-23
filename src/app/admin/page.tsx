@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useCallback, useMemo, useRef } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useTheme } from "next-themes";
 import toast from "react-hot-toast";
@@ -90,10 +90,18 @@ export default function AdminPage() {
     const [applications, setApplications] = useState<Application[]>([]);
     const [selectedApp, setSelectedApp] = useState<Application | null>(null);
     const [searchQuery, setSearchQuery] = useState("");
+    const [debouncedSearch, setDebouncedSearch] = useState("");
     const [loading, setLoading] = useState(false);
     const [currentPage, setCurrentPage] = useState(1);
     const [totalCount, setTotalCount] = useState(0);
     const itemsPerPage = 25;
+
+    useEffect(() => {
+        const timer = setTimeout(() => {
+            setDebouncedSearch(searchQuery);
+        }, 250);
+        return () => clearTimeout(timer);
+    }, [searchQuery]);
 
     // Add form
     const [addForm, setAddForm] = useState({
@@ -155,6 +163,12 @@ export default function AdminPage() {
                 limit: itemsPerPage.toString(),
                 sortOrder: sortOrder,
             });
+            if (filterStep !== "all") {
+                params.set("step", filterStep.toString());
+            }
+            if (debouncedSearch.trim()) {
+                params.set("search", debouncedSearch.trim());
+            }
             const res = await fetch(`/api/admin/applications?${params}`, {
                 headers: { Authorization: `Bearer ${token}` },
             });
@@ -175,7 +189,7 @@ export default function AdminPage() {
         } finally {
             setLoading(false);
         }
-    }, [token, currentPage, sortOrder, handleLogout]);
+    }, [token, currentPage, sortOrder, filterStep, debouncedSearch, handleLogout]);
 
     useEffect(() => {
         if (!isAuthenticated) return;
@@ -451,30 +465,9 @@ export default function AdminPage() {
     };
 
     // ─── Filtered apps ────────────────────────────────────────
-    // Note: With server-side pagination and sorting, we only do client-side filtering 
-    // for search and step to keep things fast, but ideally these would also move to the server.
-    const filteredApps = useMemo(() => {
-        let result = applications;
-
-        // 1. Filter by step
-        if (filterStep !== "all") {
-            result = result.filter(app => app.current_step === filterStep);
-        }
-
-        // 2. Filter by search
-        if (searchQuery.trim()) {
-            const q = searchQuery.toLowerCase();
-            result = result.filter(
-                (app) =>
-                    app.name.toLowerCase().includes(q) ||
-                    app.tracking_code.toLowerCase().includes(q) ||
-                    (app.destination && app.destination.toLowerCase().includes(q))
-            );
-        }
-
-        // The array is already sorted by the backend query!
-        return result;
-    }, [applications, searchQuery, filterStep]);
+    // Since search, step filtering, and sorting are executed server-side via Supabase PostgREST,
+    // the returned applications array is already accurately filtered and sorted across the database.
+    const filteredApps = applications;
 
     // ─── Glass card classes ───────────────────────────────────
     const glassCard = isDark
@@ -587,8 +580,8 @@ export default function AdminPage() {
                                     Application Tracker Admin
                                 </h1>
                                 <p className="text-sm text-muted-foreground mt-1">
-                                    {applications.length} total applicant
-                                    {applications.length !== 1 ? "s" : ""}
+                                    {totalCount} total applicant
+                                    {totalCount !== 1 ? "s" : ""}
                                 </p>
                             </div>
                             <div className="flex gap-3">

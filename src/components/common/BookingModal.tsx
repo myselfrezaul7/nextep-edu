@@ -218,6 +218,10 @@ export function BookingModal() {
                         name: data.name,
                         phone: data.phone,
                         email: data.email,
+                        date: data.date,
+                        time: data.time,
+                        education_level: data.education_level,
+                        topic: data.topic,
                         website_url: data.website_url,
                     }),
                 });

@@ -11,6 +11,18 @@ import { escapeHtml } from "@/lib/sanitize";
 
 const resend = new Resend(process.env.RESEND_API_KEY);
 
+// Non-blocking helper to broadcast status updates over Supabase Realtime
+async function broadcastApplicationUpdate(application: Application) {
+    try {
+        const channel = supabaseAdmin.channel(`track:${application.tracking_code}`);
+        await channel.httpSend("application-updated", application);
+        supabaseAdmin.removeChannel(channel);
+    } catch (broadcastErr) {
+        // Non-blocking: failure to broadcast should not fail the API response
+        console.error("Realtime broadcast error:", broadcastErr);
+    }
+}
+
 // GET: Fetch all applications
 export async function GET(request: NextRequest) {
     if (!isAuthorized(request.headers.get("Authorization"))) {
@@ -31,6 +43,26 @@ export async function GET(request: NextRequest) {
         let query = supabaseAdmin
             .from("applications")
             .select("*", { count: "exact" });
+
+        // Server-side step filter
+        const stepParam = searchParams.get("step");
+        if (stepParam && stepParam !== "all") {
+            const stepNum = parseInt(stepParam, 10);
+            if (!isNaN(stepNum) && stepNum >= 1 && stepNum <= 7) {
+                query = query.eq("current_step", stepNum);
+            }
+        }
+
+        // Server-side multi-field search
+        const searchParam = searchParams.get("search");
+        if (searchParam && typeof searchParam === "string" && searchParam.trim().length > 0) {
+            const cleanSearch = searchParam.trim().replace(/[%_(),]/g, " ").trim();
+            if (cleanSearch) {
+                query = query.or(
+                    `name.ilike.%${cleanSearch}%,tracking_code.ilike.%${cleanSearch}%,destination.ilike.%${cleanSearch}%,phone.ilike.%${cleanSearch}%,email.ilike.%${cleanSearch}%`
+                );
+            }
+        }
 
         if (sortOrder === "newest") {
             query = query.order("updated_at", { ascending: false });
@@ -283,6 +315,7 @@ export async function PATCH(request: NextRequest) {
                 }
             }
 
+            void broadcastApplicationUpdate(data as Application);
             return NextResponse.json({ application: data });
         } else if (action === "undo") {
             if (currentApp.current_step <= 1) {
@@ -332,6 +365,7 @@ export async function PATCH(request: NextRequest) {
                 );
             }
 
+            void broadcastApplicationUpdate(data as Application);
             return NextResponse.json({ application: data });
         } else if (action === "edit") {
             const { name, email, phone, destination } = body;
@@ -366,6 +400,7 @@ export async function PATCH(request: NextRequest) {
                 );
             }
 
+            void broadcastApplicationUpdate(data as Application);
             return NextResponse.json({ application: data });
         }
 
@@ -399,6 +434,28 @@ export async function DELETE(request: NextRequest) {
                 { error: "id is required" },
                 { status: 400 }
             );
+        }
+
+        // Clean up any uploaded storage files for this application
+        const { data: app } = await supabaseAdmin
+            .from("applications")
+            .select("tracking_code")
+            .eq("id", id)
+            .maybeSingle();
+
+        if (app?.tracking_code) {
+            try {
+                const { data: files } = await supabaseAdmin.storage
+                    .from("documents")
+                    .list(app.tracking_code);
+
+                if (files && files.length > 0) {
+                    const paths = files.map((f) => `${app.tracking_code}/${f.name}`);
+                    await supabaseAdmin.storage.from("documents").remove(paths);
+                }
+            } catch (storageErr) {
+                console.error("Failed to clean up storage files for application:", storageErr);
+            }
         }
 
         const { error } = await supabaseAdmin

@@ -44,3 +44,38 @@ export async function GET(request: NextRequest) {
         return NextResponse.json({ error: "Internal server error" }, { status: 500 });
     }
 }
+
+export async function DELETE(request: NextRequest) {
+    if (!isAuthorized(request.headers.get("Authorization"))) {
+        return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
+    try {
+        const body = await request.json();
+        const { trackingCode, fileName } = body || {};
+
+        if (!trackingCode || !fileName || typeof trackingCode !== "string" || typeof fileName !== "string") {
+            return NextResponse.json({ error: "trackingCode and fileName are required" }, { status: 400 });
+        }
+
+        const cleanCode = trackingCode.trim().toUpperCase();
+        const cleanFile = fileName.trim().replace(/^.*[\\/]/, "");
+        if (!/^NX-[A-Z0-9]{8}$/.test(cleanCode) || !cleanFile) {
+            return NextResponse.json({ error: "Invalid document path" }, { status: 400 });
+        }
+
+        const filePath = `${cleanCode}/${cleanFile}`;
+        const { error: removeError } = await supabaseAdmin.storage
+            .from("documents")
+            .remove([filePath]);
+
+        if (removeError) {
+            console.error("Storage delete error:", removeError);
+            return NextResponse.json({ error: "Failed to delete document." }, { status: 500 });
+        }
+
+        return NextResponse.json({ success: true });
+    } catch {
+        return NextResponse.json({ error: "Internal server error" }, { status: 500 });
+    }
+}

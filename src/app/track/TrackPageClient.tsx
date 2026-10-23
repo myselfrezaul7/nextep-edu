@@ -46,23 +46,38 @@ export function TrackPageClient() {
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
     const [data, setData] = useState<Application | null>(null);
+    const [uploadedDocs, setUploadedDocs] = useState<{ name: string; created_at: string }[]>([]);
 
     // Realtime state
     const [justUpdated, setJustUpdated] = useState(false);
 
-    // ── Supabase Realtime subscription ──
+    const appId = data?.id;
+    const appTrackingCode = data?.tracking_code;
+
+    // ── Supabase Realtime subscription (Broadcast + Postgres Changes) ──
     useEffect(() => {
-        if (!data) return;
+        if (!appId || !appTrackingCode) return;
 
         const channel = supabase
-            .channel(`app-${data.id}`)
+            .channel(`track:${appTrackingCode}`)
+            .on(
+                "broadcast",
+                { event: "application-updated" },
+                (payload) => {
+                    if (payload.payload && typeof payload.payload === "object") {
+                        setData(payload.payload as Application);
+                        setJustUpdated(true);
+                        setTimeout(() => setJustUpdated(false), 3000);
+                    }
+                }
+            )
             .on(
                 "postgres_changes",
                 {
                     event: "UPDATE",
                     schema: "public",
                     table: "applications",
-                    filter: `id=eq.${data.id}`,
+                    filter: `id=eq.${appId}`,
                 },
                 (payload) => {
                     setData(payload.new as Application);
@@ -75,7 +90,7 @@ export function TrackPageClient() {
         return () => {
             supabase.removeChannel(channel);
         };
-    }, [data?.id]); // eslint-disable-line react-hooks/exhaustive-deps
+    }, [appId, appTrackingCode]);
 
     // ── Polling fallback for status updates when RLS limits direct anon table subscription ──
     useEffect(() => {
@@ -128,6 +143,9 @@ export function TrackPageClient() {
 
             if (json.success) {
                 setData(json.data);
+                if (Array.isArray(json.uploadedDocuments)) {
+                    setUploadedDocs(json.uploadedDocuments);
+                }
             } else {
                 setError(json.error || "Something went wrong.");
             }
@@ -140,6 +158,7 @@ export function TrackPageClient() {
 
     const handleReset = () => {
         setData(null);
+        setUploadedDocs([]);
         setError(null);
         setTrackingCode("");
         setPhone("");
@@ -411,7 +430,10 @@ export function TrackPageClient() {
                                     currentStep={data.current_step}
                                 />
                                 {data.current_step <= 2 && (
-                                    <DocumentUpload trackingCode={data.tracking_code} />
+                                    <DocumentUpload
+                                        trackingCode={data.tracking_code}
+                                        initialDocuments={uploadedDocs}
+                                    />
                                 )}
                             </div>
 

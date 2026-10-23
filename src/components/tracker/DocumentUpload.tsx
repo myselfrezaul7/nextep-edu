@@ -11,11 +11,13 @@ const ALLOWED_TYPES = ["application/pdf", "image/jpeg", "image/png"];
 
 interface DocumentUploadProps {
     trackingCode: string;
+    initialDocuments?: { name: string; created_at: string }[];
 }
 
-export function DocumentUpload({ trackingCode }: DocumentUploadProps) {
+export function DocumentUpload({ trackingCode, initialDocuments = [] }: DocumentUploadProps) {
     const [isDragging, setIsDragging] = useState(false);
     const [files, setFiles] = useState<File[]>([]);
+    const [existingDocs, setExistingDocs] = useState<{ name: string; created_at: string }[]>(initialDocuments);
     const [isUploading, setIsUploading] = useState(false);
     const [uploadSuccess, setUploadSuccess] = useState(false);
     const [error, setError] = useState<string | null>(null);
@@ -104,6 +106,11 @@ export function DocumentUpload({ trackingCode }: DocumentUploadProps) {
             }));
 
             setUploadSuccess(true);
+            const uploadedList = files.map((f) => ({
+                name: f.name,
+                created_at: new Date().toISOString(),
+            }));
+            setExistingDocs((prev) => [...prev, ...uploadedList]);
             setFiles([]);
             if (fileInputRef.current) fileInputRef.current.value = "";
             
@@ -131,6 +138,31 @@ export function DocumentUpload({ trackingCode }: DocumentUploadProps) {
                     Maximum file size: 5 MB each.
                 </p>
             </div>
+
+            {existingDocs.length > 0 && (
+                <div className="mb-5 space-y-2 text-left">
+                    <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">
+                        Previously Uploaded ({existingDocs.length})
+                    </p>
+                    <div className="space-y-1.5 max-h-36 overflow-y-auto pr-1">
+                        {existingDocs.map((doc, idx) => (
+                            <div
+                                key={idx}
+                                className="flex items-center gap-2.5 px-3 py-2 rounded-xl bg-accent/5 border border-accent/20 text-xs text-foreground"
+                            >
+                                <CheckCircle2 className="w-3.5 h-3.5 text-accent shrink-0" />
+                                <span className="font-medium truncate flex-1">{doc.name}</span>
+                                <span className="text-[10px] text-muted-foreground shrink-0 font-mono">
+                                    {new Date(doc.created_at).toLocaleDateString("en-GB", {
+                                        day: "numeric",
+                                        month: "short",
+                                    })}
+                                </span>
+                            </div>
+                        ))}
+                    </div>
+                </div>
+            )}
 
             <div
                 className={cn(

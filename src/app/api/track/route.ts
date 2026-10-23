@@ -44,7 +44,23 @@ export async function POST(request: NextRequest) {
             );
         }
 
-        return NextResponse.json({ success: true, data });
+        // Retrieve uploaded document filenames for this authenticated student
+        let uploadedDocuments: { name: string; created_at: string }[] = [];
+        try {
+            const { data: files } = await supabaseAdmin.storage
+                .from("documents")
+                .list(trackingCode);
+            if (files && files.length > 0) {
+                uploadedDocuments = files.map((f) => ({
+                    name: f.name,
+                    created_at: f.created_at || new Date().toISOString(),
+                }));
+            }
+        } catch (storageErr) {
+            console.error("Failed to list student documents:", storageErr);
+        }
+
+        return NextResponse.json({ success: true, data, uploadedDocuments });
     } catch {
         return NextResponse.json(
             {

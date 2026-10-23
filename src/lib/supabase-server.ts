@@ -6,5 +6,12 @@ const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY!;
 /**
  * Server-side Supabase client using the service role key.
  * This bypasses RLS and should ONLY be used in API routes (never in client code).
+ * Configured with serverless best practices: no session persistence, no background token timers.
  */
-export const supabaseAdmin = createClient(supabaseUrl, supabaseServiceKey);
+export const supabaseAdmin = createClient(supabaseUrl, supabaseServiceKey, {
+    auth: {
+        persistSession: false,
+        autoRefreshToken: false,
+        detectSessionInUrl: false,
+    },
+});

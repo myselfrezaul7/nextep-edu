@@ -25,10 +25,17 @@ const itemVariants = {
     visible: { opacity: 1, x: 0 }
 };
 
+const featureFallbacks = [
+    "Zero Fraud Risk: We NEVER hold your original passport or documents",
+    "No Advance Fees: You pay only after service delivery (consultation excluded)",
+    "Connections with 200+ universities worldwide",
+    "BPMN 2.0 optimized workflows for faster, error-free applications",
+];
+
 const stats = [
-    { value: 200, suffix: "+", label: "Consultations Done" },
-    { value: 20, suffix: "+", label: "Countries" },
-    { value: 98, suffix: "%", label: "Visa Success Rate" },
+    { value: 200, suffix: "+", labelKey: "home.about.stats.consultations", fallback: "Consultations Done" },
+    { value: 20, suffix: "+", labelKey: "home.about.stats.countries", fallback: "Countries" },
+    { value: 98, suffix: "%", labelKey: "home.about.stats.visa", fallback: "Visa Success Rate" },
 ];
 
 const AnimatedCounter = memo(function AnimatedCounter({ value, suffix }: { value: number; suffix: string }) {
@@ -147,7 +154,7 @@ export function AboutSection() {
 
     return (
         <section id="about" className="py-16 md:py-24 bg-background overflow-hidden">
-            <div className="container mx-auto px-4 grid lg:grid-cols-2 gap-12 md:gap-16 items-center">
+            <div className="container mx-auto px-4 grid lg:grid-cols-2 gap-10 md:gap-16 items-center">
                 {/* Text Content */}
                 <motion.div
                     initial={{ opacity: 0, scale: 0.95 }}
@@ -155,9 +162,20 @@ export function AboutSection() {
                     viewport={{ once: true, amount: 0.2 }}
                     transition={{ duration: 0.8, ease: EASE_OUT_EXPO }}
                 >
-                    <h2 className="text-3xl md:text-5xl font-bold font-heading mb-6 text-primary">Why Students Trust Us</h2>
-                    <p className={cn("text-lg mb-8 leading-relaxed", isDark ? "text-white/70" : "text-muted-foreground")}>
-                        We&apos;ve helped hundreds of Bangladeshi students achieve their dreams of studying abroad. Our team combines personal experience with professional expertise.
+                    <h2 className="text-3xl md:text-5xl font-bold font-heading mb-4 md:mb-6 text-primary text-center lg:text-left">
+                        {t("home.about.title", undefined, "Why Students Trust Us")}
+                    </h2>
+                    <p
+                        className={cn(
+                            "text-base md:text-lg mb-8 leading-relaxed text-center lg:text-left",
+                            isDark ? "text-white/70" : "text-muted-foreground"
+                        )}
+                    >
+                        {t(
+                            "home.about.description",
+                            undefined,
+                            "We've helped hundreds of Bangladeshi students achieve their dreams of studying abroad. Our team combines personal experience with professional expertise."
+                        )}
                     </p>
 
                     <motion.ul
@@ -165,28 +183,30 @@ export function AboutSection() {
                         initial="hidden"
                         whileInView="visible"
                         viewport={{ once: true, amount: 0.2 }}
-                        className="space-y-4 mb-8"
+                        className="space-y-4 mb-8 text-left"
                     >
                         {[0, 1, 2, 3].map((index) => (
                             <motion.li
                                 key={index}
                                 variants={itemVariants}
-                                className="flex items-center gap-3 font-medium text-foreground"
+                                className="flex items-start gap-3 font-medium text-sm sm:text-base leading-snug text-foreground"
                             >
-                                <CheckCircle className="w-5 h-5 text-accent shrink-0" />
-                                {t(`home.about.features.${index}`)}
+                                <CheckCircle className="w-5 h-5 text-accent shrink-0 mt-0.5" />
+                                <span>{t(`home.about.features.${index}`, undefined, featureFallbacks[index])}</span>
                             </motion.li>
                         ))}
                     </motion.ul>
-                    <motion.div whileTap={{ scale: 0.95 }} className="inline-block w-full sm:w-auto">
-                        <Button
-                            size="lg"
-                            className="w-full"
-                            onClick={() => window.dispatchEvent(new CustomEvent('open-booking-modal'))}
-                        >
-                            Chat With Us
-                        </Button>
-                    </motion.div>
+                    <div className="flex justify-center lg:justify-start">
+                        <motion.div whileTap={{ scale: 0.95 }} className="w-full sm:w-auto">
+                            <Button
+                                size="lg"
+                                className="w-full sm:w-auto rounded-full text-base px-8 h-12 font-semibold shadow-md"
+                                onClick={() => window.dispatchEvent(new CustomEvent("open-booking-modal"))}
+                            >
+                                {t("home.about.ctaButton", undefined, "Chat With Us")}
+                            </Button>
+                        </motion.div>
+                    </div>
                 </motion.div>
 
                 {/* Stats Grid with World Map Background */}
@@ -194,26 +214,33 @@ export function AboutSection() {
                     {/* World Map Decoration */}
                     <WorldMapDecor />
 
-                    <div className="grid grid-cols-3 lg:grid-cols-1 gap-3 md:gap-6 relative z-10">
+                    <div className="grid grid-cols-3 lg:grid-cols-1 gap-2.5 sm:gap-4 md:gap-6 relative z-10">
                         {stats.map((stat, index) => (
                             <motion.div
-                                key={stat.label}
-                                initial={{ opacity: 0, x: 50 }}
-                                whileInView={{ opacity: 1, x: 0 }}
+                                key={stat.labelKey}
+                                initial={{ opacity: 0, y: 24 }}
+                                whileInView={{ opacity: 1, y: 0 }}
                                 viewport={{ once: true, amount: 0.2 }}
                                 whileTap={{ scale: 0.97 }}
                                 transition={{ delay: index * 0.12, duration: 0.7, ease: EASE_OUT_EXPO }}
                                 className={cn(
-                                    "relative backdrop-blur-xl p-4 md:p-8 rounded-2xl shadow-lg border text-center hover:border-accent hover:shadow-xl hover:shadow-accent/5 transition-all duration-500 ease-out overflow-hidden",
+                                    "relative backdrop-blur-xl p-3 sm:p-5 md:p-8 rounded-2xl shadow-lg border text-center flex flex-col items-center justify-center hover:border-accent hover:shadow-xl hover:shadow-accent/5 transition-all duration-500 ease-out overflow-hidden",
                                     isDark
                                         ? "bg-[rgba(15,23,42,0.85)] border-white/10 hover:bg-[rgba(15,23,42,0.95)]"
                                         : "bg-white/60 border-black/5 hover:bg-white/80"
                                 )}
                             >
-                                <h3 className="text-2xl md:text-5xl font-bold text-accent mb-1 md:mb-2">
+                                <h3 className="text-xl sm:text-2xl md:text-5xl font-bold text-accent mb-1 md:mb-2">
                                     <AnimatedCounter value={stat.value} suffix={stat.suffix} />
                                 </h3>
-                                <p className={cn("font-medium text-xs md:text-base", isDark ? "text-white/70" : "text-muted-foreground")}>{stat.label}</p>
+                                <p
+                                    className={cn(
+                                        "font-medium text-[11px] sm:text-xs md:text-base leading-tight",
+                                        isDark ? "text-white/70" : "text-muted-foreground"
+                                    )}
+                                >
+                                    {t(stat.labelKey, undefined, stat.fallback)}
+                                </p>
                             </motion.div>
                         ))}
                     </div>

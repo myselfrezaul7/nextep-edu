@@ -3,8 +3,6 @@ import { createClient } from "@supabase/supabase-js";
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
 const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!;
 
-export const supabase = createClient(supabaseUrl, supabaseAnonKey);
-
 // Types for the applications table
 export interface ApplicationStep {
     step: number;
@@ -26,6 +24,42 @@ export interface Application {
     updated_at: string;
 }
 
+export interface UploadedDocumentInfo {
+    name: string;
+    created_at: string;
+}
+
+export type Json =
+    | string
+    | number
+    | boolean
+    | null
+    | { [key: string]: Json | undefined }
+    | Json[];
+
+export interface Database {
+    public: {
+        Tables: {
+            applications: {
+                Row: Application;
+                Insert: Omit<Application, "id" | "created_at" | "updated_at"> & {
+                    id?: string;
+                    created_at?: string;
+                    updated_at?: string;
+                };
+                Update: Partial<Omit<Application, "id">> & {
+                    updated_at?: string;
+                };
+            };
+        };
+        Views: Record<string, never>;
+        Functions: Record<string, never>;
+        Enums: Record<string, never>;
+    };
+}
+
+export const supabase = createClient(supabaseUrl, supabaseAnonKey);
+
 // Default pipeline steps
 export const DEFAULT_STEPS: ApplicationStep[] = [
     { step: 1, label: "Consultation Booked", note: "", date: null },
@@ -37,12 +71,14 @@ export const DEFAULT_STEPS: ApplicationStep[] = [
     { step: 7, label: "Pre-Departure Briefing", note: "", date: null },
 ];
 
-// Generate a unique tracking code like "NX-A7K2M9X1" (8-char alphanumeric)
+// Generate a cryptographically secure tracking code like "NX-A7K2M9X1" (8-char alphanumeric)
 export function generateTrackingCode(): string {
     const chars = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789"; // no I/O/0/1 to avoid confusion
+    const randomValues = new Uint32Array(8);
+    crypto.getRandomValues(randomValues);
     let code = "";
     for (let i = 0; i < 8; i++) {
-        code += chars.charAt(Math.floor(Math.random() * chars.length));
+        code += chars.charAt(randomValues[i] % chars.length);
     }
     return `NX-${code}`;
 }
