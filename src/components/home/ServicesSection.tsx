@@ -7,12 +7,14 @@ import {
     Megaphone,
     GraduationCap,
     Landmark,
-    ChevronDown
+    ChevronDown,
+    ArrowRight
 } from "lucide-react";
 import { useState, useRef } from "react";
 import { cn } from "@/lib/utils";
 import { motion } from "framer-motion";
 import { useTranslation } from "@/i18n/LanguageContext";
+import { useBookingModal } from "@/context/BookingModalContext";
 
 const EASE_OUT_EXPO = [0.16, 1, 0.3, 1] as const;
 
@@ -63,6 +65,7 @@ const items = [
 
 export function ServicesSection() {
     const { t } = useTranslation();
+    const { openModal } = useBookingModal();
     const [expandedId, setExpandedId] = useState<number | null>(null);
     const [activeDot, setActiveDot] = useState(0);
     const scrollContainerRef = useRef<HTMLDivElement>(null);
@@ -70,8 +73,17 @@ export function ServicesSection() {
     const handleScroll = () => {
         if (!scrollContainerRef.current) return;
         const scrollLeft = scrollContainerRef.current.scrollLeft;
-        const width = scrollContainerRef.current.offsetWidth;
-        setActiveDot(Math.round(scrollLeft / width));
+        const cardWidth = scrollContainerRef.current.firstElementChild?.clientWidth || scrollContainerRef.current.offsetWidth;
+        setActiveDot(Math.min(items.length - 1, Math.max(0, Math.round(scrollLeft / (cardWidth + 16)))));
+    };
+
+    const scrollToCard = (index: number) => {
+        if (!scrollContainerRef.current) return;
+        const child = scrollContainerRef.current.children[index] as HTMLElement | undefined;
+        if (child) {
+            child.scrollIntoView({ behavior: "smooth", inline: "center", block: "nearest" });
+            setActiveDot(index);
+        }
     };
 
     return (
@@ -148,30 +160,50 @@ export function ServicesSection() {
                                     animate={{ height: isExpanded ? "auto" : 0, opacity: isExpanded ? 1 : 0 }}
                                     className="overflow-hidden"
                                 >
-                                    <p className="pt-3.5 mt-3.5 border-t border-border/50 text-xs font-medium text-foreground/90 leading-relaxed">
-                                        {item.details}
-                                    </p>
+                                    <div className="pt-3.5 mt-3.5 border-t border-border/50 space-y-3">
+                                        <p className="text-xs font-medium text-foreground/90 leading-relaxed">
+                                            {item.details}
+                                        </p>
+                                        <button
+                                            type="button"
+                                            onClick={(e) => {
+                                                e.stopPropagation();
+                                                openModal({ topic: `${item.title} Inquiry` });
+                                            }}
+                                            className="w-full min-h-[42px] px-3.5 py-2 rounded-xl bg-accent/15 hover:bg-accent text-accent hover:text-slate-950 text-xs font-semibold flex items-center justify-center gap-1.5 transition-colors"
+                                        >
+                                            <span>Get Help with {item.title}</span>
+                                            <ArrowRight className="w-3.5 h-3.5" />
+                                        </button>
+                                    </div>
                                 </motion.div>
 
                                 {/* Explicit Interactive Affordance */}
-                                <div className="mt-4 pt-3 border-t border-border/40 flex items-center justify-between text-xs font-medium text-muted-foreground group-hover:text-accent transition-colors">
+                                <div className="mt-4 pt-3 border-t border-border/40 flex items-center justify-between text-xs font-medium text-muted-foreground group-hover:text-accent transition-colors min-h-[36px]">
                                     <span>{isExpanded ? "Hide deliverables" : "Included deliverables"}</span>
-                                    <ChevronDown className={cn("w-3.5 h-3.5 transition-transform duration-200", isExpanded && "rotate-180 text-accent")} />
+                                    <ChevronDown className={cn("w-4 h-4 transition-transform duration-200", isExpanded && "rotate-180 text-accent")} />
                                 </div>
                             </motion.div>
                         );
                     })}
                 </div>
 
-                <div className="flex justify-center gap-2 mt-6 md:hidden">
-                    {items.map((_, i) => (
-                        <div
-                            key={i}
-                            className={cn(
-                                "h-1.5 rounded-full transition-all duration-300",
-                                activeDot === i ? "w-6 bg-accent" : "w-1.5 bg-accent/30"
-                            )}
-                        />
+                <div className="flex justify-center items-center gap-1.5 mt-5 md:hidden">
+                    {items.map((item, i) => (
+                        <button
+                            key={item.id}
+                            type="button"
+                            onClick={() => scrollToCard(i)}
+                            aria-label={`View ${item.title}`}
+                            className="p-2 flex items-center justify-center"
+                        >
+                            <span
+                                className={cn(
+                                    "block h-1.5 rounded-full transition-all duration-300",
+                                    activeDot === i ? "w-6 bg-accent" : "w-1.5 bg-accent/30"
+                                )}
+                            />
+                        </button>
                     ))}
                 </div>
             </div>

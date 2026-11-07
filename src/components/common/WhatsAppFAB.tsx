@@ -10,12 +10,12 @@ export function WhatsAppFAB() {
     const pathname = usePathname();
     const [isExpanded, setIsExpanded] = useState(false);
     const [showNudge, setShowNudge] = useState(false);
-    const [bottomOffset, setBottomOffset] = useState("6.25rem");
+    const [tabBarVisible, setTabBarVisible] = useState(true);
 
     useEffect(() => {
         const handleTabBar = (e: Event) => {
             const customEvent = e as CustomEvent<{ visible: boolean }>;
-            setBottomOffset(customEvent.detail?.visible ? "6.25rem" : "1.5rem");
+            setTabBarVisible(Boolean(customEvent.detail?.visible));
         };
         window.addEventListener("tabbar-visibility", handleTabBar);
         return () => window.removeEventListener("tabbar-visibility", handleTabBar);
@@ -23,6 +23,7 @@ export function WhatsAppFAB() {
 
     // Idle timer for calm one-time nudge
     useEffect(() => {
+        if (pathname.startsWith("/admin")) return;
         const hasSeenNudge = sessionStorage.getItem("wa_nudge_seen");
         if (hasSeenNudge) return;
 
@@ -43,13 +44,23 @@ export function WhatsAppFAB() {
         resetTimer();
 
         const events = ["mousedown", "mousemove", "keypress", "scroll", "touchstart"];
-        events.forEach(e => document.addEventListener(e, resetTimer));
+        events.forEach(e => document.addEventListener(e, resetTimer, { passive: true }));
 
         return () => {
             clearTimeout(idleTimer);
             events.forEach(e => document.removeEventListener(e, resetTimer));
         };
-    }, []);
+    }, [pathname]);
+
+    if (pathname.startsWith("/admin")) {
+        return null;
+    }
+
+    const isCountryDetailPage = pathname.startsWith("/destinations/") && pathname !== "/destinations";
+    const baseRem = tabBarVisible
+        ? (isCountryDetailPage ? "10.25rem" : "6.25rem")
+        : (isCountryDetailPage ? "5.5rem" : "1.5rem");
+    const bottomOffset = `calc(${baseRem} + env(safe-area-inset-bottom, 0px))`;
 
     const getMessage = () => {
         if (pathname === "/") {
@@ -64,6 +75,10 @@ export function WhatsAppFAB() {
             }
         }
 
+        if (pathname.startsWith("/track")) {
+            return "Hi! I'm checking my application status on the NexTep Edu tracker and have a quick question.";
+        }
+
         return "Hi! I have a question about studying abroad.";
     };
 
@@ -71,7 +86,7 @@ export function WhatsAppFAB() {
     const waUrl = `https://wa.me/${phoneNumber}?text=${encodeURIComponent(getMessage())}`;
 
     return (
-        <div className="fixed right-5 z-50 flex flex-col items-end md:!bottom-6 transition-[bottom] duration-300" style={{ bottom: bottomOffset }}>
+        <div className="fixed right-4 sm:right-5 z-50 flex flex-col items-end md:!bottom-6 transition-[bottom] duration-300" style={{ bottom: bottomOffset }}>
             <AnimatePresence>
                 {/* Expanded Card */}
                 {isExpanded && (
@@ -94,7 +109,7 @@ export function WhatsAppFAB() {
                             </div>
                             <button
                                 onClick={() => setIsExpanded(false)}
-                                className="p-1 text-white/70 hover:text-white hover:bg-white/10 rounded-full transition-colors"
+                                className="w-9 h-9 flex items-center justify-center text-white/70 hover:text-white hover:bg-white/10 rounded-full transition-colors"
                                 aria-label="Close chat preview"
                             >
                                 <X className="w-4 h-4" />
@@ -111,7 +126,7 @@ export function WhatsAppFAB() {
                                 target="_blank"
                                 rel="noopener noreferrer"
                                 onClick={() => setIsExpanded(false)}
-                                className="w-full flex items-center justify-center gap-2 bg-[#25D366] hover:bg-[#20bd5a] text-white py-2.5 rounded-xl text-sm font-semibold transition-colors shadow-sm"
+                                className="w-full min-h-[44px] flex items-center justify-center gap-2 bg-[#25D366] hover:bg-[#20bd5a] text-white py-2.5 rounded-xl text-sm font-semibold transition-colors shadow-sm"
                             >
                                 Continue on WhatsApp <ArrowRight className="w-4 h-4" />
                             </a>

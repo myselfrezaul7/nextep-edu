@@ -153,6 +153,7 @@ export const viewport: Viewport = {
     width: "device-width",
     initialScale: 1,
     maximumScale: 5,
+    viewportFit: "cover",
 };
 
 export default function RootLayout({
@@ -183,7 +184,7 @@ export default function RootLayout({
                             <ScrollProgress />
                             <div className="flex flex-col min-h-screen">
                                 <Header />
-                                <main className="flex-grow pt-20 pb-24 md:pb-0">
+                                <main className="flex-grow pt-20 pb-[calc(6.5rem+env(safe-area-inset-bottom,0px))] md:pb-0">
                                     <ErrorBoundary>
                                         <PageTransition>{children}</PageTransition>
                                     </ErrorBoundary>

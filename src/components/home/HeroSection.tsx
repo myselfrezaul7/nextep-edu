@@ -100,7 +100,7 @@ export function HeroSection() {
                         <motion.div whileTap={{ scale: 0.98 }} className="w-full sm:w-auto">
                             <Button
                                 size="lg"
-                                className="rounded-full text-base px-8 w-full sm:w-auto gap-2"
+                                className="rounded-full text-base px-8 min-h-[48px] w-full sm:w-auto gap-2"
                                 onClick={() => openModal()}
                             >
                                 {t("home.hero.ctaPrimary", undefined, "Let's Talk")}
@@ -111,7 +111,7 @@ export function HeroSection() {
                             <Button
                                 size="lg"
                                 variant="outline"
-                                className="rounded-full text-base px-8 w-full sm:w-auto"
+                                className="rounded-full text-base px-8 min-h-[48px] w-full sm:w-auto"
                                 asChild
                             >
                                 <Link href="/#services">
@@ -121,11 +121,51 @@ export function HeroSection() {
                         </motion.div>
                     </motion.div>
 
+                    {/* Quick Destination Jump Chips for Mobile & Desktop */}
+                    <motion.div
+                        initial={{ opacity: 0, y: 16 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ duration: 0.8, delay: 0.35, ease: EASE_OUT_EXPO }}
+                        className="pt-1 flex flex-wrap items-center justify-center lg:justify-start gap-2"
+                    >
+                        <span className="text-xs font-semibold uppercase tracking-wider text-muted-foreground mr-1">
+                            Popular:
+                        </span>
+                        {[
+                            { name: "Germany", slug: "germany", flag: "🇩🇪" },
+                            { name: "UK", slug: "uk", flag: "🇬🇧" },
+                            { name: "USA", slug: "usa", flag: "🇺🇸" },
+                            { name: "Canada", slug: "canada", flag: "🇨🇦" },
+                            { name: "Australia", slug: "australia", flag: "🇦🇺" },
+                        ].map((country) => (
+                            <Link
+                                key={country.slug}
+                                href={`/destinations/${country.slug}`}
+                                className={cn(
+                                    "inline-flex items-center gap-1.5 px-3 min-h-[38px] rounded-full text-xs font-medium border transition-all active:scale-95",
+                                    isDark
+                                        ? "bg-slate-900/70 border-white/10 text-foreground/90 hover:border-accent/50 hover:text-accent"
+                                        : "bg-white/85 border-slate-200/90 text-foreground/90 hover:border-accent/50 hover:text-accent shadow-2xs"
+                                )}
+                            >
+                                <span>{country.flag}</span>
+                                <span>{country.name}</span>
+                            </Link>
+                        ))}
+                        <Link
+                            href="/destinations"
+                            className="inline-flex items-center gap-1 px-3 min-h-[38px] rounded-full text-xs font-semibold text-accent bg-accent/10 border border-accent/25 hover:bg-accent/20 transition-all active:scale-95"
+                        >
+                            <span>17+ Countries</span>
+                            <ArrowRight className="w-3 h-3" />
+                        </Link>
+                    </motion.div>
+
                     <motion.div
                         initial={{ opacity: 0, y: 18 }}
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ duration: 0.8, delay: 0.4, ease: EASE_OUT_EXPO }}
-                        className="pt-4 flex justify-center lg:justify-start"
+                        className="pt-3 flex flex-col sm:flex-row items-center justify-center lg:justify-start gap-3"
                     >
                         <div className={cn(
                             "inline-flex items-center gap-3.5 px-4 py-2.5 rounded-full glass-nav border",
@@ -146,6 +186,18 @@ export function HeroSection() {
                                 <span className="text-muted-foreground/80">{t("home.hero.across", undefined, " across ")}</span>
                                 <span className="font-semibold text-accent">{t("home.hero.countries", undefined, "20+ countries")}</span>
                             </div>
+                        </div>
+
+                        {/* Mobile-visible compact trust badges */}
+                        <div className="flex sm:hidden items-center justify-center gap-2.5 text-xs font-medium text-muted-foreground">
+                            <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-accent/10 border border-accent/20 text-foreground">
+                                <CheckCircle2 className="w-3.5 h-3.5 text-accent" />
+                                98% Visa Success
+                            </span>
+                            <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-accent/10 border border-accent/20 text-foreground">
+                                <ShieldCheck className="w-3.5 h-3.5 text-accent" />
+                                Zero Advance Fees
+                            </span>
                         </div>
                     </motion.div>
                 </div>

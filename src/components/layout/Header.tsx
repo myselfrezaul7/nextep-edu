@@ -224,7 +224,7 @@ export function Header() {
                     <motion.button
                         whileTap={{ scale: 0.95 }}
                         onClick={toggleTheme}
-                        className="p-2 w-10 h-10 flex items-center justify-center rounded-full hover:bg-muted transition-colors text-primary shrink-0"
+                        className="p-2 w-11 h-11 flex items-center justify-center rounded-full hover:bg-muted transition-colors text-primary shrink-0"
                         aria-label="Toggle theme"
                     >
                         {mounted && theme === "dark" ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}

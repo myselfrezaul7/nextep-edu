@@ -9,7 +9,7 @@ export function LanguageToggle() {
     const mounted = useMounted();
 
     if (!mounted) {
-        return <div className="w-[42px] h-8" />; // Placeholder to prevent layout shift
+        return <div className="w-11 h-11 lg:w-[44px] lg:h-9" />; // Placeholder to prevent layout shift
     }
 
     return (
@@ -19,7 +19,7 @@ export function LanguageToggle() {
             className={cn(
                 "px-3 py-1.5 rounded-full text-xs font-bold tracking-wide",
                 "hover:bg-muted transition-colors text-primary shrink-0",
-                "border border-border/50 flex items-center justify-center min-w-[42px] h-8"
+                "border border-border/50 flex items-center justify-center min-w-[44px] h-11 lg:h-9"
             )}
             aria-label={locale === "en" ? "Switch to Bangla" : "Switch to English"}
         >
