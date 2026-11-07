@@ -24,6 +24,8 @@ import {
     X,
     WifiOff,
     RefreshCw,
+    Phone,
+    ExternalLink,
 } from "lucide-react";
 import { ApplicationTimeline } from "@/components/tracker/ApplicationTimeline";
 import { DocumentViewer } from "@/components/admin/DocumentViewer";
@@ -849,16 +851,16 @@ export default function AdminPage() {
     // --- DASHBOARD VIEWS --------------------------------------
     return (
         <div className="min-h-screen bg-background">
-            <AnimatePresence mode="wait">
-                {/* --- LIST VIEW --- */}
-                {view === "list" && (
+            <AnimatePresence>
+                {/* --- LIST VIEW (stays mounted on mobile when edit drawer is open) --- */}
+                {(view === "list" || view === "edit") && (
                     <motion.div
                         key="list"
                         initial={{ opacity: 0 }}
                         animate={{ opacity: 1 }}
                         exit={{ opacity: 0 }}
                         transition={{ duration: 0.3, ease: EASE_OUT_EXPO }}
-                        className="max-w-5xl mx-auto px-4 py-8"
+                        className={`max-w-5xl mx-auto px-4 py-8 ${view === "edit" ? "lg:hidden" : ""}`}
                     >
                         {/* Header */}
                         <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-8">
@@ -975,8 +977,22 @@ export default function AdminPage() {
 
                         {/* Application Cards */}
                         {loading ? (
-                            <div className="flex items-center justify-center py-20">
-                                <Loader2 className="w-8 h-8 animate-spin text-accent" />
+                            <div className="grid gap-3" aria-busy="true" aria-label="Loading applications">
+                                {[1, 2, 3, 4, 5].map((i) => (
+                                    <div
+                                        key={i}
+                                        className={`w-full rounded-2xl p-4 md:p-5 ${glassCard} animate-pulse flex items-center justify-between gap-4`}
+                                    >
+                                        <div className="flex items-center gap-3.5 min-w-0 flex-1">
+                                            <div className="w-10 h-10 rounded-xl bg-accent/15 shrink-0" />
+                                            <div className="space-y-2 flex-1 max-w-[220px]">
+                                                <div className="h-4 bg-foreground/15 rounded w-3/4" />
+                                                <div className="h-3 bg-foreground/10 rounded w-1/2" />
+                                            </div>
+                                        </div>
+                                        <div className="h-7 w-20 rounded-full bg-foreground/10 shrink-0" />
+                                    </div>
+                                ))}
                             </div>
                         ) : filteredApps.length === 0 ? (
                             <div className="text-center py-20">
@@ -1351,97 +1367,165 @@ export default function AdminPage() {
                     </motion.div>
                 )}
 
-                {/* --- EDIT VIEW --- */}
+                {/* --- EDIT VIEW (Mobile Slide-Up Bottom Sheet / Desktop View) --- */}
                 {view === "edit" && selectedApp && (
                     <motion.div
                         key="edit"
-                        initial={{ opacity: 0, x: 30 }}
-                        animate={{ opacity: 1, x: 0 }}
-                        exit={{ opacity: 0, x: -30 }}
-                        transition={{ duration: 0.4, ease: EASE_OUT_EXPO }}
-                        className="max-w-2xl mx-auto px-4 py-8"
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        exit={{ opacity: 0 }}
+                        transition={{ duration: 0.25 }}
+                        className="max-lg:fixed max-lg:inset-0 max-lg:z-50 max-lg:bg-black/60 max-lg:backdrop-blur-xs max-lg:flex max-lg:flex-col max-lg:justify-end"
+                        onClick={() => setView("list")}
                     >
-                        <div className="flex items-center justify-between mb-6">
+                    <motion.div
+                        initial={{ y: 36, opacity: 0 }}
+                        animate={{ y: 0, opacity: 1 }}
+                        exit={{ y: 36, opacity: 0 }}
+                        transition={{ duration: 0.35, ease: EASE_OUT_EXPO }}
+                        onClick={(e) => e.stopPropagation()}
+                        className={`w-full max-w-2xl mx-auto px-4 pb-8 pt-3 lg:py-8 max-lg:max-h-[92dvh] max-lg:overflow-y-auto max-lg:rounded-t-3xl max-lg:shadow-2xl max-lg:border-t pb-safe ${
+                            isDark
+                                ? "max-lg:bg-[#0B1120] max-lg:border-white/15"
+                                : "max-lg:bg-background max-lg:border-black/10"
+                        }`}
+                    >
+                        {/* Mobile Bottom-Sheet Drag Handle */}
+                        <div className="lg:hidden flex justify-center pt-1 pb-3">
+                            <div className="w-11 h-1.5 rounded-full bg-muted-foreground/30" />
+                        </div>
+
+                        <div className="flex items-center justify-between mb-5">
                             <button
                                 onClick={() => setView("list")}
-                                className="inline-flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground transition-colors"
+                                className="inline-flex items-center gap-1.5 min-h-[44px] px-3 -ml-2 rounded-xl text-sm font-medium text-muted-foreground hover:text-foreground hover:bg-muted/50 transition-colors"
                             >
                                 <ArrowLeft className="w-4 h-4" />
                                 Back to List
                             </button>
-                            {syncStatus === "offline" ? (
-                                <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium bg-red-500/10 text-red-500 border border-red-500/20">
-                                    <WifiOff className="w-3 h-3" />
-                                    Offline
-                                </span>
-                            ) : syncStatus === "reconnecting" ? (
-                                <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium bg-amber-500/10 text-amber-500 border border-amber-500/20">
-                                    <RefreshCw className="w-3 h-3 animate-spin" />
-                                    Syncing...
-                                </span>
-                            ) : (
-                                <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium bg-green-500/10 text-green-500 border border-green-500/20">
-                                    <span className="relative flex h-2 w-2">
-                                        <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75" />
-                                        <span className="relative inline-flex rounded-full h-2 w-2 bg-green-500" />
+                            <div className="flex items-center gap-2">
+                                {syncStatus === "offline" ? (
+                                    <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium bg-red-500/10 text-red-500 border border-red-500/20">
+                                        <WifiOff className="w-3 h-3" />
+                                        Offline
                                     </span>
-                                    Live Sync
-                                </span>
-                            )}
+                                ) : syncStatus === "reconnecting" ? (
+                                    <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium bg-amber-500/10 text-amber-500 border border-amber-500/20">
+                                        <RefreshCw className="w-3 h-3 animate-spin" />
+                                        Syncing...
+                                    </span>
+                                ) : (
+                                    <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium bg-green-500/10 text-green-500 border border-green-500/20">
+                                        <span className="relative flex h-2 w-2">
+                                            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75" />
+                                            <span className="relative inline-flex rounded-full h-2 w-2 bg-green-500" />
+                                        </span>
+                                        Live Sync
+                                    </span>
+                                )}
+                                <button
+                                    type="button"
+                                    onClick={() => setView("list")}
+                                    aria-label="Close application drawer"
+                                    className="lg:hidden min-w-[44px] min-h-[44px] rounded-xl flex items-center justify-center hover:bg-muted text-muted-foreground hover:text-foreground transition-colors"
+                                >
+                                    <X className="w-5 h-5" />
+                                </button>
+                            </div>
                         </div>
 
                         {/* Applicant Header */}
                         <div
-                            className={`rounded-2xl p-5 md:p-6 mb-6 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 ${glassCard} shadow-lg`}
+                            className={`rounded-2xl p-5 md:p-6 mb-6 flex flex-col gap-4 ${glassCard} shadow-lg`}
                         >
-                            <div className="flex items-center gap-4">
-                                <span className="text-4xl">
-                                    {getDestinationFlag(
-                                        selectedApp.destination
-                                    )}
-                                </span>
-                                <div>
-                                    <h2 className="text-xl font-bold text-foreground">
-                                        {selectedApp.name}
-                                    </h2>
-                                    <div className="flex items-center gap-3 mt-1 flex-wrap">
-                                        <span className="font-mono text-sm text-accent">
-                                            {selectedApp.tracking_code}
-                                        </span>
-                                        {selectedApp.destination && (
-                                            <span className="text-xs text-muted-foreground">
-                                                →{" "}
-                                                {destinations[
-                                                    selectedApp.destination
-                                                ]?.name ||
-                                                    selectedApp.destination}
-                                            </span>
+                            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+                                <div className="flex items-center gap-4 min-w-0">
+                                    <span className="text-4xl shrink-0">
+                                        {getDestinationFlag(
+                                            selectedApp.destination
                                         )}
+                                    </span>
+                                    <div className="min-w-0">
+                                        <h2 className="text-xl font-bold text-foreground truncate">
+                                            {selectedApp.name}
+                                        </h2>
+                                        <div className="flex items-center gap-2.5 mt-1 flex-wrap">
+                                            <button
+                                                type="button"
+                                                onClick={() => handleCopyCode(selectedApp.tracking_code)}
+                                                className="inline-flex items-center gap-1.5 font-mono text-sm text-accent hover:underline"
+                                                title="Tap to copy tracking code"
+                                            >
+                                                <span>{selectedApp.tracking_code}</span>
+                                                {codeCopied ? (
+                                                    <Check className="w-3.5 h-3.5 text-green-500" />
+                                                ) : (
+                                                    <Copy className="w-3.5 h-3.5" />
+                                                )}
+                                            </button>
+                                            {selectedApp.destination && (
+                                                <span className="text-xs text-muted-foreground">
+                                                    -{" "}
+                                                    {destinations[
+                                                        selectedApp.destination
+                                                    ]?.name ||
+                                                        selectedApp.destination}
+                                                </span>
+                                            )}
+                                        </div>
                                     </div>
                                 </div>
+                                <div className="flex items-center gap-2 w-full sm:w-auto">
+                                    <button
+                                        onClick={() => {
+                                            setEditForm({
+                                                name: selectedApp.name,
+                                                phone: selectedApp.phone,
+                                                email: selectedApp.email || "",
+                                                destination: selectedApp.destination || "",
+                                            });
+                                            setIsEditModalOpen(true);
+                                        }}
+                                        className="flex-1 sm:flex-initial min-h-[44px] px-4 py-2 rounded-xl text-sm font-medium border transition-colors border-border text-foreground hover:bg-muted/60"
+                                    >
+                                        Edit
+                                    </button>
+                                    <button
+                                        onClick={handleDelete}
+                                        disabled={deleteLoading}
+                                        className="flex-1 sm:flex-initial min-h-[44px] px-4 py-2 rounded-xl text-sm font-medium border transition-colors border-red-500/20 text-red-500 hover:bg-red-500/10 disabled:opacity-50 flex items-center justify-center"
+                                    >
+                                        {deleteLoading ? <Loader2 className="w-4 h-4 animate-spin" /> : "Delete"}
+                                    </button>
+                                </div>
                             </div>
-                            <div className="flex gap-2">
-                                <button
-                                    onClick={() => {
-                                        setEditForm({
-                                            name: selectedApp.name,
-                                            phone: selectedApp.phone,
-                                            email: selectedApp.email || "",
-                                            destination: selectedApp.destination || "",
-                                        });
-                                        setIsEditModalOpen(true);
-                                    }}
-                                    className="px-4 py-2 rounded-xl text-sm font-medium border transition-colors border-white/10 text-foreground hover:bg-white/10"
+
+                            {/* One-Tap Mobile Counselor Quick Actions */}
+                            <div className="grid grid-cols-2 sm:grid-cols-3 gap-2.5 pt-3.5 border-t border-border/50">
+                                <a
+                                    href={`tel:${selectedApp.phone.replace(/[^0-9+]/g, "")}`}
+                                    className="min-h-[44px] px-3.5 py-2 rounded-xl bg-accent/12 hover:bg-accent/20 text-accent text-xs font-semibold flex items-center justify-center gap-2 transition-colors"
                                 >
-                                    Edit
-                                </button>
+                                    <Phone className="w-4 h-4 shrink-0" />
+                                    <span className="truncate">Call Student</span>
+                                </a>
                                 <button
-                                    onClick={handleDelete}
-                                    disabled={deleteLoading}
-                                    className="px-4 py-2 rounded-xl text-sm font-medium border transition-colors border-red-500/20 text-red-500 hover:bg-red-500/10 disabled:opacity-50"
+                                    type="button"
+                                    onClick={() => handleWhatsApp(selectedApp)}
+                                    className="min-h-[44px] px-3.5 py-2 rounded-xl bg-emerald-500/12 hover:bg-emerald-500/20 text-emerald-500 text-xs font-semibold flex items-center justify-center gap-2 transition-colors"
                                 >
-                                    {deleteLoading ? <Loader2 className="w-4 h-4 animate-spin" /> : "Delete"}
+                                    <MessageCircle className="w-4 h-4 shrink-0" />
+                                    <span className="truncate">WhatsApp</span>
                                 </button>
+                                <a
+                                    href={`/track?code=${encodeURIComponent(selectedApp.tracking_code)}`}
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    className="col-span-2 sm:col-span-1 min-h-[44px] px-3.5 py-2 rounded-xl bg-muted/60 hover:bg-muted text-foreground text-xs font-semibold flex items-center justify-center gap-2 transition-colors"
+                                >
+                                    <ExternalLink className="w-4 h-4 shrink-0 text-muted-foreground" />
+                                    <span className="truncate">Student Portal</span>
+                                </a>
                             </div>
                         </div>
 
@@ -1598,25 +1682,32 @@ export default function AdminPage() {
                             </div>
                         </div>
                     </motion.div>
+                    </motion.div>
                 )}
 
-                {/* --- EDIT MODAL --- */}
+                {/* --- EDIT MODAL (Mobile Bottom Sheet / Desktop Centered Modal) --- */}
                 {isEditModalOpen && selectedApp && (
                     <motion.div
                         initial={{ opacity: 0 }}
                         animate={{ opacity: 1 }}
                         exit={{ opacity: 0 }}
-                        className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm"
+                        className="fixed inset-0 z-[60] flex items-end sm:items-center justify-center sm:p-4 bg-black/60 backdrop-blur-sm"
+                        onClick={() => setIsEditModalOpen(false)}
                     >
                         <motion.div
-                            initial={{ scale: 0.95 }}
-                            animate={{ scale: 1 }}
-                            exit={{ scale: 0.95 }}
-                            className={`w-full max-w-lg rounded-2xl p-6 ${glassCard} shadow-2xl relative`}
+                            initial={{ y: 24, scale: 0.98 }}
+                            animate={{ y: 0, scale: 1 }}
+                            exit={{ y: 24, scale: 0.98 }}
+                            onClick={(e) => e.stopPropagation()}
+                            className={`w-full max-w-lg rounded-t-3xl sm:rounded-2xl p-6 pb-safe ${glassCard} shadow-2xl relative max-h-[90dvh] overflow-y-auto`}
                         >
+                            <div className="sm:hidden flex justify-center pb-3">
+                                <div className="w-10 h-1.5 rounded-full bg-muted-foreground/30" />
+                            </div>
                             <button
                                 onClick={() => setIsEditModalOpen(false)}
-                                className="absolute top-4 right-4 p-2 rounded-full hover:bg-black/5 dark:hover:bg-white/10 transition-colors"
+                                aria-label="Close edit modal"
+                                className="absolute top-4 right-4 min-w-[44px] min-h-[44px] flex items-center justify-center rounded-full hover:bg-black/5 dark:hover:bg-white/10 transition-colors"
                             >
                                 <X className="w-5 h-5 text-muted-foreground" />
                             </button>

@@ -198,8 +198,25 @@ export function DocumentViewer({
 
     if (loading) {
         return (
-            <div className="flex items-center justify-center p-8">
-                <Loader2 className="w-6 h-6 animate-spin text-accent" />
+            <div className="space-y-3" aria-busy="true" aria-label="Loading documents">
+                {[1, 2].map((i) => (
+                    <div
+                        key={i}
+                        className="p-4 rounded-xl bg-black/5 dark:bg-white/5 border border-black/5 dark:border-white/10 animate-pulse flex items-center justify-between gap-3"
+                    >
+                        <div className="flex items-center gap-3 flex-1">
+                            <div className="w-8 h-8 rounded-lg bg-accent/15 shrink-0" />
+                            <div className="space-y-2 flex-1 max-w-[220px]">
+                                <div className="h-3.5 bg-foreground/15 rounded w-3/4" />
+                                <div className="h-2.5 bg-foreground/10 rounded w-1/2" />
+                            </div>
+                        </div>
+                        <div className="flex gap-2">
+                            <div className="h-10 w-16 rounded-lg bg-foreground/10" />
+                            <div className="h-10 w-16 rounded-lg bg-foreground/10" />
+                        </div>
+                    </div>
+                ))}
             </div>
         );
     }
@@ -267,7 +284,7 @@ export function DocumentViewer({
                                 </div>
                             </div>
 
-                            <div className="flex items-center gap-1.5 shrink-0 flex-wrap">
+                            <div className="flex items-center gap-2 shrink-0 flex-wrap">
                                 <button
                                     type="button"
                                     disabled={isBusy}
@@ -278,14 +295,14 @@ export function DocumentViewer({
                                             ""
                                         )
                                     }
-                                    className={`inline-flex items-center gap-1 px-2.5 py-1.5 min-h-[36px] rounded-lg text-xs font-semibold transition-colors disabled:opacity-50 ${
+                                    className={`inline-flex items-center justify-center gap-1.5 px-3.5 py-2 min-h-[44px] rounded-xl text-xs font-semibold transition-colors disabled:opacity-50 ${
                                         status === "verified"
                                             ? "bg-emerald-500 text-white"
                                             : "bg-emerald-500/10 text-emerald-500 hover:bg-emerald-500/20 border border-emerald-500/20"
                                     }`}
                                     title="Mark as Verified"
                                 >
-                                    <CheckCircle2 className="w-3.5 h-3.5" />
+                                    <CheckCircle2 className="w-4 h-4" />
                                     Verify
                                 </button>
 
@@ -302,14 +319,14 @@ export function DocumentViewer({
                                             );
                                         }
                                     }}
-                                    className={`inline-flex items-center gap-1 px-2.5 py-1.5 min-h-[36px] rounded-lg text-xs font-semibold transition-colors disabled:opacity-50 ${
+                                    className={`inline-flex items-center justify-center gap-1.5 px-3.5 py-2 min-h-[44px] rounded-xl text-xs font-semibold transition-colors disabled:opacity-50 ${
                                         status === "rejected" || isRejecting
                                             ? "bg-red-500 text-white"
                                             : "bg-red-500/10 text-red-500 hover:bg-red-500/20 border border-red-500/20"
                                     }`}
                                     title="Reject and request re-upload"
                                 >
-                                    <XCircle className="w-3.5 h-3.5" />
+                                    <XCircle className="w-4 h-4" />
                                     Reject
                                 </button>
 
@@ -319,16 +336,18 @@ export function DocumentViewer({
                                             href={doc.url}
                                             target="_blank"
                                             rel="noopener noreferrer"
-                                            className="p-2 min-h-[36px] min-w-[36px] flex items-center justify-center hover:bg-black/10 dark:hover:bg-white/10 rounded-lg transition-colors"
+                                            className="p-2.5 min-h-[44px] min-w-[44px] flex items-center justify-center hover:bg-black/10 dark:hover:bg-white/10 rounded-xl transition-colors"
                                             title="View Document"
+                                            aria-label="View Document"
                                         >
                                             <ExternalLink className="w-4 h-4 text-muted-foreground" />
                                         </a>
                                         <a
                                             href={doc.url}
                                             download
-                                            className="p-2 min-h-[36px] min-w-[36px] flex items-center justify-center hover:bg-black/10 dark:hover:bg-white/10 rounded-lg transition-colors"
+                                            className="p-2.5 min-h-[44px] min-w-[44px] flex items-center justify-center hover:bg-black/10 dark:hover:bg-white/10 rounded-xl transition-colors"
                                             title="Download Document"
+                                            aria-label="Download Document"
                                         >
                                             <Download className="w-4 h-4 text-muted-foreground" />
                                         </a>
@@ -338,8 +357,9 @@ export function DocumentViewer({
                                     type="button"
                                     onClick={() => handleDeleteDoc(doc.name, displayName)}
                                     disabled={isBusy}
-                                    className="p-2 min-h-[36px] min-w-[36px] flex items-center justify-center hover:bg-red-500/10 text-muted-foreground hover:text-red-500 rounded-lg transition-colors disabled:opacity-50"
+                                    className="p-2.5 min-h-[44px] min-w-[44px] flex items-center justify-center hover:bg-red-500/10 text-muted-foreground hover:text-red-500 rounded-xl transition-colors disabled:opacity-50"
                                     title="Delete Document"
+                                    aria-label="Delete Document"
                                 >
                                     {deletingName === doc.name ? (
                                         <Loader2 className="w-4 h-4 animate-spin text-red-500" />
@@ -351,15 +371,16 @@ export function DocumentViewer({
                         </div>
 
                         {isRejecting && (
-                            <div className="pt-2 border-t border-black/5 dark:border-white/10 flex flex-col sm:flex-row gap-2">
+                            <div className="pt-2.5 border-t border-black/5 dark:border-white/10 flex flex-col sm:flex-row gap-2">
                                 <input
                                     type="text"
+                                    enterKeyHint="send"
                                     value={rejectFeedback}
                                     onChange={(e) =>
                                         setRejectFeedback(e.target.value)
                                     }
                                     placeholder="Reason for rejection (e.g. Blurry scan, please re-upload clear PDF)..."
-                                    className="flex-1 px-3 py-2 rounded-lg text-xs bg-black/5 dark:bg-white/5 border border-black/10 dark:border-white/10 text-foreground outline-none focus:border-red-500/50"
+                                    className="flex-1 min-h-[44px] px-3.5 py-2 rounded-xl text-xs bg-black/5 dark:bg-white/5 border border-black/10 dark:border-white/10 text-foreground outline-none focus:border-red-500/50"
                                 />
                                 <div className="flex gap-2">
                                     <button
@@ -372,7 +393,7 @@ export function DocumentViewer({
                                                     "Please re-upload a clearer copy of this document."
                                             )
                                         }
-                                        className="px-3 py-2 rounded-lg bg-red-500 text-white text-xs font-semibold hover:bg-red-600 transition-colors"
+                                        className="min-h-[44px] px-4 py-2 rounded-xl bg-red-500 text-white text-xs font-semibold hover:bg-red-600 transition-colors"
                                     >
                                         Confirm Reject
                                     </button>
@@ -381,7 +402,7 @@ export function DocumentViewer({
                                         onClick={() =>
                                             setRejectingDocName(null)
                                         }
-                                        className="px-3 py-2 rounded-lg bg-black/5 dark:bg-white/10 text-xs font-medium text-muted-foreground hover:text-foreground transition-colors"
+                                        className="min-h-[44px] px-4 py-2 rounded-xl bg-black/5 dark:bg-white/10 text-xs font-medium text-muted-foreground hover:text-foreground transition-colors"
                                     >
                                         Cancel
                                     </button>
