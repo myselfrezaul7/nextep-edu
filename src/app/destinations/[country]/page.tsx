@@ -84,6 +84,7 @@ export default async function DestinationCountryPage({ params }: Props) {
     const serializedData = {
         slug: destination.slug,
         name: destination.name,
+        flag: destination.flag,
         heroImage: destination.heroImage,
         heroTitle: destination.hero.title,
         heroDescription: destination.hero.description,

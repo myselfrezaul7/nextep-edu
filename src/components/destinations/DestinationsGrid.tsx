@@ -13,14 +13,24 @@ import { cn } from "@/lib/utils";
 
 // Top 6 destinations to show on homepage
 const TOP_SLUGS = ["germany", "usa", "australia", "canada", "uk", "south-korea"];
-const EUROPE_SLUGS = ["germany", "uk", "sweden", "finland", "denmark", "france", "italy", "hungary", "poland", "lithuania", "latvia", "estonia", "cyprus", "malta", "georgia"];
+const EUROPE_SLUGS = ["uk", "germany", "france", "netherlands", "norway", "portugal", "austria", "belgium", "turkey", "cyprus", "latvia"];
+const SCHENGEN_SLUGS = ["germany", "france", "netherlands", "norway", "portugal", "austria", "belgium", "latvia"];
 const NORTH_AMERICA_SLUGS = ["usa", "canada"];
-const ASIA_PACIFIC_SLUGS = ["australia", "south-korea", "japan", "malaysia", "china"];
-const BUDGET_SLUGS = ["germany", "italy", "hungary", "poland", "lithuania", "latvia", "estonia", "malaysia", "china", "georgia", "cyprus"];
+const ASIA_PACIFIC_SLUGS = ["australia", "south-korea", "china", "malaysia"];
+const BUDGET_SLUGS = ["germany", "norway", "portugal", "austria", "china", "malaysia", "turkey", "cyprus", "latvia"];
+const WORK_RIGHTS_SLUGS = ["uk", "usa", "canada", "australia", "germany", "netherlands"];
 
-type HomeFilterCategory = "featured" | "europe" | "north-america" | "asia-pacific" | "budget";
+export type DestinationFilterCategory =
+    | "all"
+    | "featured"
+    | "europe"
+    | "schengen"
+    | "north-america"
+    | "asia-pacific"
+    | "budget"
+    | "work-rights";
 
-const HOME_FILTER_CHIPS: { id: HomeFilterCategory; label: string }[] = [
+const HOME_FILTER_CHIPS: { id: DestinationFilterCategory; label: string }[] = [
     { id: "featured", label: "Top Picks" },
     { id: "europe", label: "Europe" },
     { id: "north-america", label: "North America" },
@@ -116,42 +126,92 @@ function Card3D({ children, href }: { children: React.ReactNode; href: string })
     );
 }
 
-export function DestinationsGrid({ featuredOnly = false }: { featuredOnly?: boolean }) {
+interface DestinationsGridProps {
+    featuredOnly?: boolean;
+    searchQuery?: string;
+    activeCategory?: DestinationFilterCategory;
+    onResetFilters?: () => void;
+}
+
+export function DestinationsGrid({
+    featuredOnly = false,
+    searchQuery = "",
+    activeCategory = "all",
+    onResetFilters,
+}: DestinationsGridProps) {
     const { t } = useTranslation();
     const { openModal } = useBookingModal();
-    const [activeFilter, setActiveFilter] = useState<HomeFilterCategory>("featured");
+    const [homeFilter, setHomeFilter] = useState<DestinationFilterCategory>("featured");
+
+    const effectiveCategory = featuredOnly ? homeFilter : activeCategory;
 
     const displayedDestinations = useMemo(() => {
-        if (!featuredOnly) {
-            return Object.values(destinations);
-        }
         const allList = Object.values(destinations);
-        switch (activeFilter) {
-            case "europe":
-                return allList.filter((d) => EUROPE_SLUGS.includes(d.slug)).slice(0, 6);
-            case "north-america":
-                return allList.filter((d) => NORTH_AMERICA_SLUGS.includes(d.slug));
-            case "asia-pacific":
-                return allList.filter((d) => ASIA_PACIFIC_SLUGS.includes(d.slug)).slice(0, 6);
-            case "budget":
-                return allList.filter((d) => BUDGET_SLUGS.includes(d.slug)).slice(0, 6);
+        let filtered = allList;
+
+        switch (effectiveCategory) {
             case "featured":
+                filtered = topDestinations;
+                break;
+            case "europe":
+                filtered = allList.filter((d) => EUROPE_SLUGS.includes(d.slug));
+                break;
+            case "schengen":
+                filtered = allList.filter((d) => SCHENGEN_SLUGS.includes(d.slug));
+                break;
+            case "north-america":
+                filtered = allList.filter((d) => NORTH_AMERICA_SLUGS.includes(d.slug));
+                break;
+            case "asia-pacific":
+                filtered = allList.filter((d) => ASIA_PACIFIC_SLUGS.includes(d.slug));
+                break;
+            case "budget":
+                filtered = allList.filter((d) => BUDGET_SLUGS.includes(d.slug));
+                break;
+            case "work-rights":
+                filtered = allList.filter((d) => WORK_RIGHTS_SLUGS.includes(d.slug));
+                break;
+            case "all":
             default:
-                return topDestinations;
+                filtered = allList;
+                break;
         }
-    }, [featuredOnly, activeFilter]);
+
+        if (featuredOnly && effectiveCategory !== "featured") {
+            filtered = filtered.slice(0, 6);
+        }
+
+        const q = searchQuery.trim().toLowerCase();
+        if (q) {
+            filtered = filtered.filter((d) => {
+                const matchName = d.name.toLowerCase().includes(q);
+                const matchDesc = d.hero.description.toLowerCase().includes(q);
+                const matchBenefit = d.benefits.some(
+                    (b) =>
+                        b.title.toLowerCase().includes(q) ||
+                        b.description.toLowerCase().includes(q)
+                );
+                const matchUni = d.universities.some((u) =>
+                    u.name.toLowerCase().includes(q)
+                );
+                return matchName || matchDesc || matchBenefit || matchUni;
+            });
+        }
+
+        return filtered;
+    }, [featuredOnly, effectiveCategory, searchQuery]);
 
     return (
         <div>
             {featuredOnly && (
                 <div className="flex items-center justify-start sm:justify-center gap-2 overflow-x-auto scrollbar-hide -mx-4 px-4 sm:mx-0 sm:px-0 pb-3 mb-8 snap-x">
                     {HOME_FILTER_CHIPS.map((chip) => {
-                        const isActive = activeFilter === chip.id;
+                        const isActive = homeFilter === chip.id;
                         return (
                             <button
                                 key={chip.id}
                                 type="button"
-                                onClick={() => setActiveFilter(chip.id)}
+                                onClick={() => setHomeFilter(chip.id)}
                                 className={cn(
                                     "relative px-4 min-h-[42px] rounded-full text-xs sm:text-sm font-semibold whitespace-nowrap transition-all shrink-0 snap-start flex items-center gap-1.5 border",
                                     isActive
@@ -166,8 +226,40 @@ export function DestinationsGrid({ featuredOnly = false }: { featuredOnly?: bool
                 </div>
             )}
 
+            {displayedDestinations.length === 0 ? (
+                <motion.div
+                    initial={{ opacity: 0, y: 12 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    className="surface-card rounded-2xl p-8 md:p-12 text-center max-w-xl mx-auto my-4"
+                >
+                    <p className="text-lg font-heading font-bold text-primary mb-2">
+                        No destinations matched your filter
+                    </p>
+                    <p className="text-sm text-muted-foreground mb-6">
+                        Try clearing your search query or switching to a broader region filter, or ask our counselors for a custom university shortlist.
+                    </p>
+                    <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
+                        {onResetFilters && (
+                            <Button
+                                variant="outline"
+                                className="rounded-full min-h-[44px] px-6 w-full sm:w-auto"
+                                onClick={onResetFilters}
+                            >
+                                Reset Filters
+                            </Button>
+                        )}
+                        <Button
+                            className="rounded-full min-h-[44px] px-6 w-full sm:w-auto gap-2"
+                            onClick={() => openModal({ topic: "Custom Country & University Shortlist" })}
+                        >
+                            <Sparkles className="w-4 h-4" />
+                            <span>Get Custom Shortlist</span>
+                        </Button>
+                    </div>
+                </motion.div>
+            ) : (
             <motion.div
-                key={featuredOnly ? activeFilter : "all"}
+                key={`${effectiveCategory}-${searchQuery}`}
                 variants={container}
                 initial="hidden"
                 animate="show"
@@ -250,6 +342,7 @@ export function DestinationsGrid({ featuredOnly = false }: { featuredOnly?: bool
                     ))}
                 </AnimatePresence>
             </motion.div>
+            )}
 
             {/* See All Destinations Button - Only show if featuredOnly is true */}
             {featuredOnly && (
