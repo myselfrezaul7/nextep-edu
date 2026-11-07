@@ -1,5 +1,4 @@
 import { NextRequest, NextResponse } from "next/server";
-import { Resend } from "resend";
 import {
     DEFAULT_STEPS,
     generateTrackingCode,
@@ -7,9 +6,7 @@ import {
 import type { Application } from "@/lib/supabase";
 import { isAuthorized } from "@/lib/auth";
 import { supabaseAdmin } from "@/lib/supabase-server";
-import { escapeHtml } from "@/lib/sanitize";
-
-const resend = new Resend(process.env.RESEND_API_KEY);
+import { escapeHtml, normalizePhone } from "@/lib/sanitize";
 
 // Non-blocking helper to broadcast status updates over Supabase Realtime
 async function broadcastApplicationUpdate(application: Application) {
@@ -149,8 +146,8 @@ export async function POST(request: NextRequest) {
             .from("applications")
             .insert({
                 tracking_code: trackingCode,
-                name,
-                phone,
+                name: typeof name === "string" ? name.trim() : name,
+                phone: normalizePhone(phone),
                 email: email || null,
                 destination: destination || null,
                 current_step: 1,
@@ -189,7 +186,7 @@ export async function PATCH(request: NextRequest) {
 
     try {
         const body = await request.json();
-        const { id, action, note } = body;
+        const { id, action, note, updated_at } = body;
 
         if (!id || !action) {
             return NextResponse.json(
@@ -213,6 +210,15 @@ export async function PATCH(request: NextRequest) {
         }
 
         const currentApp = app as Application;
+
+        // True optimistic locking check against client-supplied timestamp
+        const expectedUpdatedAt = typeof updated_at === "string" && updated_at ? updated_at : currentApp.updated_at;
+        if (expectedUpdatedAt !== currentApp.updated_at) {
+            return NextResponse.json(
+                { error: "Data was modified by another user." },
+                { status: 409 }
+            );
+        }
 
         if (action === "advance") {
             if (currentApp.current_step >= 7) {
@@ -263,12 +269,14 @@ export async function PATCH(request: NextRequest) {
                 );
             }
 
-            // Try to send an email notification if they have an email
+            // Try to send an email notification if they have an email (lazy dynamic import)
             if (currentApp.email && process.env.RESEND_API_KEY) {
                 try {
+                    const { Resend } = await import("resend");
+                    const resend = new Resend(process.env.RESEND_API_KEY);
                     const stepName = updatedNotes[newStep - 1].label;
-                    const baseUrl = process.env.NEXT_PUBLIC_APP_URL || "https://www.nextepedu.com";
-                    const trackingUrl = `${baseUrl}/track?code=${currentApp.tracking_code}`;
+                    const baseUrl = (process.env.NEXT_PUBLIC_APP_URL || "https://www.nextepedu.com").replace(/\/+$/, "");
+                    const trackingUrl = `${baseUrl}/track?code=${encodeURIComponent(currentApp.tracking_code)}`;
 
                     await resend.emails.send({
                         from: "NexTep Edu <onboarding@nextepedu.com>",
@@ -292,13 +300,13 @@ export async function PATCH(request: NextRequest) {
                                     </div>
                                     ${note ? `<div style="background: #1E293B; border-radius: 8px; padding: 16px; margin: 0 0 24px; border-left: 3px solid #D4AF37;">
                                         <p style="margin: 0 0 4px; font-size: 12px; color: #94A3B8;">Note from counselor:</p>
-                                        <p style="margin: 0; font-size: 14px; color: #F8FAFC;">${escapeHtml(note)}</p>
+                                        <p style="margin: 0; font-size: 14px; color: #F8FAFC; white-space: pre-wrap;">${escapeHtml(note)}</p>
                                     </div>` : ""}
                                     <p style="font-size: 14px; color: #CBD5E1; margin: 0 0 16px;">
                                         You can track your live application progress at any time:
                                     </p>
                                     <div style="text-align: center; margin: 28px 0;">
-                                        <a href="${trackingUrl}" style="background-color: #D4AF37; color: #0F172A; text-decoration: none; padding: 12px 24px; border-radius: 8px; font-weight: bold; font-size: 16px; display: inline-block;">Track My Application →</a>
+                                        <a href="${escapeHtml(trackingUrl)}" style="background-color: #D4AF37; color: #0F172A; text-decoration: none; padding: 12px 24px; border-radius: 8px; font-weight: bold; font-size: 16px; display: inline-block;">Track My Application →</a>
                                     </div>
                                     <p style="font-size: 14px; color: #94A3B8; margin: 0;">
                                         - The NexTep Edu Team
@@ -374,9 +382,9 @@ export async function PATCH(request: NextRequest) {
             const { data, error } = await supabaseAdmin
                 .from("applications")
                 .update({
-                    name: name !== undefined ? name : currentApp.name,
+                    name: name !== undefined ? (typeof name === "string" ? name.trim() : name) : currentApp.name,
                     email: email !== undefined ? (email || null) : currentApp.email,
-                    phone: phone !== undefined ? phone : currentApp.phone,
+                    phone: phone !== undefined ? normalizePhone(phone) : currentApp.phone,
                     destination: destination !== undefined ? (destination || null) : currentApp.destination,
                     updated_at: now,
                 })

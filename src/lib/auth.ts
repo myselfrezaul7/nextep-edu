@@ -7,7 +7,7 @@ function getSecret(): string {
     }
     return secret;
 }
-const SECRET = getSecret();
+
 const TOKEN_EXPIRY_MS = 24 * 60 * 60 * 1000; // 24 hours
 
 interface TokenPayload {
@@ -20,6 +20,7 @@ interface TokenPayload {
  * Signs a token with HMAC-SHA256. Returns a Base64-encoded payload + signature.
  */
 export function signToken(payload: Omit<TokenPayload, "iat" | "exp">): string {
+    const secret = getSecret();
     const now = Date.now();
     const fullPayload: TokenPayload = {
         ...payload,
@@ -28,7 +29,7 @@ export function signToken(payload: Omit<TokenPayload, "iat" | "exp">): string {
     };
 
     const payloadStr = Buffer.from(JSON.stringify(fullPayload)).toString("base64url");
-    const signature = createHmac("sha256", SECRET)
+    const signature = createHmac("sha256", secret)
         .update(payloadStr)
         .digest("base64url");
 
@@ -45,8 +46,10 @@ export function verifyToken(token: string): TokenPayload | null {
         const [payloadStr, signature] = token.split(".");
         if (!payloadStr || !signature) return null;
 
+        const secret = getSecret();
+
         // Verify signature with constant-time comparison
-        const expectedSignature = createHmac("sha256", SECRET)
+        const expectedSignature = createHmac("sha256", secret)
             .update(payloadStr)
             .digest("base64url");
 

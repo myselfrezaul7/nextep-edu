@@ -18,9 +18,15 @@ export default function sitemap(): MetadataRoute.Sitemap {
             changeFrequency: "weekly",
             priority: 0.9,
         },
+        {
+            url: `${baseUrl}/track`,
+            lastModified: new Date(),
+            changeFrequency: "monthly",
+            priority: 0.7,
+        },
     ];
 
-    // Dynamic destination pages - all 13 countries
+    // Dynamic destination pages - all 17 countries
     const destinationPages: MetadataRoute.Sitemap = Object.values(destinations).map(
         (destination) => ({
             url: `${baseUrl}/destinations/${destination.slug}`,

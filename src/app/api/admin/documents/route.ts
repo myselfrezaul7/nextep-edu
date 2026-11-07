@@ -8,10 +8,15 @@ export async function GET(request: NextRequest) {
     }
 
     const { searchParams } = new URL(request.url);
-    const trackingCode = searchParams.get("trackingCode");
+    const rawCode = searchParams.get("trackingCode");
 
-    if (!trackingCode) {
+    if (!rawCode || typeof rawCode !== "string") {
         return NextResponse.json({ error: "trackingCode is required" }, { status: 400 });
+    }
+
+    const trackingCode = rawCode.trim().toUpperCase();
+    if (!/^NX-[A-Z0-9]{8}$/.test(trackingCode)) {
+        return NextResponse.json({ error: "Invalid tracking code format" }, { status: 400 });
     }
 
     try {

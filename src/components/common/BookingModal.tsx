@@ -189,52 +189,65 @@ export function BookingModal() {
         Object.entries(data).forEach(([key, value]) => formData.append(key, value));
 
         const accessKey = process.env.NEXT_PUBLIC_WEB3FORMS_KEY || "";
-        if (!accessKey) {
-            console.error("[BookingModal] NEXT_PUBLIC_WEB3FORMS_KEY is not configured. Booking submissions will fail. Add this key to .env.local and Vercel environment variables.");
-            toast.error("Booking service is temporarily unavailable.");
-            return;
+        if (accessKey) {
+            formData.append("access_key", accessKey);
+            formData.append("subject", `New Consultation Request: ${data.name}`);
+        } else {
+            console.warn("[BookingModal] NEXT_PUBLIC_WEB3FORMS_KEY is not configured; relying on database registration.");
         }
-        formData.append("access_key", accessKey);
 
         try {
-            const response = await fetch("https://api.web3forms.com/submit", {
+            // Execute Web3Forms and database registration with resilience
+            const registerPromise = fetch("/api/applications/register", {
                 method: "POST",
-                body: formData
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                    name: data.name,
+                    phone: data.phone,
+                    email: data.email,
+                    date: data.date,
+                    time: data.time,
+                    education_level: data.education_level,
+                    topic: data.topic,
+                    website_url: data.website_url,
+                }),
+            }).then(async (res) => {
+                const regData = (await res.json()) as { success: boolean; trackingCode?: string; isExisting?: boolean; error?: string };
+                if (!res.ok || !regData.success) {
+                    throw new Error(regData.error || "Registration failed");
+                }
+                return regData;
             });
-            const result = await response.json();
 
-            if (!result.success) {
-                throw new Error(result.message || "Submission failed");
+            const web3Promise = accessKey
+                ? fetch("https://api.web3forms.com/submit", {
+                    method: "POST",
+                    body: formData
+                }).then(async (res) => {
+                    const result = await res.json();
+                    if (!result.success) throw new Error(result.message || "Web3Forms submission failed");
+                    return result;
+                })
+                : Promise.resolve(null);
+
+            const [regResult, web3Result] = await Promise.allSettled([registerPromise, web3Promise]);
+
+            const regSuccess = regResult.status === "fulfilled" && regResult.value.success;
+            const web3Success = web3Result.status === "fulfilled" && web3Result.value !== null;
+
+            if (!regSuccess && !web3Success) {
+                toast.error("Something went wrong. Please try again.");
+                return;
             }
 
             setIsSuccess(true);
 
-            // Auto-register in the tracking system (fire-and-forget)
-            try {
-                const regRes = await fetch("/api/applications/register", {
-                    method: "POST",
-                    headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify({
-                        name: data.name,
-                        phone: data.phone,
-                        email: data.email,
-                        date: data.date,
-                        time: data.time,
-                        education_level: data.education_level,
-                        topic: data.topic,
-                        website_url: data.website_url,
-                    }),
-                });
-                const regData = (await regRes.json()) as { success: boolean; trackingCode?: string; isExisting?: boolean };
-                if (regData.success) {
-                    if (regData.trackingCode) {
-                        setTrackingCode(regData.trackingCode);
-                    } else if (regData.isExisting) {
-                        setIsExistingApp(true);
-                    }
+            if (regResult.status === "fulfilled" && regResult.value.success) {
+                if (regResult.value.trackingCode) {
+                    setTrackingCode(regResult.value.trackingCode);
+                } else if (regResult.value.isExisting) {
+                    setIsExistingApp(true);
                 }
-            } catch {
-                // Registration failure must not break the booking flow
             }
         } catch {
             toast.error("Something went wrong. Please try again.");

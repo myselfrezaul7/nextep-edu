@@ -277,6 +277,7 @@ export default function AdminPage() {
                     id: selectedApp.id,
                     action: "advance",
                     note: advanceNote,
+                    updated_at: selectedApp.updated_at,
                 }),
             });
             const data = await res.json();
@@ -316,6 +317,7 @@ export default function AdminPage() {
                 body: JSON.stringify({
                     id: selectedApp.id,
                     action: "undo",
+                    updated_at: selectedApp.updated_at,
                 }),
             });
             const data = await res.json();
@@ -352,6 +354,7 @@ export default function AdminPage() {
                 body: JSON.stringify({
                     id: selectedApp.id,
                     action: "edit",
+                    updated_at: selectedApp.updated_at,
                     ...editForm,
                 }),
             });

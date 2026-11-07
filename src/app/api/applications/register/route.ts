@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { DEFAULT_STEPS, generateTrackingCode } from "@/lib/supabase";
 import { supabaseAdmin } from "@/lib/supabase-server";
 import { rateLimit, getClientIp } from "@/lib/rate-limit";
-import { escapeHtml } from "@/lib/sanitize";
+import { escapeHtml, normalizePhone, getPhoneVariants } from "@/lib/sanitize";
 
 interface RegisterBody {
     name: string;
@@ -76,11 +76,12 @@ export async function POST(request: NextRequest) {
             );
         }
 
-        // Check if an application already exists for this phone number
+        // Check if an application already exists for this phone number using all variants
+        const phoneVariants = getPhoneVariants(phone);
         const { data: existing, error: lookupError } = await supabaseAdmin
             .from("applications")
             .select("id")
-            .eq("phone", phone)
+            .in("phone", phoneVariants)
             .maybeSingle();
 
         if (lookupError) {
@@ -121,18 +122,23 @@ export async function POST(request: NextRequest) {
         }
         const now = new Date().toISOString();
 
-        // Format consultation details into Step 1 note if provided
+        // Format consultation details into Step 1 note with strict bounds
         const consultationParts: string[] = [];
-        if (body?.date && body?.time) {
-            consultationParts.push(`Slot: ${body.date} at ${body.time}`);
-        } else if (body?.date) {
-            consultationParts.push(`Date: ${body.date}`);
+        const cleanDate = typeof body?.date === "string" ? body.date.trim().slice(0, 50) : "";
+        const cleanTime = typeof body?.time === "string" ? body.time.trim().slice(0, 50) : "";
+        const cleanLevel = typeof body?.education_level === "string" ? body.education_level.trim().slice(0, 50).replace(/_/g, " ") : "";
+        const cleanTopic = typeof body?.topic === "string" ? body.topic.trim().slice(0, 50).replace(/_/g, " ") : "";
+
+        if (cleanDate && cleanTime) {
+            consultationParts.push(`Slot: ${cleanDate} at ${cleanTime}`);
+        } else if (cleanDate) {
+            consultationParts.push(`Date: ${cleanDate}`);
         }
-        if (body?.education_level) {
-            consultationParts.push(`Level: ${body.education_level.replace(/_/g, " ")}`);
+        if (cleanLevel) {
+            consultationParts.push(`Level: ${cleanLevel}`);
         }
-        if (body?.topic) {
-            consultationParts.push(`Topic: ${body.topic.replace(/_/g, " ")}`);
+        if (cleanTopic) {
+            consultationParts.push(`Topic: ${cleanTopic}`);
         }
         const consultationNote = consultationParts.join(" | ");
 
@@ -140,12 +146,14 @@ export async function POST(request: NextRequest) {
             s.step === 1 ? { ...s, date: now, note: consultationNote || s.note } : s
         );
 
+        const normalizedPhone = normalizePhone(phone);
+
         const { error: insertError } = await supabaseAdmin
             .from("applications")
             .insert({
                 tracking_code: trackingCode,
                 name,
-                phone,
+                phone: normalizedPhone,
                 email,
                 current_step: 1,
                 notes: stepsWithFirstCompleted,
@@ -164,8 +172,8 @@ export async function POST(request: NextRequest) {
             try {
                 const { Resend } = await import("resend");
                 const resend = new Resend(process.env.RESEND_API_KEY);
-                const baseUrl = process.env.NEXT_PUBLIC_APP_URL || "https://www.nextepedu.com";
-                const trackingUrl = `${baseUrl}/track?code=${trackingCode}`;
+                const baseUrl = (process.env.NEXT_PUBLIC_APP_URL || "https://www.nextepedu.com").replace(/\/+$/, "");
+                const trackingUrl = `${baseUrl}/track?code=${encodeURIComponent(trackingCode)}`;
                 
                 await resend.emails.send({
                     from: "NexTep Edu <onboarding@nextepedu.com>",
@@ -184,13 +192,13 @@ export async function POST(request: NextRequest) {
                                 </p>
                                 <div style="background: rgba(212, 175, 55, 0.1); border: 1px solid rgba(212, 175, 55, 0.3); border-radius: 8px; padding: 20px; text-align: center; margin: 0 0 24px;">
                                     <p style="margin: 0 0 8px; font-size: 12px; color: #94A3B8; text-transform: uppercase; letter-spacing: 1px;">Your Tracking Code</p>
-                                    <p style="margin: 0; font-size: 24px; font-weight: bold; color: #D4AF37; letter-spacing: 2px;">${trackingCode}</p>
+                                    <p style="margin: 0; font-size: 24px; font-weight: bold; color: #D4AF37; letter-spacing: 2px;">${escapeHtml(trackingCode)}</p>
                                 </div>
                                 <p style="font-size: 14px; color: #CBD5E1; margin: 0 0 16px;">
                                     You can track the progress of your application at any time by clicking the button below:
                                 </p>
                                 <div style="text-align: center; margin: 32px 0;">
-                                    <a href="${trackingUrl}" style="background-color: #D4AF37; color: #0F172A; text-decoration: none; padding: 12px 24px; border-radius: 8px; font-weight: bold; font-size: 16px; display: inline-block;">Track My Application</a>
+                                    <a href="${escapeHtml(trackingUrl)}" style="background-color: #D4AF37; color: #0F172A; text-decoration: none; padding: 12px 24px; border-radius: 8px; font-weight: bold; font-size: 16px; display: inline-block;">Track My Application</a>
                                 </div>
                                 <p style="font-size: 14px; color: #94A3B8; margin: 0;">
                                     - The NexTep Edu Team

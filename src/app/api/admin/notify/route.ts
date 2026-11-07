@@ -61,6 +61,9 @@ export async function POST(request: NextRequest) {
         const currentStepLabel =
             currentStepData?.label || `Step ${application.current_step}`;
 
+        const baseUrl = (process.env.NEXT_PUBLIC_APP_URL || "https://www.nextepedu.com").replace(/\/+$/, "");
+        const trackingUrl = `${baseUrl}/track?code=${encodeURIComponent(application.tracking_code)}`;
+
         const { error: emailError } = await resend.emails.send({
             from: "NexTep Edu <onboarding@nextepedu.com>",
             to: application.email,
@@ -81,13 +84,16 @@ export async function POST(request: NextRequest) {
                             <p style="margin: 0; font-size: 20px; font-weight: bold; color: #D4AF37;">${escapeHtml(currentStepLabel)}</p>
                             <p style="margin: 8px 0 0; font-size: 14px; color: #CBD5E1;">Step ${application.current_step} of 7</p>
                         </div>
-                        ${currentStepData?.note ? `<div style="background: #1E293B; border-radius: 8px; padding: 16px; margin: 0 0 24px;">
-                            <p style="margin: 0 0 4px; font-size: 12px; color: #94A3B8;">Note from your counselor:</p>
-                            <p style="margin: 0; font-size: 14px; color: #F8FAFC;">${escapeHtml(currentStepData.note)}</p>
+                        ${currentStepData?.note ? `<div style="background: #1E293B; border-radius: 8px; padding: 16px; margin: 0 0 24px; border-left: 3px solid #D4AF37;">
+                            <p style="margin: 0 0 4px; font-size: 12px; color: #94A3B8;">Note from counselor:</p>
+                            <p style="margin: 0; font-size: 14px; color: #F8FAFC; white-space: pre-wrap;">${escapeHtml(currentStepData.note)}</p>
                         </div>` : ""}
-                        <p style="font-size: 14px; color: #CBD5E1; margin: 0 0 8px;">
-                            If you have any questions, don't hesitate to reach out to us.
+                        <p style="font-size: 14px; color: #CBD5E1; margin: 0 0 16px;">
+                            You can track your live application progress at any time:
                         </p>
+                        <div style="text-align: center; margin: 28px 0;">
+                            <a href="${escapeHtml(trackingUrl)}" style="background-color: #D4AF37; color: #0F172A; text-decoration: none; padding: 12px 24px; border-radius: 8px; font-weight: bold; font-size: 16px; display: inline-block;">Track My Application →</a>
+                        </div>
                         <p style="font-size: 14px; color: #94A3B8; margin: 0;">
                             - The NexTep Edu Team
                         </p>

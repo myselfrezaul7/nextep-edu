@@ -6,7 +6,7 @@ export default function robots(): MetadataRoute.Robots {
             {
                 userAgent: "*",
                 allow: "/",
-                disallow: ["/api/", "/admin/", "/private/"],
+                disallow: ["/api/", "/admin", "/admin/", "/private/"],
             },
         ],
         sitemap: "https://www.nextepedu.com/sitemap.xml",
