@@ -1,24 +1,33 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
-import { ReactNode } from "react";
+import { type ReactNode } from "react";
+import { useBookingModal, type BookingModalPrefill } from "@/context/BookingModalContext";
 
 interface BookingButtonProps {
     children: ReactNode;
     className?: string;
-    variant?: "default" | "destructive" | "outline" | "secondary" | "ghost" | "link";
+    variant?: "default" | "destructive" | "outline" | "secondary" | "ghost" | "link" | "accent";
     size?: "default" | "sm" | "lg" | "icon";
+    prefill?: BookingModalPrefill;
 }
 
-export function BookingButton({ children, className, variant = "default", size = "default" }: BookingButtonProps) {
+export function BookingButton({
+    children,
+    className = "",
+    variant = "default",
+    size = "default",
+    prefill,
+}: BookingButtonProps) {
+    const { openModal } = useBookingModal();
+
     return (
         <div className="relative group inline-block">
-            {/* Liquid Glass buttons have built-in luminous edges - no glow wrapper needed */}
             <Button
                 variant={variant}
                 size={size}
                 className={`relative ${className}`}
-                onClick={() => window.dispatchEvent(new CustomEvent('open-booking-modal'))}
+                onClick={() => openModal(prefill)}
             >
                 {children}
             </Button>

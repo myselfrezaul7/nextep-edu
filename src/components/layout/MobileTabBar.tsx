@@ -8,6 +8,7 @@ import { usePathname, useRouter } from "next/navigation";
 import { motion } from "framer-motion";
 import { useTranslation } from "@/i18n/LanguageContext";
 import { useMounted } from "@/lib/use-mounted";
+import { useBookingModal } from "@/context/BookingModalContext";
 
 export function MobileTabBar() {
     const { theme, systemTheme } = useTheme();
@@ -16,6 +17,7 @@ export function MobileTabBar() {
     const router = useRouter();
     const [activeHash, setActiveHash] = useState("");
     const { t } = useTranslation();
+    const { openModal } = useBookingModal();
     const [tabVisible, setTabVisible] = useState(true);
     const lastScrollY = useRef(0);
     const scrollTimeout = useRef<NodeJS.Timeout | null>(null);
@@ -221,7 +223,7 @@ export function MobileTabBar() {
 
                 {/* BOOK */}
                 <button
-                    onClick={() => window.dispatchEvent(new CustomEvent("open-booking-modal"))}
+                    onClick={() => openModal()}
                     className="relative flex flex-col items-center justify-center gap-0.5 h-11 rounded-xl bg-accent/15 text-accent font-semibold transition-colors duration-200"
                 >
                     <CalendarCheck className="w-4 h-4" strokeWidth={2.2} />

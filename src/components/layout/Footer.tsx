@@ -10,6 +10,7 @@ import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { motion, AnimatePresence } from "framer-motion";
 import { useTranslation } from "@/i18n/LanguageContext";
+import { useBookingModal } from "@/context/BookingModalContext";
 
 const subscribeResize = (callback: () => void) => {
     window.addEventListener("resize", callback);
@@ -26,6 +27,7 @@ export function Footer() {
         () => false
     );
     const { t } = useTranslation();
+    const { openModal } = useBookingModal();
     const currentTheme = theme === "system" ? systemTheme : theme;
 
     const toggleSection = (section: string) => {
@@ -66,7 +68,7 @@ export function Footer() {
                                 size="lg"
                                 variant="accent"
                                 className="rounded-full font-bold text-base px-8"
-                                onClick={() => window.dispatchEvent(new CustomEvent("open-booking-modal"))}
+                                onClick={() => openModal()}
                             >
                                 {t("common.footer.ctaButton", undefined, "Book Free Consultation")}
                             </Button>

@@ -14,6 +14,7 @@ import dynamic from "next/dynamic";
 import { usePathname } from "next/navigation";
 import { useMounted } from "@/lib/use-mounted";
 import { destinations as destinationsData } from "@/data/destinations";
+import { useBookingModal } from "@/context/BookingModalContext";
 
 const SearchModal = dynamic(() => import("@/components/common/SearchModal").then(mod => mod.SearchModal), { ssr: false });
 
@@ -34,6 +35,7 @@ export function Header() {
     const [navVisible, setNavVisible] = useState(true);
     const { theme, setTheme, systemTheme } = useTheme();
     const { t } = useTranslation();
+    const { openModal } = useBookingModal();
     const pathname = usePathname();
     const activeHash = useSyncExternalStore(
         subscribeHash,
@@ -207,7 +209,7 @@ export function Header() {
                     <Button
                         size="sm"
                         className="rounded-full px-5 h-9 text-xs font-semibold"
-                        onClick={() => window.dispatchEvent(new CustomEvent("open-booking-modal"))}
+                        onClick={() => openModal()}
                     >
                         {t("common.nav.bookConsultation", undefined, "Book Consultation")}
                     </Button>

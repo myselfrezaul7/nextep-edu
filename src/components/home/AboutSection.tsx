@@ -8,6 +8,7 @@ import { useMounted } from "@/lib/use-mounted";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { useTranslation } from "@/i18n/LanguageContext";
+import { useBookingModal } from "@/context/BookingModalContext";
 
 const containerVariants = {
     hidden: { opacity: 0 },
@@ -148,6 +149,7 @@ export function AboutSection() {
     const { theme, systemTheme } = useTheme();
     const mounted = useMounted();
     const { t } = useTranslation();
+    const { openModal } = useBookingModal();
     const currentTheme = theme === "system" ? systemTheme : theme;
     const isDark = mounted && currentTheme === "dark";
     const EASE_OUT_EXPO = [0.16, 1, 0.3, 1] as const;
@@ -201,7 +203,7 @@ export function AboutSection() {
                             <Button
                                 size="lg"
                                 className="w-full sm:w-auto rounded-full text-base px-8 h-12 font-semibold shadow-md"
-                                onClick={() => window.dispatchEvent(new CustomEvent("open-booking-modal"))}
+                                onClick={() => openModal()}
                             >
                                 {t("home.about.ctaButton", undefined, "Chat With Us")}
                             </Button>

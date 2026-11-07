@@ -5,6 +5,7 @@ import { PhoneCall, ClipboardList, SendHorizonal, PlaneTakeoff, Clock } from "lu
 import { useRef } from "react";
 import { Button } from "@/components/ui/button";
 import { useTranslation } from "@/i18n/LanguageContext";
+import { useBookingModal } from "@/context/BookingModalContext";
 
 const EASE_OUT_EXPO = [0.16, 1, 0.3, 1] as const;
 
@@ -41,6 +42,7 @@ const stepsData = [
 
 export function HowItWorksSection() {
     const { t } = useTranslation();
+    const { openModal } = useBookingModal();
     const containerRef = useRef<HTMLDivElement>(null);
     const { scrollYProgress } = useScroll({
         target: containerRef,
@@ -154,7 +156,7 @@ export function HowItWorksSection() {
                     <Button
                         size="lg"
                         className="rounded-full text-base px-8 h-12 font-semibold"
-                        onClick={() => window.dispatchEvent(new CustomEvent("open-booking-modal"))}
+                        onClick={() => openModal({ topic: "General_Inquiry" })}
                     >
                         {t("home.howItWorks.ctaButton", undefined, "Start With Step 1 - It's Free")}
                     </Button>

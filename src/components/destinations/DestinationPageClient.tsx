@@ -7,6 +7,7 @@ import { ArrowLeft, ArrowRight, GraduationCap, CheckCircle, Globe2, Trophy, Cloc
 import { Button } from "@/components/ui/button";
 import { useState } from "react";
 import { useTranslation } from "@/i18n/LanguageContext";
+import { useBookingModal } from "@/context/BookingModalContext";
 
 interface SerializedDestination {
     slug: string;
@@ -85,6 +86,7 @@ const iconMap: Record<string, React.ComponentType<{ className?: string }>> = {
 export function DestinationPageClient({ destination, relatedDestinations = [] }: DestinationPageClientProps) {
     const [searchQuery, setSearchQuery] = useState("");
     const { t } = useTranslation();
+    const { openModal } = useBookingModal();
 
     const filteredUniversities = destination.universities.filter(u =>
         u.name.toLowerCase().includes(searchQuery.toLowerCase())
@@ -219,19 +221,31 @@ export function DestinationPageClient({ destination, relatedDestinations = [] }:
                     ) : (
                         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4 max-w-6xl mx-auto">
                             {filteredUniversities.map((university, index) => (
-                                <motion.div
+                                <motion.button
+                                    type="button"
                                     key={university.name}
                                     initial={{ opacity: 0, y: 12 }}
                                     whileInView={{ opacity: 1, y: 0 }}
                                     viewport={{ once: true }}
                                     transition={{ delay: index * 0.04 }}
-                                    className="surface-card flex items-center gap-3.5 p-4 rounded-xl"
+                                    onClick={() =>
+                                        openModal({
+                                            destination: destination.name,
+                                            topic: `University Admission - ${university.name}`,
+                                        })
+                                    }
+                                    className="surface-card flex items-center justify-between gap-3.5 p-4 rounded-xl text-left group hover:border-accent/40 transition-all cursor-pointer active:scale-[0.99]"
                                 >
-                                    <div className="w-10 h-10 rounded-lg bg-accent/10 border border-accent/20 flex items-center justify-center text-accent shrink-0">
-                                        <GraduationCap className="w-5 h-5" />
+                                    <div className="flex items-center gap-3.5 min-w-0">
+                                        <div className="w-10 h-10 rounded-lg bg-accent/10 border border-accent/20 flex items-center justify-center text-accent shrink-0 group-hover:bg-accent group-hover:text-slate-950 transition-colors">
+                                            <GraduationCap className="w-5 h-5" />
+                                        </div>
+                                        <span className="font-medium text-sm md:text-base text-primary group-hover:text-accent transition-colors truncate">
+                                            {university.name}
+                                        </span>
                                     </div>
-                                    <span className="font-medium text-sm md:text-base text-primary">{university.name}</span>
-                                </motion.div>
+                                    <ArrowRight className="w-4 h-4 text-muted-foreground group-hover:text-accent group-hover:translate-x-0.5 transition-all shrink-0" />
+                                </motion.button>
                             ))}
                         </div>
                     )}
@@ -341,7 +355,12 @@ export function DestinationPageClient({ destination, relatedDestinations = [] }:
                                     size="lg"
                                     variant="accent"
                                     className="rounded-full font-bold px-8"
-                                    onClick={() => window.dispatchEvent(new CustomEvent("open-booking-modal"))}
+                                    onClick={() =>
+                                        openModal({
+                                            destination: destination.name,
+                                            topic: "University_Admission",
+                                        })
+                                    }
                                 >
                                     Book Free Consultation
                                 </Button>

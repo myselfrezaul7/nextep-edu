@@ -12,6 +12,7 @@ import { PageTransition } from "@/components/common/PageTransition";
 import { ErrorBoundary } from "@/components/common/ErrorBoundary";
 import { SpeedInsights } from "@vercel/speed-insights/next";
 import { LanguageProvider } from "@/i18n/LanguageContext";
+import { BookingModalProvider } from "@/context/BookingModalContext";
 import { BookingModal } from "@/components/common/BookingModal";
 import "./globals.css";
 
@@ -178,22 +179,24 @@ export default function RootLayout({
                         enableSystem
                         disableTransitionOnChange
                     >
-                    <ScrollProgress />
-                    <div className="flex flex-col min-h-screen">
-                        <Header />
-                        <main className="flex-grow pt-20 pb-24 md:pb-0">
-                            <ErrorBoundary>
-                                <PageTransition>{children}</PageTransition>
-                            </ErrorBoundary>
-                        </main>
-                        <Footer />
-                        <MobileTabBar />
-                    </div>
-                    <BookingModal />
-                    <WhatsAppFAB />
-                    <BackToTop />
-                    <SpeedInsights />
-                </ThemeProvider>
+                        <BookingModalProvider>
+                            <ScrollProgress />
+                            <div className="flex flex-col min-h-screen">
+                                <Header />
+                                <main className="flex-grow pt-20 pb-24 md:pb-0">
+                                    <ErrorBoundary>
+                                        <PageTransition>{children}</PageTransition>
+                                    </ErrorBoundary>
+                                </main>
+                                <Footer />
+                                <MobileTabBar />
+                            </div>
+                            <BookingModal />
+                            <WhatsAppFAB />
+                            <BackToTop />
+                            <SpeedInsights />
+                        </BookingModalProvider>
+                    </ThemeProvider>
                 </LanguageProvider>
             </body>
         </html>

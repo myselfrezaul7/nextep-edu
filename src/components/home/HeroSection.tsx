@@ -10,6 +10,7 @@ import dynamic from "next/dynamic";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { useTranslation } from "@/i18n/LanguageContext";
+import { useBookingModal } from "@/context/BookingModalContext";
 
 const HeroCanvas = dynamic(
     () => import("@/components/home/HeroCanvas").then((mod) => mod.HeroCanvas),
@@ -22,6 +23,7 @@ export function HeroSection() {
     const { theme, systemTheme } = useTheme();
     const mounted = useMounted();
     const { t } = useTranslation();
+    const { openModal } = useBookingModal();
     const currentTheme = theme === "system" ? systemTheme : theme;
     const isDark = mounted && currentTheme === "dark";
     const { scrollY } = useScroll();
@@ -99,7 +101,7 @@ export function HeroSection() {
                             <Button
                                 size="lg"
                                 className="rounded-full text-base px-8 w-full sm:w-auto gap-2"
-                                onClick={() => window.dispatchEvent(new CustomEvent("open-booking-modal"))}
+                                onClick={() => openModal()}
                             >
                                 {t("home.hero.ctaPrimary", undefined, "Let's Talk")}
                                 <ArrowRight className="w-4 h-4" />

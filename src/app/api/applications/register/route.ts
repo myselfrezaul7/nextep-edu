@@ -5,16 +5,46 @@ import { supabaseAdmin } from "@/lib/supabase-server";
 import { rateLimit, getClientIp } from "@/lib/rate-limit";
 import { escapeHtml, normalizePhone, getPhoneVariants } from "@/lib/sanitize";
 import { broadcastApplicationEvent } from "@/lib/realtime-broadcast";
+import { destinations } from "@/data/destinations";
 
 interface RegisterBody {
     name: string;
     phone: string;
     email: string;
+    destination?: string;
     date?: string;
     time?: string;
     education_level?: string;
     topic?: string;
     website_url?: string;
+}
+
+const KNOWN_DESTINATIONS = Object.values(destinations);
+
+function resolveOrInferDestination(rawDestination?: string, rawTopic?: string): string {
+    if (typeof rawDestination === "string" && rawDestination.trim()) {
+        const trimmed = rawDestination.trim();
+        const lower = trimmed.toLowerCase();
+        const matched = KNOWN_DESTINATIONS.find(
+            (d) => d.slug.toLowerCase() === lower || d.name.toLowerCase() === lower
+        );
+        return matched ? matched.name : trimmed.slice(0, 80);
+    }
+
+    if (typeof rawTopic === "string" && rawTopic.trim()) {
+        const normalized = rawTopic.replace(/_/g, " ").toLowerCase();
+        for (const dest of KNOWN_DESTINATIONS) {
+            if (
+                normalized.includes(dest.name.toLowerCase()) ||
+                (dest.slug === "uk" && /\buk\b/.test(normalized)) ||
+                (dest.slug === "usa" && /\busa\b/.test(normalized))
+            ) {
+                return dest.name;
+            }
+        }
+    }
+
+    return "";
 }
 
 const EMAIL_REGEX = /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)+$/;
@@ -126,11 +156,15 @@ export async function POST(request: NextRequest) {
 
         // Format consultation details into Step 1 note with strict bounds
         const consultationParts: string[] = [];
+        const cleanDestination = resolveOrInferDestination(body?.destination, body?.topic);
         const cleanDate = typeof body?.date === "string" ? body.date.trim().slice(0, 50) : "";
         const cleanTime = typeof body?.time === "string" ? body.time.trim().slice(0, 50) : "";
         const cleanLevel = typeof body?.education_level === "string" ? body.education_level.trim().slice(0, 50).replace(/_/g, " ") : "";
-        const cleanTopic = typeof body?.topic === "string" ? body.topic.trim().slice(0, 50).replace(/_/g, " ") : "";
+        const cleanTopic = typeof body?.topic === "string" ? body.topic.trim().slice(0, 100).replace(/_/g, " ") : "";
 
+        if (cleanDestination) {
+            consultationParts.push(`Destination: ${cleanDestination}`);
+        }
         if (cleanDate && cleanTime) {
             consultationParts.push(`Slot: ${cleanDate} at ${cleanTime}`);
         } else if (cleanDate) {
@@ -157,6 +191,7 @@ export async function POST(request: NextRequest) {
                 name,
                 phone: normalizedPhone,
                 email,
+                destination: cleanDestination || null,
                 current_step: 1,
                 notes: stepsWithFirstCompleted,
             })

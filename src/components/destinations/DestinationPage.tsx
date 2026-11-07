@@ -6,6 +6,7 @@ import Link from "next/link";
 import { ArrowLeft, GraduationCap, CheckCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import type { Destination } from "@/data/destinations";
+import { useBookingModal } from "@/context/BookingModalContext";
 
 interface DestinationPageProps {
     destination: Destination;
@@ -13,6 +14,7 @@ interface DestinationPageProps {
 
 export function DestinationPage({ destination }: DestinationPageProps) {
     const Icon = destination.hero.icon;
+    const { openModal } = useBookingModal();
 
     return (
         <article className="min-h-screen">
@@ -158,7 +160,12 @@ export function DestinationPage({ destination }: DestinationPageProps) {
                                 <Button
                                     size="lg"
                                     className="rounded-full font-bold"
-                                    onClick={() => window.dispatchEvent(new CustomEvent('open-booking-modal'))}
+                                    onClick={() =>
+                                        openModal({
+                                            destination: destination.name,
+                                            topic: "University_Admission",
+                                        })
+                                    }
                                 >
                                     Book Free Consultation
                                 </Button>
