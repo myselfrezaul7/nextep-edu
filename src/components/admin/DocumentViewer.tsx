@@ -1,47 +1,167 @@
-import { useState, useEffect } from "react";
-import { File, Download, Loader2, ExternalLink, Trash2 } from "lucide-react";
+import { useState, useEffect, useCallback } from "react";
+import {
+    File,
+    Download,
+    Loader2,
+    ExternalLink,
+    Trash2,
+    CheckCircle2,
+    XCircle,
+    Clock,
+    MessageSquareWarning,
+} from "lucide-react";
 import toast from "react-hot-toast";
+import type {
+    Application,
+    DocumentVerificationStatus,
+    UploadedDocumentInfo,
+} from "@/lib/supabase";
 
-interface Document {
-    name: string;
-    id: string;
-    created_at: string;
-    url: string | null;
+interface DocumentViewerProps {
+    trackingCode: string;
+    token: string;
+    refreshTrigger?: number;
+    onApplicationUpdated?: (app: Application) => void;
 }
 
-export function DocumentViewer({ trackingCode, token }: { trackingCode: string; token: string }) {
-    const [documents, setDocuments] = useState<Document[]>([]);
+export function DocumentViewer({
+    trackingCode,
+    token,
+    refreshTrigger = 0,
+    onApplicationUpdated,
+}: DocumentViewerProps) {
+    const [documents, setDocuments] = useState<UploadedDocumentInfo[]>([]);
     const [loading, setLoading] = useState(true);
     const [deletingName, setDeletingName] = useState<string | null>(null);
+    const [updatingName, setUpdatingName] = useState<string | null>(null);
+    const [rejectingDocName, setRejectingDocName] = useState<string | null>(
+        null
+    );
+    const [rejectFeedback, setRejectFeedback] = useState("");
 
-    useEffect(() => {
-        const fetchDocs = async () => {
+    const fetchDocs = useCallback(
+        async (silent = false) => {
+            await Promise.resolve();
+            if (!silent) setLoading(true);
             try {
-                const res = await fetch(`/api/admin/documents?trackingCode=${trackingCode}`, {
-                    headers: { Authorization: `Bearer ${token}` },
-                });
+                const res = await fetch(
+                    `/api/admin/documents?trackingCode=${encodeURIComponent(trackingCode)}`,
+                    {
+                        headers: { Authorization: `Bearer ${token}` },
+                    }
+                );
                 const data = await res.json();
                 if (res.ok) {
                     setDocuments(data.documents || []);
-                } else {
+                } else if (!silent) {
                     toast.error("Failed to load documents");
                 }
             } catch {
-                toast.error("Network error loading documents");
+                if (!silent) {
+                    toast.error("Network error loading documents");
+                }
             } finally {
-                setLoading(false);
+                if (!silent) setLoading(false);
+            }
+        },
+        [trackingCode, token]
+    );
+
+    useEffect(() => {
+        let isMounted = true;
+        const load = async () => {
+            await Promise.resolve();
+            if (isMounted) {
+                await fetchDocs(refreshTrigger > 0);
             }
         };
+        void load();
+        return () => {
+            isMounted = false;
+        };
+    }, [fetchDocs, refreshTrigger]);
 
-        fetchDocs();
-    }, [trackingCode, token]);
+    const handleVerifyStatus = async (
+        fileName: string,
+        status: DocumentVerificationStatus,
+        feedback = ""
+    ) => {
+        const previousDocs = [...documents];
+        setUpdatingName(fileName);
 
-    const handleDeleteDoc = async (fileName: string) => {
-        if (!window.confirm(`Are you sure you want to delete "${fileName}"? This cannot be undone.`)) {
+        // Optimistic UI update
+        setDocuments((prev) =>
+            prev.map((doc) =>
+                doc.name === fileName
+                    ? {
+                          ...doc,
+                          status,
+                          feedback,
+                          updated_at: new Date().toISOString(),
+                      }
+                    : doc
+            )
+        );
+        setRejectingDocName(null);
+        setRejectFeedback("");
+
+        try {
+            const res = await fetch("/api/admin/documents", {
+                method: "PATCH",
+                headers: {
+                    "Content-Type": "application/json",
+                    Authorization: `Bearer ${token}`,
+                },
+                body: JSON.stringify({
+                    trackingCode,
+                    fileName,
+                    status,
+                    feedback,
+                }),
+            });
+
+            const data = await res.json();
+            if (res.ok && data.success) {
+                if (Array.isArray(data.documents)) {
+                    setDocuments(data.documents);
+                }
+                if (data.application && onApplicationUpdated) {
+                    onApplicationUpdated(data.application as Application);
+                }
+                toast.success(
+                    status === "verified"
+                        ? "Document verified!"
+                        : status === "rejected"
+                        ? "Document marked for re-upload."
+                        : "Document status updated."
+                );
+            } else {
+                setDocuments(previousDocs);
+                toast.error(data.error || "Failed to update document status.");
+            }
+        } catch {
+            setDocuments(previousDocs);
+            toast.error("Network error updating document status.");
+        } finally {
+            setUpdatingName(null);
+        }
+    };
+
+    const handleDeleteDoc = async (fileName: string, displayName?: string) => {
+        if (
+            !window.confirm(
+                `Are you sure you want to delete "${displayName || fileName}"? This cannot be undone.`
+            )
+        ) {
             return;
         }
 
+        const previousDocs = [...documents];
         setDeletingName(fileName);
+
+        // Optimistic UI removal
+        setDocuments((prev) => prev.filter((d) => d.name !== fileName));
+
         try {
             const res = await fetch("/api/admin/documents", {
                 method: "DELETE",
@@ -57,12 +177,19 @@ export function DocumentViewer({ trackingCode, token }: { trackingCode: string; 
 
             const data = await res.json();
             if (res.ok && data.success) {
-                setDocuments((prev) => prev.filter((d) => d.name !== fileName));
+                if (Array.isArray(data.documents)) {
+                    setDocuments(data.documents);
+                }
+                if (data.application && onApplicationUpdated) {
+                    onApplicationUpdated(data.application as Application);
+                }
                 toast.success("Document deleted.");
             } else {
+                setDocuments(previousDocs);
                 toast.error(data.error || "Failed to delete document.");
             }
         } catch {
+            setDocuments(previousDocs);
             toast.error("Network error deleting document.");
         } finally {
             setDeletingName(null);
@@ -80,46 +207,190 @@ export function DocumentViewer({ trackingCode, token }: { trackingCode: string; 
     if (documents.length === 0) {
         return (
             <div className="text-center p-8 border border-dashed border-white/20 rounded-xl">
-                <p className="text-sm text-muted-foreground">No documents uploaded yet.</p>
+                <p className="text-sm text-muted-foreground">
+                    No documents uploaded yet.
+                </p>
             </div>
         );
     }
 
     return (
         <div className="space-y-3">
-            {documents.map((doc) => (
-                <div key={doc.id} className="flex items-center justify-between p-3 rounded-lg bg-black/5 dark:bg-white/5 border border-black/5 dark:border-white/5">
-                    <div className="flex items-center gap-3 min-w-0">
-                        <File className="w-4 h-4 text-accent shrink-0" />
-                        <span className="text-sm font-medium text-foreground truncate">{doc.name}</span>
-                    </div>
-                    <div className="flex items-center gap-1 shrink-0">
-                        {doc.url && (
-                            <>
-                                <a href={doc.url} target="_blank" rel="noopener noreferrer" className="p-2 hover:bg-black/10 dark:hover:bg-white/10 rounded-lg transition-colors" title="View Document">
-                                    <ExternalLink className="w-4 h-4 text-muted-foreground" />
-                                </a>
-                                <a href={doc.url} download className="p-2 hover:bg-black/10 dark:hover:bg-white/10 rounded-lg transition-colors" title="Download Document">
-                                    <Download className="w-4 h-4 text-muted-foreground" />
-                                </a>
-                            </>
+            {documents.map((doc) => {
+                const status = doc.status || "pending";
+                const displayName = doc.originalName || doc.name;
+                const isRejecting = rejectingDocName === doc.name;
+                const isBusy =
+                    updatingName === doc.name || deletingName === doc.name;
+
+                return (
+                    <div
+                        key={doc.id || doc.name}
+                        className="p-3.5 rounded-xl bg-black/5 dark:bg-white/5 border border-black/5 dark:border-white/10 space-y-2.5"
+                    >
+                        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2.5">
+                            <div className="flex items-center gap-3 min-w-0">
+                                <File className="w-4 h-4 text-accent shrink-0" />
+                                <div className="min-w-0">
+                                    <div className="flex items-center gap-2 flex-wrap">
+                                        <span
+                                            className="text-sm font-medium text-foreground truncate"
+                                            title={displayName}
+                                        >
+                                            {displayName}
+                                        </span>
+                                        {status === "verified" && (
+                                            <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[11px] font-semibold bg-emerald-500/15 text-emerald-500 border border-emerald-500/25">
+                                                <CheckCircle2 className="w-3 h-3" />
+                                                Verified
+                                            </span>
+                                        )}
+                                        {status === "rejected" && (
+                                            <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[11px] font-semibold bg-red-500/15 text-red-500 border border-red-500/25">
+                                                <XCircle className="w-3 h-3" />
+                                                Rejected
+                                            </span>
+                                        )}
+                                        {status === "pending" && (
+                                            <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[11px] font-semibold bg-amber-500/15 text-amber-500 border border-amber-500/25">
+                                                <Clock className="w-3 h-3" />
+                                                Pending
+                                            </span>
+                                        )}
+                                    </div>
+                                    {doc.feedback && status === "rejected" && (
+                                        <p className="text-xs text-red-400 mt-1 flex items-center gap-1">
+                                            <MessageSquareWarning className="w-3 h-3 shrink-0" />
+                                            <span>Note: {doc.feedback}</span>
+                                        </p>
+                                    )}
+                                </div>
+                            </div>
+
+                            <div className="flex items-center gap-1.5 shrink-0 flex-wrap">
+                                <button
+                                    type="button"
+                                    disabled={isBusy}
+                                    onClick={() =>
+                                        handleVerifyStatus(
+                                            doc.name,
+                                            "verified",
+                                            ""
+                                        )
+                                    }
+                                    className={`inline-flex items-center gap-1 px-2.5 py-1.5 min-h-[36px] rounded-lg text-xs font-semibold transition-colors disabled:opacity-50 ${
+                                        status === "verified"
+                                            ? "bg-emerald-500 text-white"
+                                            : "bg-emerald-500/10 text-emerald-500 hover:bg-emerald-500/20 border border-emerald-500/20"
+                                    }`}
+                                    title="Mark as Verified"
+                                >
+                                    <CheckCircle2 className="w-3.5 h-3.5" />
+                                    Verify
+                                </button>
+
+                                <button
+                                    type="button"
+                                    disabled={isBusy}
+                                    onClick={() => {
+                                        if (isRejecting) {
+                                            setRejectingDocName(null);
+                                        } else {
+                                            setRejectingDocName(doc.name);
+                                            setRejectFeedback(
+                                                doc.feedback || ""
+                                            );
+                                        }
+                                    }}
+                                    className={`inline-flex items-center gap-1 px-2.5 py-1.5 min-h-[36px] rounded-lg text-xs font-semibold transition-colors disabled:opacity-50 ${
+                                        status === "rejected" || isRejecting
+                                            ? "bg-red-500 text-white"
+                                            : "bg-red-500/10 text-red-500 hover:bg-red-500/20 border border-red-500/20"
+                                    }`}
+                                    title="Reject and request re-upload"
+                                >
+                                    <XCircle className="w-3.5 h-3.5" />
+                                    Reject
+                                </button>
+
+                                {doc.url && (
+                                    <>
+                                        <a
+                                            href={doc.url}
+                                            target="_blank"
+                                            rel="noopener noreferrer"
+                                            className="p-2 min-h-[36px] min-w-[36px] flex items-center justify-center hover:bg-black/10 dark:hover:bg-white/10 rounded-lg transition-colors"
+                                            title="View Document"
+                                        >
+                                            <ExternalLink className="w-4 h-4 text-muted-foreground" />
+                                        </a>
+                                        <a
+                                            href={doc.url}
+                                            download
+                                            className="p-2 min-h-[36px] min-w-[36px] flex items-center justify-center hover:bg-black/10 dark:hover:bg-white/10 rounded-lg transition-colors"
+                                            title="Download Document"
+                                        >
+                                            <Download className="w-4 h-4 text-muted-foreground" />
+                                        </a>
+                                    </>
+                                )}
+                                <button
+                                    type="button"
+                                    onClick={() => handleDeleteDoc(doc.name, displayName)}
+                                    disabled={isBusy}
+                                    className="p-2 min-h-[36px] min-w-[36px] flex items-center justify-center hover:bg-red-500/10 text-muted-foreground hover:text-red-500 rounded-lg transition-colors disabled:opacity-50"
+                                    title="Delete Document"
+                                >
+                                    {deletingName === doc.name ? (
+                                        <Loader2 className="w-4 h-4 animate-spin text-red-500" />
+                                    ) : (
+                                        <Trash2 className="w-4 h-4" />
+                                    )}
+                                </button>
+                            </div>
+                        </div>
+
+                        {isRejecting && (
+                            <div className="pt-2 border-t border-black/5 dark:border-white/10 flex flex-col sm:flex-row gap-2">
+                                <input
+                                    type="text"
+                                    value={rejectFeedback}
+                                    onChange={(e) =>
+                                        setRejectFeedback(e.target.value)
+                                    }
+                                    placeholder="Reason for rejection (e.g. Blurry scan, please re-upload clear PDF)..."
+                                    className="flex-1 px-3 py-2 rounded-lg text-xs bg-black/5 dark:bg-white/5 border border-black/10 dark:border-white/10 text-foreground outline-none focus:border-red-500/50"
+                                />
+                                <div className="flex gap-2">
+                                    <button
+                                        type="button"
+                                        onClick={() =>
+                                            handleVerifyStatus(
+                                                doc.name,
+                                                "rejected",
+                                                rejectFeedback.trim() ||
+                                                    "Please re-upload a clearer copy of this document."
+                                            )
+                                        }
+                                        className="px-3 py-2 rounded-lg bg-red-500 text-white text-xs font-semibold hover:bg-red-600 transition-colors"
+                                    >
+                                        Confirm Reject
+                                    </button>
+                                    <button
+                                        type="button"
+                                        onClick={() =>
+                                            setRejectingDocName(null)
+                                        }
+                                        className="px-3 py-2 rounded-lg bg-black/5 dark:bg-white/10 text-xs font-medium text-muted-foreground hover:text-foreground transition-colors"
+                                    >
+                                        Cancel
+                                    </button>
+                                </div>
+                            </div>
                         )}
-                        <button
-                            type="button"
-                            onClick={() => handleDeleteDoc(doc.name)}
-                            disabled={deletingName === doc.name}
-                            className="p-2 hover:bg-red-500/10 text-muted-foreground hover:text-red-500 rounded-lg transition-colors disabled:opacity-50"
-                            title="Delete Document"
-                        >
-                            {deletingName === doc.name ? (
-                                <Loader2 className="w-4 h-4 animate-spin text-red-500" />
-                            ) : (
-                                <Trash2 className="w-4 h-4" />
-                            )}
-                        </button>
                     </div>
-                </div>
-            ))}
+                );
+            })}
         </div>
     );
 }

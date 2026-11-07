@@ -22,16 +22,19 @@ import {
     Sparkles,
     Users,
     X,
+    WifiOff,
+    RefreshCw,
 } from "lucide-react";
 import { ApplicationTimeline } from "@/components/tracker/ApplicationTimeline";
 import { DocumentViewer } from "@/components/admin/DocumentViewer";
 import { destinations } from "@/data/destinations";
+import { supabase } from "@/lib/supabase";
 import type { Application } from "@/lib/supabase";
 import { useMounted } from "@/lib/use-mounted";
 
 const EASE_OUT_EXPO = [0.16, 1, 0.3, 1] as const;
 
-// ─── Step color helper ────────────────────────────────────────
+// --- Step color helper ---
 function getStepColor(step: number) {
     if (step <= 2) return { bg: "bg-emerald-500/10", text: "text-emerald-500", border: "border-emerald-500/20" };
     if (step <= 4) return { bg: "bg-blue-500/10", text: "text-blue-500", border: "border-blue-500/20" };
@@ -39,14 +42,14 @@ function getStepColor(step: number) {
     return { bg: "bg-accent/10", text: "text-accent", border: "border-accent/20" };
 }
 
-// ─── Destination options for dropdown ─────────────────────────
+// --- Destination options for dropdown -------------------------
 const DESTINATION_OPTIONS = Object.values(destinations).map((d) => ({
     slug: d.slug,
     name: d.name,
     flag: d.flag,
 }));
 
-// ─── Helpers ──────────────────────────────────────────────────
+// --- Helpers --------------------------------------------------
 function getDestinationFlag(dest: string | null) {
     if (!dest) return "🌍";
     const found = Object.values(destinations).find(
@@ -63,7 +66,7 @@ function formatDate(dateStr: string) {
     });
 }
 
-// ─── Main Admin Page ──────────────────────────────────────────
+// --- Main Admin Page ------------------------------------------
 export default function AdminPage() {
     const { resolvedTheme } = useTheme();
     const mounted = useMounted();
@@ -128,6 +131,17 @@ export default function AdminPage() {
     const [deleteLoading, setDeleteLoading] = useState(false);
     const [undoLoading, setUndoLoading] = useState(false);
 
+    // Realtime & connection resilience state
+    const [syncStatus, setSyncStatus] = useState<"live" | "reconnecting" | "offline">("live");
+    const [channelRetryKey, setChannelRetryKey] = useState(0);
+    const [docRefreshTrigger, setDocRefreshTrigger] = useState(0);
+    const selectedAppRef = useRef<Application | null>(null);
+    const lastCreatedIdRef = useRef<string | null>(null);
+
+    useEffect(() => {
+        selectedAppRef.current = selectedApp;
+    }, [selectedApp]);
+
     const isDark = mounted && resolvedTheme === "dark";
     const mountedRef = useRef(true);
 
@@ -154,9 +168,12 @@ export default function AdminPage() {
         setSearchQuery("");
     }, []);
 
-    // ─── Fetch applications ───────────────────────────────────
-    const fetchApplications = useCallback(async () => {
-        setLoading(true);
+    // --- Fetch applications ---
+    const fetchApplications = useCallback(async (options?: { silent?: boolean }) => {
+        const silent = Boolean(options?.silent);
+        if (!silent) {
+            setLoading(true);
+        }
         try {
             const params = new URLSearchParams({
                 page: currentPage.toString(),
@@ -179,15 +196,31 @@ export default function AdminPage() {
             }
             if (res.ok) {
                 const data = await res.json();
-                setApplications(data.applications || []);
+                const fetchedApps: Application[] = data.applications || [];
+                setApplications(fetchedApps);
                 setTotalCount(data.total || 0);
-            } else {
+                setSyncStatus("live");
+                if (selectedAppRef.current) {
+                    const updatedSelected = fetchedApps.find(
+                        (a) => a.id === selectedAppRef.current?.id
+                    );
+                    if (updatedSelected) {
+                        setSelectedApp(updatedSelected);
+                    }
+                }
+            } else if (!silent) {
                 toast.error("Failed to fetch applications.");
             }
         } catch {
-            toast.error("Network error while fetching applications.");
+            if (!silent) {
+                toast.error("Network error while fetching applications.");
+            } else {
+                setSyncStatus("offline");
+            }
         } finally {
-            setLoading(false);
+            if (!silent) {
+                setLoading(false);
+            }
         }
     }, [token, currentPage, sortOrder, filterStep, debouncedSearch, handleLogout]);
 
@@ -197,7 +230,7 @@ export default function AdminPage() {
         const load = async () => {
             await Promise.resolve();
             if (isMounted) {
-                fetchApplications();
+                void fetchApplications();
             }
         };
         load();
@@ -206,7 +239,163 @@ export default function AdminPage() {
         };
     }, [isAuthenticated, fetchApplications]);
 
-    // ─── Auth handler ─────────────────────────────────────────
+    // --- Supabase Realtime subscription on admin:live ---
+    useEffect(() => {
+        if (!isAuthenticated) return;
+
+        const channel = supabase
+            .channel("admin:live")
+            .on(
+                "broadcast",
+                { event: "application-created" },
+                (payload) => {
+                    const body = payload.payload as
+                        | { application?: Application }
+                        | undefined;
+                    if (
+                        body?.application &&
+                        body.application.id !== lastCreatedIdRef.current
+                    ) {
+                        toast.success(
+                            `New application received: ${body.application.name}`
+                        );
+                    }
+                    void fetchApplications({ silent: true });
+                }
+            )
+            .on(
+                "broadcast",
+                { event: "application-updated" },
+                (payload) => {
+                    const body = payload.payload as
+                        | { application?: Application }
+                        | undefined;
+                    const updatedApp = body?.application;
+                    if (updatedApp && updatedApp.id) {
+                        setApplications((prev) =>
+                            prev.map((a) =>
+                                a.id === updatedApp.id ? updatedApp : a
+                            )
+                        );
+                        if (selectedAppRef.current?.id === updatedApp.id) {
+                            setSelectedApp(updatedApp);
+                        }
+                    } else {
+                        void fetchApplications({ silent: true });
+                    }
+                }
+            )
+            .on(
+                "broadcast",
+                { event: "application-deleted" },
+                (payload) => {
+                    const body = payload.payload as
+                        | { application?: { id?: string } }
+                        | undefined;
+                    const deletedId = body?.application?.id;
+                    if (deletedId) {
+                        setApplications((prev) =>
+                            prev.filter((a) => a.id !== deletedId)
+                        );
+                        setTotalCount((prev) => Math.max(0, prev - 1));
+                        if (selectedAppRef.current?.id === deletedId) {
+                            setSelectedApp(null);
+                            setView("list");
+                        }
+                    } else {
+                        void fetchApplications({ silent: true });
+                    }
+                }
+            )
+            .on(
+                "broadcast",
+                { event: "documents_updated" },
+                (payload) => {
+                    const body = payload.payload as
+                        | { trackingCode?: string; action?: string }
+                        | undefined;
+                    if (body?.trackingCode) {
+                        if (
+                            selectedAppRef.current?.tracking_code ===
+                            body.trackingCode
+                        ) {
+                            setDocRefreshTrigger((prev) => prev + 1);
+                        }
+                        if (body.action === "uploaded") {
+                            toast.success(
+                                `New document uploaded (${body.trackingCode})`
+                            );
+                        }
+                    }
+                }
+            )
+            .subscribe((status) => {
+                if (status === "SUBSCRIBED") {
+                    setSyncStatus("live");
+                } else if (
+                    status === "CHANNEL_ERROR" ||
+                    status === "TIMED_OUT" ||
+                    status === "CLOSED"
+                ) {
+                    setSyncStatus(
+                        typeof navigator !== "undefined" && !navigator.onLine
+                            ? "offline"
+                            : "reconnecting"
+                    );
+                }
+            });
+
+        return () => {
+            supabase.removeChannel(channel);
+        };
+    }, [isAuthenticated, channelRetryKey, fetchApplications]);
+
+    // --- Mobile connection resilience (visibilitychange, online, offline) ---
+    useEffect(() => {
+        if (!isAuthenticated) return;
+
+        const handleReconnectAndSync = () => {
+            if (typeof navigator !== "undefined" && !navigator.onLine) {
+                setSyncStatus("offline");
+                return;
+            }
+            setSyncStatus("reconnecting");
+            setChannelRetryKey((prev) => prev + 1);
+            void fetchApplications({ silent: true });
+            if (selectedAppRef.current) {
+                setDocRefreshTrigger((prev) => prev + 1);
+            }
+        };
+
+        const handleVisibilityChange = () => {
+            if (document.visibilityState === "visible") {
+                handleReconnectAndSync();
+            }
+        };
+
+        const handleOnline = () => {
+            handleReconnectAndSync();
+        };
+
+        const handleOffline = () => {
+            setSyncStatus("offline");
+        };
+
+        document.addEventListener("visibilitychange", handleVisibilityChange);
+        window.addEventListener("online", handleOnline);
+        window.addEventListener("offline", handleOffline);
+
+        return () => {
+            document.removeEventListener(
+                "visibilitychange",
+                handleVisibilityChange
+            );
+            window.removeEventListener("online", handleOnline);
+            window.removeEventListener("offline", handleOffline);
+        };
+    }, [isAuthenticated, fetchApplications]);
+
+    // --- Auth handler ---
     const handleLogin = async (e: React.FormEvent) => {
         e.preventDefault();
         setAuthError("");
@@ -234,7 +423,7 @@ export default function AdminPage() {
     };
 
 
-    // ─── Add application handler ──────────────────────────────
+    // --- Add application handler ---
     const handleAddApplication = async (e: React.FormEvent) => {
         e.preventDefault();
         setAddLoading(true);
@@ -249,6 +438,7 @@ export default function AdminPage() {
             });
             const data = await res.json();
             if (res.ok && data.application) {
+                lastCreatedIdRef.current = data.application.id;
                 setCreatedApp(data.application);
                 setAddForm({ name: "", phone: "", email: "", destination: "" });
                 toast.success("Application created successfully!");
@@ -262,10 +452,33 @@ export default function AdminPage() {
         }
     };
 
-    // ─── Advance step handler ─────────────────────────────────
+    // --- Advance step handler (with instant optimistic UI update) ---
     const handleAdvance = async () => {
-        if (!selectedApp) return;
+        if (!selectedApp || selectedApp.current_step >= 7) return;
+        const previousApp = selectedApp;
+        const nextStepNum = selectedApp.current_step + 1;
+        const optimisticNow = new Date().toISOString();
+        const optimisticApp: Application = {
+            ...selectedApp,
+            current_step: nextStepNum,
+            notes: selectedApp.notes.map((step, idx) =>
+                idx === nextStepNum - 1
+                    ? {
+                          ...step,
+                          date: optimisticNow,
+                          note: advanceNote || step.note,
+                      }
+                    : step
+            ),
+            updated_at: optimisticNow,
+        };
+
         setAdvanceLoading(true);
+        setSelectedApp(optimisticApp);
+        setApplications((prev) =>
+            prev.map((a) => (a.id === optimisticApp.id ? optimisticApp : a))
+        );
+
         try {
             const res = await fetch("/api/admin/applications", {
                 method: "PATCH",
@@ -274,30 +487,43 @@ export default function AdminPage() {
                     Authorization: `Bearer ${token}`,
                 },
                 body: JSON.stringify({
-                    id: selectedApp.id,
+                    id: previousApp.id,
                     action: "advance",
                     note: advanceNote,
-                    updated_at: selectedApp.updated_at,
+                    updated_at: previousApp.updated_at,
                 }),
             });
             const data = await res.json();
             if (res.status === 409) {
                 toast.error("Data was modified by another user. Refreshing...");
-                fetchApplications();
+                void fetchApplications({ silent: true });
                 setSelectedApp(null);
                 return;
             }
             if (res.ok && data.application) {
-                setSelectedApp(data.application); // Optimistic update
+                setSelectedApp(data.application);
+                setApplications((prev) =>
+                    prev.map((a) =>
+                        a.id === data.application.id ? data.application : a
+                    )
+                );
                 setAdvanceNote("");
                 setShowSparkle(true);
                 setTimeout(() => { if (mountedRef.current) setShowSparkle(false); }, 1500);
                 toast.success("Step advanced successfully!");
-                fetchApplications(); // Refresh list in background
+                void fetchApplications({ silent: true });
             } else {
+                setSelectedApp(previousApp);
+                setApplications((prev) =>
+                    prev.map((a) => (a.id === previousApp.id ? previousApp : a))
+                );
                 toast.error(data.error || "Failed to advance step.");
             }
         } catch {
+            setSelectedApp(previousApp);
+            setApplications((prev) =>
+                prev.map((a) => (a.id === previousApp.id ? previousApp : a))
+            );
             toast.error("Network error while advancing step.");
         } finally {
             setAdvanceLoading(false);
@@ -305,8 +531,27 @@ export default function AdminPage() {
     };
 
     const handleUndo = async () => {
-        if (!selectedApp) return;
+        if (!selectedApp || selectedApp.current_step <= 1) return;
+        const previousApp = selectedApp;
+        const prevStepNum = selectedApp.current_step - 1;
+        const optimisticNow = new Date().toISOString();
+        const optimisticApp: Application = {
+            ...selectedApp,
+            current_step: prevStepNum,
+            notes: selectedApp.notes.map((step, idx) =>
+                idx === selectedApp.current_step - 1
+                    ? { ...step, date: null, note: "" }
+                    : step
+            ),
+            updated_at: optimisticNow,
+        };
+
         setUndoLoading(true);
+        setSelectedApp(optimisticApp);
+        setApplications((prev) =>
+            prev.map((a) => (a.id === optimisticApp.id ? optimisticApp : a))
+        );
+
         try {
             const res = await fetch("/api/admin/applications", {
                 method: "PATCH",
@@ -315,26 +560,39 @@ export default function AdminPage() {
                     Authorization: `Bearer ${token}`,
                 },
                 body: JSON.stringify({
-                    id: selectedApp.id,
+                    id: previousApp.id,
                     action: "undo",
-                    updated_at: selectedApp.updated_at,
+                    updated_at: previousApp.updated_at,
                 }),
             });
             const data = await res.json();
             if (res.status === 409) {
                 toast.error("Data was modified by another user. Refreshing...");
-                fetchApplications();
+                void fetchApplications({ silent: true });
                 setSelectedApp(null);
                 return;
             }
             if (res.ok && data.application) {
                 setSelectedApp(data.application);
+                setApplications((prev) =>
+                    prev.map((a) =>
+                        a.id === data.application.id ? data.application : a
+                    )
+                );
                 toast.success("Step undone successfully!");
-                fetchApplications();
+                void fetchApplications({ silent: true });
             } else {
+                setSelectedApp(previousApp);
+                setApplications((prev) =>
+                    prev.map((a) => (a.id === previousApp.id ? previousApp : a))
+                );
                 toast.error(data.error || "Failed to undo step.");
             }
         } catch {
+            setSelectedApp(previousApp);
+            setApplications((prev) =>
+                prev.map((a) => (a.id === previousApp.id ? previousApp : a))
+            );
             toast.error("Network error while undoing step.");
         } finally {
             setUndoLoading(false);
@@ -344,6 +602,19 @@ export default function AdminPage() {
     const handleEdit = async (e: React.FormEvent) => {
         e.preventDefault();
         if (!selectedApp) return;
+        const previousApp = selectedApp;
+        const optimisticApp: Application = {
+            ...selectedApp,
+            name: editForm.name.trim(),
+            phone: editForm.phone.trim(),
+            email: editForm.email.trim() || null,
+            destination: editForm.destination || null,
+        };
+        setSelectedApp(optimisticApp);
+        setApplications((prev) =>
+            prev.map((a) => (a.id === optimisticApp.id ? optimisticApp : a))
+        );
+
         try {
             const res = await fetch("/api/admin/applications", {
                 method: "PATCH",
@@ -352,29 +623,42 @@ export default function AdminPage() {
                     Authorization: `Bearer ${token}`,
                 },
                 body: JSON.stringify({
-                    id: selectedApp.id,
+                    id: previousApp.id,
                     action: "edit",
-                    updated_at: selectedApp.updated_at,
+                    updated_at: previousApp.updated_at,
                     ...editForm,
                 }),
             });
             const data = await res.json();
             if (res.status === 409) {
                 toast.error("Data was modified by another user. Refreshing...");
-                fetchApplications();
+                void fetchApplications({ silent: true });
                 setIsEditModalOpen(false);
                 setSelectedApp(null);
                 return;
             }
             if (res.ok && data.application) {
                 setSelectedApp(data.application);
+                setApplications((prev) =>
+                    prev.map((a) =>
+                        a.id === data.application.id ? data.application : a
+                    )
+                );
                 setIsEditModalOpen(false);
                 toast.success("Application updated successfully!");
-                fetchApplications();
+                void fetchApplications({ silent: true });
             } else {
+                setSelectedApp(previousApp);
+                setApplications((prev) =>
+                    prev.map((a) => (a.id === previousApp.id ? previousApp : a))
+                );
                 toast.error(data.error || "Failed to update application.");
             }
         } catch {
+            setSelectedApp(previousApp);
+            setApplications((prev) =>
+                prev.map((a) => (a.id === previousApp.id ? previousApp : a))
+            );
             toast.error("Network error while updating application.");
         }
     };
@@ -411,7 +695,7 @@ export default function AdminPage() {
         }
     };
 
-    // ─── Notify handlers ──────────────────────────────────────
+    // --- Notify handlers --------------------------------------
     const handleWhatsApp = (app: Application) => {
         const currentStep = app.notes.find((s) => s.step === app.current_step);
         const stepLabel = currentStep?.label || `Step ${app.current_step}`;
@@ -467,12 +751,12 @@ export default function AdminPage() {
         }
     };
 
-    // ─── Filtered apps ────────────────────────────────────────
+    // --- Filtered apps ----------------------------------------
     // Since search, step filtering, and sorting are executed server-side via Supabase PostgREST,
     // the returned applications array is already accurately filtered and sorted across the database.
     const filteredApps = applications;
 
-    // ─── Glass card classes ───────────────────────────────────
+    // --- Glass card classes -----------------------------------
     const glassCard = isDark
         ? "bg-[rgba(15,23,42,0.85)] border border-white/10 backdrop-blur-xl"
         : "bg-white/60 border border-black/5 backdrop-blur-xl";
@@ -481,7 +765,7 @@ export default function AdminPage() {
         ? "hover:bg-[rgba(15,23,42,0.95)] hover:border-white/20"
         : "hover:bg-white/80 hover:border-black/10";
 
-    // ─── Render ───────────────────────────────────────────────
+    // --- Render -----------------------------------------------
     if (!mounted) {
         return (
             <div className="min-h-screen flex items-center justify-center bg-background">
@@ -490,7 +774,7 @@ export default function AdminPage() {
         );
     }
 
-    // ─── LOGIN VIEW ───────────────────────────────────────────
+    // --- LOGIN VIEW -------------------------------------------
     if (!isAuthenticated) {
         return (
             <div className="min-h-screen flex items-center justify-center bg-background p-4">
@@ -562,11 +846,11 @@ export default function AdminPage() {
         );
     }
 
-    // ─── DASHBOARD VIEWS ──────────────────────────────────────
+    // --- DASHBOARD VIEWS --------------------------------------
     return (
         <div className="min-h-screen bg-background">
             <AnimatePresence mode="wait">
-                {/* ─── LIST VIEW ─── */}
+                {/* --- LIST VIEW --- */}
                 {view === "list" && (
                     <motion.div
                         key="list"
@@ -579,9 +863,30 @@ export default function AdminPage() {
                         {/* Header */}
                         <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-8">
                             <div>
-                                <h1 className="text-2xl md:text-3xl font-bold font-heading text-primary">
-                                    Application Tracker Admin
-                                </h1>
+                                <div className="flex items-center gap-3 flex-wrap">
+                                    <h1 className="text-2xl md:text-3xl font-bold font-heading text-primary">
+                                        Application Tracker Admin
+                                    </h1>
+                                    {syncStatus === "offline" ? (
+                                        <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium bg-red-500/10 text-red-500 border border-red-500/20">
+                                            <WifiOff className="w-3 h-3" />
+                                            Offline
+                                        </span>
+                                    ) : syncStatus === "reconnecting" ? (
+                                        <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium bg-amber-500/10 text-amber-500 border border-amber-500/20">
+                                            <RefreshCw className="w-3 h-3 animate-spin" />
+                                            Syncing...
+                                        </span>
+                                    ) : (
+                                        <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium bg-green-500/10 text-green-500 border border-green-500/20">
+                                            <span className="relative flex h-2 w-2">
+                                                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75" />
+                                                <span className="relative inline-flex rounded-full h-2 w-2 bg-green-500" />
+                                            </span>
+                                            Live Sync
+                                        </span>
+                                    )}
+                                </div>
                                 <p className="text-sm text-muted-foreground mt-1">
                                     {totalCount} total applicant
                                     {totalCount !== 1 ? "s" : ""}
@@ -789,7 +1094,7 @@ export default function AdminPage() {
                     </motion.div>
                 )}
 
-                {/* ─── ADD VIEW ─── */}
+                {/* --- ADD VIEW --- */}
                 {view === "add" && (
                     <motion.div
                         key="add"
@@ -812,7 +1117,7 @@ export default function AdminPage() {
                         </button>
 
                         {createdApp ? (
-                            /* ─── Success Screen ─── */
+                            /* --- Success Screen --- */
                             <motion.div
                                 initial={{ opacity: 0, scale: 0.95 }}
                                 animate={{ opacity: 1, scale: 1 }}
@@ -896,7 +1201,7 @@ export default function AdminPage() {
                                 </div>
                             </motion.div>
                         ) : (
-                            /* ─── Add Form ─── */
+                            /* --- Add Form --- */
                             <div
                                 className={`rounded-2xl p-6 md:p-8 ${glassCard} shadow-lg`}
                             >
@@ -1046,7 +1351,7 @@ export default function AdminPage() {
                     </motion.div>
                 )}
 
-                {/* ─── EDIT VIEW ─── */}
+                {/* --- EDIT VIEW --- */}
                 {view === "edit" && selectedApp && (
                     <motion.div
                         key="edit"
@@ -1056,13 +1361,34 @@ export default function AdminPage() {
                         transition={{ duration: 0.4, ease: EASE_OUT_EXPO }}
                         className="max-w-2xl mx-auto px-4 py-8"
                     >
-                        <button
-                            onClick={() => setView("list")}
-                            className="inline-flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground transition-colors mb-6"
-                        >
-                            <ArrowLeft className="w-4 h-4" />
-                            Back to List
-                        </button>
+                        <div className="flex items-center justify-between mb-6">
+                            <button
+                                onClick={() => setView("list")}
+                                className="inline-flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground transition-colors"
+                            >
+                                <ArrowLeft className="w-4 h-4" />
+                                Back to List
+                            </button>
+                            {syncStatus === "offline" ? (
+                                <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium bg-red-500/10 text-red-500 border border-red-500/20">
+                                    <WifiOff className="w-3 h-3" />
+                                    Offline
+                                </span>
+                            ) : syncStatus === "reconnecting" ? (
+                                <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium bg-amber-500/10 text-amber-500 border border-amber-500/20">
+                                    <RefreshCw className="w-3 h-3 animate-spin" />
+                                    Syncing...
+                                </span>
+                            ) : (
+                                <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium bg-green-500/10 text-green-500 border border-green-500/20">
+                                    <span className="relative flex h-2 w-2">
+                                        <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75" />
+                                        <span className="relative inline-flex rounded-full h-2 w-2 bg-green-500" />
+                                    </span>
+                                    Live Sync
+                                </span>
+                            )}
+                        </div>
 
                         {/* Applicant Header */}
                         <div
@@ -1137,7 +1463,21 @@ export default function AdminPage() {
                             <h3 className="text-base font-semibold text-foreground mb-4">
                                 Uploaded Documents
                             </h3>
-                            <DocumentViewer trackingCode={selectedApp.tracking_code} token={token} />
+                            <DocumentViewer
+                                trackingCode={selectedApp.tracking_code}
+                                token={token}
+                                refreshTrigger={docRefreshTrigger}
+                                onApplicationUpdated={(updatedApp) => {
+                                    setSelectedApp(updatedApp);
+                                    setApplications((prev) =>
+                                        prev.map((a) =>
+                                            a.id === updatedApp.id
+                                                ? updatedApp
+                                                : a
+                                        )
+                                    );
+                                }}
+                            />
                         </div>
 
                         {/* Advance Step */}
@@ -1260,7 +1600,7 @@ export default function AdminPage() {
                     </motion.div>
                 )}
 
-                {/* ─── EDIT MODAL ─── */}
+                {/* --- EDIT MODAL --- */}
                 {isEditModalOpen && selectedApp && (
                     <motion.div
                         initial={{ opacity: 0 }}

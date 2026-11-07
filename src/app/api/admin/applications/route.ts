@@ -7,17 +7,14 @@ import type { Application } from "@/lib/supabase";
 import { isAuthorized } from "@/lib/auth";
 import { supabaseAdmin } from "@/lib/supabase-server";
 import { escapeHtml, normalizePhone } from "@/lib/sanitize";
+import { broadcastApplicationEvent } from "@/lib/realtime-broadcast";
 
-// Non-blocking helper to broadcast status updates over Supabase Realtime
-async function broadcastApplicationUpdate(application: Application) {
-    try {
-        const channel = supabaseAdmin.channel(`track:${application.tracking_code}`);
-        await channel.httpSend("application-updated", application);
-        supabaseAdmin.removeChannel(channel);
-    } catch (broadcastErr) {
-        // Non-blocking: failure to broadcast should not fail the API response
-        console.error("Realtime broadcast error:", broadcastErr);
-    }
+// Non-blocking helper to broadcast status updates over Supabase Realtime to student and admin channels
+async function broadcastApplicationUpdate(
+    application: Application,
+    event: "application-created" | "application-updated" = "application-updated"
+) {
+    await broadcastApplicationEvent(event, application);
 }
 
 // GET: Fetch all applications
@@ -166,6 +163,7 @@ export async function POST(request: NextRequest) {
             );
         }
 
+        void broadcastApplicationUpdate(data as Application, "application-created");
         return NextResponse.json({ application: data }, { status: 201 });
     } catch {
         return NextResponse.json(
@@ -478,6 +476,11 @@ export async function DELETE(request: NextRequest) {
                 { status: 500 }
             );
         }
+
+        void broadcastApplicationEvent("application-deleted", {
+            id,
+            tracking_code: app?.tracking_code,
+        });
 
         return NextResponse.json({ success: true });
     } catch {

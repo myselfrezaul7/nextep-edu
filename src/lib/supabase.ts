@@ -3,12 +3,22 @@ import { createClient } from "@supabase/supabase-js";
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
 const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!;
 
+export type DocumentVerificationStatus = "pending" | "verified" | "rejected";
+
+export interface DocumentReviewMeta {
+    status: DocumentVerificationStatus;
+    feedback?: string;
+    originalName?: string;
+    updated_at: string;
+}
+
 // Types for the applications table
 export interface ApplicationStep {
     step: number;
     label: string;
     note: string;
     date: string | null;
+    document_reviews?: Record<string, DocumentReviewMeta>;
 }
 
 export interface Application {
@@ -26,7 +36,13 @@ export interface Application {
 
 export interface UploadedDocumentInfo {
     name: string;
+    id?: string;
     created_at: string;
+    url?: string | null;
+    status?: DocumentVerificationStatus;
+    feedback?: string;
+    originalName?: string;
+    updated_at?: string;
 }
 
 export type Json =

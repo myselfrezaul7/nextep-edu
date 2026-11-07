@@ -1,8 +1,10 @@
 import { NextRequest, NextResponse } from "next/server";
 import { DEFAULT_STEPS, generateTrackingCode } from "@/lib/supabase";
+import type { Application } from "@/lib/supabase";
 import { supabaseAdmin } from "@/lib/supabase-server";
 import { rateLimit, getClientIp } from "@/lib/rate-limit";
 import { escapeHtml, normalizePhone, getPhoneVariants } from "@/lib/sanitize";
+import { broadcastApplicationEvent } from "@/lib/realtime-broadcast";
 
 interface RegisterBody {
     name: string;
@@ -148,7 +150,7 @@ export async function POST(request: NextRequest) {
 
         const normalizedPhone = normalizePhone(phone);
 
-        const { error: insertError } = await supabaseAdmin
+        const { data: createdApp, error: insertError } = await supabaseAdmin
             .from("applications")
             .insert({
                 tracking_code: trackingCode,
@@ -157,7 +159,9 @@ export async function POST(request: NextRequest) {
                 email,
                 current_step: 1,
                 notes: stepsWithFirstCompleted,
-            });
+            })
+            .select("*")
+            .single();
 
         if (insertError) {
             console.error("Supabase insert error:", insertError);
@@ -165,6 +169,10 @@ export async function POST(request: NextRequest) {
                 { success: false, error: "Failed to create application." },
                 { status: 500 }
             );
+        }
+
+        if (createdApp) {
+            void broadcastApplicationEvent("application-created", createdApp as Application);
         }
 
         // Try to send the welcome email

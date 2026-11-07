@@ -244,7 +244,25 @@ export function BookingModal() {
 
             if (regResult.status === "fulfilled" && regResult.value.success) {
                 if (regResult.value.trackingCode) {
-                    setTrackingCode(regResult.value.trackingCode);
+                    const newCode = regResult.value.trackingCode;
+                    setTrackingCode(newCode);
+                    try {
+                        const raw = localStorage.getItem("nextep_recent_tracks");
+                        const parsed = raw ? JSON.parse(raw) : [];
+                        const prev = Array.isArray(parsed) ? parsed : [];
+                        const next = [
+                            {
+                                code: newCode,
+                                name: data.name,
+                                phone: data.phone,
+                                updatedAt: new Date().toISOString(),
+                            },
+                            ...prev.filter((item: { code?: string }) => item?.code !== newCode),
+                        ].slice(0, 5);
+                        localStorage.setItem("nextep_recent_tracks", JSON.stringify(next));
+                    } catch {
+                        // Ignore localStorage write errors
+                    }
                 } else if (regResult.value.isExisting) {
                     setIsExistingApp(true);
                 }
@@ -416,7 +434,8 @@ export function BookingModal() {
                                                     Your tracking code is <span className="font-semibold text-accent">{trackingCode}</span>. Use this to check your progress anytime.
                                                 </p>
                                                 <Link
-                                                    href="/track"
+                                                    href={`/track?code=${encodeURIComponent(trackingCode)}`}
+                                                    onClick={closeModal}
                                                     className="inline-flex items-center gap-1 text-sm font-semibold text-accent hover:text-accent/80 transition-colors"
                                                 >
                                                     Track Your Application →
