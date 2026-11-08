@@ -20,10 +20,12 @@ export default function Home() {
         <div className="flex flex-col">
             <HeroSection />
             <ServicesSection />
-            <HowItWorksSection />
+            <div className="cv-auto">
+                <HowItWorksSection />
+            </div>
 
             {/* Destinations Section with distinct surface rhythm */}
-            <section id="destinations" className="py-20 md:py-28 bg-surface/60 dark:bg-card/40 border-y border-border/50">
+            <section id="destinations" className="py-20 md:py-28 bg-surface/60 dark:bg-card/40 border-y border-border/50 cv-auto">
                 <div className="container mx-auto px-4">
                     <div className="text-center mb-14">
                         <span className="inline-block px-3.5 py-1.5 rounded-full bg-accent/10 border border-accent/20 text-accent text-xs font-semibold tracking-wider uppercase mb-4">
@@ -40,7 +42,9 @@ export default function Home() {
                 </div>
             </section>
 
-            <AboutSection />
+            <div className="cv-auto">
+                <AboutSection />
+            </div>
             <TestimonialCarousel />
         </div>
     );

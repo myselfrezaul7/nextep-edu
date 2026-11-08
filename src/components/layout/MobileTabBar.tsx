@@ -1,38 +1,38 @@
 "use client";
 
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect } from "react";
 import { Home, BookOpen, Globe2, Compass, CalendarCheck } from "lucide-react";
-import { useTheme } from "next-themes";
 import { cn } from "@/lib/utils";
 import { usePathname, useRouter } from "next/navigation";
 import { motion } from "framer-motion";
 import { useTranslation } from "@/i18n/LanguageContext";
-import { useMounted } from "@/lib/use-mounted";
 import { useBookingModal } from "@/context/BookingModalContext";
+import { useNavVisible } from "@/lib/scroll-store";
+
+function triggerHaptic() {
+    if (typeof navigator !== "undefined" && typeof navigator.vibrate === "function") {
+        try {
+            navigator.vibrate(8);
+        } catch {
+            // Silently ignore on unsupported browsers
+        }
+    }
+}
 
 export function MobileTabBar() {
-    const { theme, systemTheme } = useTheme();
-    const mounted = useMounted();
     const pathname = usePathname();
     const router = useRouter();
     const [activeHash, setActiveHash] = useState("");
     const { t } = useTranslation();
     const { openModal } = useBookingModal();
-    const [tabVisible, setTabVisible] = useState(true);
-    const lastScrollY = useRef(0);
-    const scrollTimeout = useRef<NodeJS.Timeout | null>(null);
-
-    const currentTheme = theme === "system" ? systemTheme : theme;
-    const isDark = mounted && currentTheme === "dark";
+    const tabVisible = useNavVisible();
 
     useEffect(() => {
-        window.dispatchEvent(new CustomEvent("tabbar-visibility", { detail: { visible: tabVisible } }));
-    }, [tabVisible]);
+        if (pathname.startsWith("/admin")) return;
 
-    useEffect(() => {
         const observerCallback = (entries: IntersectionObserverEntry[]) => {
             let mostVisible = entries[0];
-            entries.forEach(entry => {
+            entries.forEach((entry) => {
                 if (entry.intersectionRatio > mostVisible.intersectionRatio) {
                     mostVisible = entry;
                 }
@@ -46,24 +46,20 @@ export function MobileTabBar() {
             }
         };
 
-        const observerOptions = {
+        const observer = new IntersectionObserver(observerCallback, {
             root: null,
             rootMargin: "-20% 0px -40% 0px",
-            threshold: [0, 0.25, 0.5, 0.75, 1]
-        };
-
-        const observer = new IntersectionObserver(observerCallback, observerOptions);
+            threshold: [0, 0.25, 0.5, 0.75, 1],
+        });
 
         const sections = [
             document.getElementById("hero"),
             document.getElementById("services"),
-            document.getElementById("about")
+            document.getElementById("about"),
         ];
 
-        sections.forEach(section => {
-            if (section) {
-                observer.observe(section);
-            }
+        sections.forEach((section) => {
+            if (section) observer.observe(section);
         });
 
         const handleHashChange = () => {
@@ -73,32 +69,15 @@ export function MobileTabBar() {
         window.addEventListener("hashchange", handleHashChange);
         handleHashChange();
 
-        const handleScroll = () => {
-            const currentScrollY = window.scrollY;
-
-            if (currentScrollY <= 20) {
-                setTabVisible(true);
-            } else if (currentScrollY > lastScrollY.current && currentScrollY > 60) {
-                setTabVisible(false);
-            } else if (currentScrollY < lastScrollY.current) {
-                setTabVisible(true);
-            }
-            lastScrollY.current = currentScrollY;
-
-            if (scrollTimeout.current) clearTimeout(scrollTimeout.current);
-            scrollTimeout.current = setTimeout(() => {
-                setTabVisible(true);
-            }, 150);
-        };
-        window.addEventListener("scroll", handleScroll, { passive: true });
-
         return () => {
             window.removeEventListener("hashchange", handleHashChange);
             observer.disconnect();
-            window.removeEventListener("scroll", handleScroll);
-            if (scrollTimeout.current) clearTimeout(scrollTimeout.current);
         };
     }, [pathname]);
+
+    if (pathname.startsWith("/admin")) {
+        return null;
+    }
 
     const isHomeActive = pathname === "/" && (!activeHash || activeHash === "");
     const isServicesActive = pathname === "/" && activeHash === "#services";
@@ -106,130 +85,190 @@ export function MobileTabBar() {
     const isTrackActive = pathname.startsWith("/track");
 
     const handleNavClick = (hash: string) => {
+        triggerHaptic();
         if (pathname !== "/") {
             router.push(`/${hash}`);
+        } else if (hash === "") {
+            window.scrollTo({ top: 0, behavior: "smooth" });
+            history.replaceState(null, "", " ");
+            setActiveHash("");
         } else {
-            if (hash === "") {
-                window.scrollTo({ top: 0, behavior: "smooth" });
-                history.replaceState(null, "", " ");
-                setActiveHash("");
-            } else {
-                const element = document.querySelector(hash);
-                if (element) {
-                    element.scrollIntoView({ behavior: "smooth" });
-                    history.pushState(null, "", hash);
-                    setActiveHash(hash);
-                }
+            const element = document.querySelector(hash);
+            if (element) {
+                element.scrollIntoView({ behavior: "smooth" });
+                history.pushState(null, "", hash);
+                setActiveHash(hash);
             }
         }
     };
 
+    const handleRouteClick = (href: string) => {
+        triggerHaptic();
+        router.push(href);
+    };
+
+    const handleBookClick = () => {
+        triggerHaptic();
+        openModal();
+    };
+
     return (
-        <motion.nav
+        <nav
+            aria-label="Mobile primary navigation"
             className={cn(
-                "fixed bottom-3.5 left-3.5 right-3.5 z-50 md:hidden",
-                "px-2.5 py-2 rounded-2xl border glass-nav transition-all duration-300 ease-out",
-                tabVisible ? "translate-y-0 opacity-100" : "translate-y-[120%] opacity-0",
-                isDark
-                    ? "bg-slate-900/90 border-white/[0.08] shadow-[0_8px_30px_rgba(0,0,0,0.4)]"
-                    : "bg-white/90 border-slate-200/80 shadow-[0_8px_30px_rgba(15,23,42,0.08)]"
+                "fixed left-3.5 right-3.5 z-50 md:hidden will-change-transform",
+                "px-2.5 py-2 rounded-[1.75rem] border glass-nav saturate-[1.8]",
+                "bg-white/75 dark:bg-slate-900/78 border-slate-200/85 dark:border-white/[0.1]",
+                "shadow-[0_10px_34px_rgba(15,23,42,0.12),inset_0_1px_0_rgba(255,255,255,0.75)] dark:shadow-[0_12px_38px_rgba(0,0,0,0.55),inset_0_1px_0_rgba(255,255,255,0.08)]",
+                "transition-[transform,opacity] duration-300 ease-out",
+                tabVisible
+                    ? "translate-y-0 opacity-100"
+                    : "translate-y-[140%] opacity-0 pointer-events-none"
             )}
-            style={{ paddingBottom: "env(safe-area-inset-bottom)" }}
+            style={{
+                bottom: "calc(0.75rem + env(safe-area-inset-bottom, 0px))",
+            }}
         >
+            {/* Subtle Gold Hairline Accent along top edge */}
+            <div
+                aria-hidden="true"
+                className="pointer-events-none absolute top-0 left-6 right-6 h-px bg-gradient-to-r from-transparent via-accent/65 to-transparent"
+            />
+
             <div className="grid grid-cols-5 items-center gap-1">
-                {/* HOME */}
+                {/* 1. HOME */}
                 <button
+                    type="button"
                     onClick={() => handleNavClick("")}
+                    aria-label={t("common.tab.home", undefined, "Home")}
+                    aria-current={isHomeActive ? "page" : undefined}
                     className={cn(
-                        "relative flex flex-col items-center justify-center gap-0.5 h-11 rounded-xl transition-colors duration-200",
+                        "relative flex flex-col items-center justify-center gap-0.5 min-h-[46px] rounded-2xl transition-all duration-150 active:scale-[0.92]",
                         isHomeActive
                             ? "text-accent"
-                            : isDark ? "text-white/60 hover:text-white" : "text-muted-foreground hover:text-foreground"
+                            : "text-muted-foreground dark:text-white/65 hover:text-foreground dark:hover:text-white"
                     )}
                 >
-                    <Home className="w-4 h-4" strokeWidth={isHomeActive ? 2.4 : 1.9} />
-                    <span className="text-[10px] font-semibold tracking-tight">{t("common.tab.home", undefined, "Home")}</span>
+                    <Home className="w-[18px] h-[18px]" strokeWidth={isHomeActive ? 2.3 : 1.8} />
+                    <span className="text-[10px] font-semibold tracking-tight leading-none mt-0.5">
+                        {t("common.tab.home", undefined, "Home")}
+                    </span>
                     {isHomeActive && (
-                        <motion.div
-                            layoutId="tab-indicator"
-                            className="absolute inset-0 rounded-xl bg-accent/12 -z-10"
-                            transition={{ type: "spring", stiffness: 350, damping: 28 }}
-                        />
+                        <>
+                            <motion.div
+                                layoutId="tab-indicator"
+                                className="absolute inset-0 rounded-2xl bg-accent/14 border border-accent/25 -z-10"
+                                transition={{ type: "spring", stiffness: 500, damping: 38 }}
+                            />
+                            <span className="w-1 h-1 rounded-full bg-accent mt-0.5" />
+                        </>
                     )}
                 </button>
 
-                {/* SERVICES */}
+                {/* 2. SERVICES */}
                 <button
+                    type="button"
                     onClick={() => handleNavClick("#services")}
+                    aria-label={t("common.tab.services", undefined, "Services")}
+                    aria-current={isServicesActive ? "page" : undefined}
                     className={cn(
-                        "relative flex flex-col items-center justify-center gap-0.5 h-11 rounded-xl transition-colors duration-200",
+                        "relative flex flex-col items-center justify-center gap-0.5 min-h-[46px] rounded-2xl transition-all duration-150 active:scale-[0.92]",
                         isServicesActive
                             ? "text-accent"
-                            : isDark ? "text-white/60 hover:text-white" : "text-muted-foreground hover:text-foreground"
+                            : "text-muted-foreground dark:text-white/65 hover:text-foreground dark:hover:text-white"
                     )}
                 >
-                    <BookOpen className="w-4 h-4" strokeWidth={isServicesActive ? 2.4 : 1.9} />
-                    <span className="text-[10px] font-semibold tracking-tight">{t("common.tab.services", undefined, "Services")}</span>
+                    <BookOpen className="w-[18px] h-[18px]" strokeWidth={isServicesActive ? 2.3 : 1.8} />
+                    <span className="text-[10px] font-semibold tracking-tight leading-none mt-0.5">
+                        {t("common.tab.services", undefined, "Services")}
+                    </span>
                     {isServicesActive && (
-                        <motion.div
-                            layoutId="tab-indicator"
-                            className="absolute inset-0 rounded-xl bg-accent/12 -z-10"
-                            transition={{ type: "spring", stiffness: 350, damping: 28 }}
-                        />
+                        <>
+                            <motion.div
+                                layoutId="tab-indicator"
+                                className="absolute inset-0 rounded-2xl bg-accent/14 border border-accent/25 -z-10"
+                                transition={{ type: "spring", stiffness: 500, damping: 38 }}
+                            />
+                            <span className="w-1 h-1 rounded-full bg-accent mt-0.5" />
+                        </>
                     )}
                 </button>
 
-                {/* COUNTRIES */}
+                {/* 3. RAISED CENTER BOOK CTA */}
+                <div className="relative flex flex-col items-center justify-center">
+                    <button
+                        type="button"
+                        onClick={handleBookClick}
+                        aria-label={t("common.tab.book", undefined, "Book Free Consultation")}
+                        className="group relative flex flex-col items-center justify-center focus:outline-none active:scale-[0.92] transition-transform duration-150"
+                    >
+                        <div className="-mt-6 w-13 h-13 rounded-full bg-gradient-to-br from-[#E6C55A] via-[#D4AF37] to-[#B8901F] text-slate-950 ring-4 ring-background shadow-[0_8px_24px_rgba(212,175,55,0.42)] flex items-center justify-center transition-transform duration-200 group-hover:scale-105">
+                            <CalendarCheck className="w-5 h-5" strokeWidth={2.3} />
+                        </div>
+                        <span className="text-[10px] font-bold tracking-tight text-accent leading-none mt-1">
+                            {t("common.tab.book", undefined, "Book")}
+                        </span>
+                    </button>
+                </div>
+
+                {/* 4. COUNTRIES */}
                 <button
-                    onClick={() => router.push("/destinations")}
+                    type="button"
+                    onClick={() => handleRouteClick("/destinations")}
+                    aria-label={t("common.tab.countries", undefined, "Countries")}
+                    aria-current={isCountriesActive ? "page" : undefined}
                     className={cn(
-                        "relative flex flex-col items-center justify-center gap-0.5 h-11 rounded-xl transition-colors duration-200",
+                        "relative flex flex-col items-center justify-center gap-0.5 min-h-[46px] rounded-2xl transition-all duration-150 active:scale-[0.92]",
                         isCountriesActive
                             ? "text-accent"
-                            : isDark ? "text-white/60 hover:text-white" : "text-muted-foreground hover:text-foreground"
+                            : "text-muted-foreground dark:text-white/65 hover:text-foreground dark:hover:text-white"
                     )}
                 >
-                    <Globe2 className="w-4 h-4" strokeWidth={isCountriesActive ? 2.4 : 1.9} />
-                    <span className="text-[10px] font-semibold tracking-tight">{t("common.tab.countries", undefined, "Countries")}</span>
+                    <Globe2 className="w-[18px] h-[18px]" strokeWidth={isCountriesActive ? 2.3 : 1.8} />
+                    <span className="text-[10px] font-semibold tracking-tight leading-none mt-0.5">
+                        {t("common.tab.countries", undefined, "Countries")}
+                    </span>
                     {isCountriesActive && (
-                        <motion.div
-                            layoutId="tab-indicator"
-                            className="absolute inset-0 rounded-xl bg-accent/12 -z-10"
-                            transition={{ type: "spring", stiffness: 350, damping: 28 }}
-                        />
+                        <>
+                            <motion.div
+                                layoutId="tab-indicator"
+                                className="absolute inset-0 rounded-2xl bg-accent/14 border border-accent/25 -z-10"
+                                transition={{ type: "spring", stiffness: 500, damping: 38 }}
+                            />
+                            <span className="w-1 h-1 rounded-full bg-accent mt-0.5" />
+                        </>
                     )}
                 </button>
 
-                {/* TRACK */}
+                {/* 5. TRACK */}
                 <button
-                    onClick={() => router.push("/track")}
+                    type="button"
+                    onClick={() => handleRouteClick("/track")}
+                    aria-label={t("common.tab.track", undefined, "Track Application")}
+                    aria-current={isTrackActive ? "page" : undefined}
                     className={cn(
-                        "relative flex flex-col items-center justify-center gap-0.5 h-11 rounded-xl transition-colors duration-200",
+                        "relative flex flex-col items-center justify-center gap-0.5 min-h-[46px] rounded-2xl transition-all duration-150 active:scale-[0.92]",
                         isTrackActive
                             ? "text-accent"
-                            : isDark ? "text-white/60 hover:text-white" : "text-muted-foreground hover:text-foreground"
+                            : "text-muted-foreground dark:text-white/65 hover:text-foreground dark:hover:text-white"
                     )}
                 >
-                    <Compass className="w-4 h-4" strokeWidth={isTrackActive ? 2.4 : 1.9} />
-                    <span className="text-[10px] font-semibold tracking-tight">{t("common.tab.track", undefined, "Track")}</span>
+                    <Compass className="w-[18px] h-[18px]" strokeWidth={isTrackActive ? 2.3 : 1.8} />
+                    <span className="text-[10px] font-semibold tracking-tight leading-none mt-0.5">
+                        {t("common.tab.track", undefined, "Track")}
+                    </span>
                     {isTrackActive && (
-                        <motion.div
-                            layoutId="tab-indicator"
-                            className="absolute inset-0 rounded-xl bg-accent/12 -z-10"
-                            transition={{ type: "spring", stiffness: 350, damping: 28 }}
-                        />
+                        <>
+                            <motion.div
+                                layoutId="tab-indicator"
+                                className="absolute inset-0 rounded-2xl bg-accent/14 border border-accent/25 -z-10"
+                                transition={{ type: "spring", stiffness: 500, damping: 38 }}
+                            />
+                            <span className="w-1 h-1 rounded-full bg-accent mt-0.5" />
+                        </>
                     )}
-                </button>
-
-                {/* BOOK */}
-                <button
-                    onClick={() => openModal()}
-                    className="relative flex flex-col items-center justify-center gap-0.5 h-11 rounded-xl bg-accent/15 text-accent font-semibold transition-colors duration-200"
-                >
-                    <CalendarCheck className="w-4 h-4" strokeWidth={2.2} />
-                    <span className="text-[10px] font-bold tracking-tight">{t("common.tab.book", undefined, "Book")}</span>
                 </button>
             </div>
-        </motion.nav>
+        </nav>
     );
 }

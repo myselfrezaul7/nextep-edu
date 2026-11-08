@@ -5,23 +5,15 @@ import { motion, AnimatePresence } from "framer-motion";
 import { usePathname } from "next/navigation";
 import { destinations } from "@/data/destinations";
 import { X, MessageCircle, ArrowRight } from "lucide-react";
+import { useNavVisible } from "@/lib/scroll-store";
 
 export function WhatsAppFAB() {
     const pathname = usePathname();
     const [isExpanded, setIsExpanded] = useState(false);
     const [showNudge, setShowNudge] = useState(false);
-    const [tabBarVisible, setTabBarVisible] = useState(true);
+    const tabBarVisible = useNavVisible();
 
-    useEffect(() => {
-        const handleTabBar = (e: Event) => {
-            const customEvent = e as CustomEvent<{ visible: boolean }>;
-            setTabBarVisible(Boolean(customEvent.detail?.visible));
-        };
-        window.addEventListener("tabbar-visibility", handleTabBar);
-        return () => window.removeEventListener("tabbar-visibility", handleTabBar);
-    }, []);
-
-    // Idle timer for calm one-time nudge
+    // Idle timer for calm one-time nudge (only reset on intentional interactions, not mousemove/scroll)
     useEffect(() => {
         if (pathname.startsWith("/admin")) return;
         const hasSeenNudge = sessionStorage.getItem("wa_nudge_seen");
@@ -43,7 +35,7 @@ export function WhatsAppFAB() {
 
         resetTimer();
 
-        const events = ["mousedown", "mousemove", "keypress", "scroll", "touchstart"];
+        const events = ["pointerdown", "keydown", "touchstart"];
         events.forEach(e => document.addEventListener(e, resetTimer, { passive: true }));
 
         return () => {
@@ -58,7 +50,7 @@ export function WhatsAppFAB() {
 
     const isCountryDetailPage = pathname.startsWith("/destinations/") && pathname !== "/destinations";
     const baseRem = tabBarVisible
-        ? (isCountryDetailPage ? "10.25rem" : "6.25rem")
+        ? (isCountryDetailPage ? "10.75rem" : "6.75rem")
         : (isCountryDetailPage ? "5.5rem" : "1.5rem");
     const bottomOffset = `calc(${baseRem} + env(safe-area-inset-bottom, 0px))`;
 

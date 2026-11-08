@@ -75,6 +75,8 @@ const testimonials = [
 export function TestimonialCarousel() {
     const mounted = useMounted();
     const [isHovered, setIsHovered] = useState(false);
+    const [isInView, setIsInView] = useState(false);
+    const sectionRef = useRef<HTMLElement>(null);
     const scrollRef = useRef<HTMLDivElement>(null);
     const { theme, systemTheme } = useTheme();
     const { t } = useTranslation();
@@ -95,8 +97,19 @@ export function TestimonialCarousel() {
         }
     }, [isMobile]);
 
+    useEffect(() => {
+        const el = sectionRef.current;
+        if (!el) return;
+        const observer = new IntersectionObserver(
+            ([entry]) => setIsInView(entry.isIntersecting),
+            { threshold: 0.05 }
+        );
+        observer.observe(el);
+        return () => observer.disconnect();
+    }, []);
+
     return (
-        <section id="stories" className="py-20 md:py-28 bg-surface/60 dark:bg-card/40 border-t border-border/50 relative overflow-hidden">
+        <section ref={sectionRef} id="stories" className="py-20 md:py-28 bg-surface/60 dark:bg-card/40 border-t border-border/50 relative overflow-hidden cv-auto">
             {/* Soft Background Gradients */}
             <div className="absolute inset-0 bg-[radial-gradient(circle_at_20%_80%,_rgba(212,175,55,0.04)_0%,_transparent_50%),_radial-gradient(circle_at_80%_20%,_rgba(212,175,55,0.04)_0%,_transparent_50%)] pointer-events-none" />
 
@@ -158,7 +171,7 @@ export function TestimonialCarousel() {
                     style={{ willChange: "transform" }}
                     className={cn(
                         "flex w-max gap-6 px-4 md:px-0 transform-gpu animate-marquee hover:pause",
-                        isHovered && "pause"
+                        (isHovered || !isInView) && "pause"
                     )}
                 >
                     {[...testimonials, ...testimonials].map((story, i) => (

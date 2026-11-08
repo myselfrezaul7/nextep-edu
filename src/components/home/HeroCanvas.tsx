@@ -178,13 +178,14 @@ export function HeroCanvas() {
         camera.position.set(0, 0, 11);
         cameraRef.current = camera;
 
+        const dpr = window.devicePixelRatio || 1;
         const renderer = new WebGLRenderer({
             alpha: true,
-            antialias: true,
+            antialias: dpr < 2,
             powerPreference: "high-performance",
         });
         renderer.setSize(container.clientWidth, container.clientHeight);
-        renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 1.5));
+        renderer.setPixelRatio(Math.min(dpr, 1.5));
         renderer.domElement.style.pointerEvents = "none";
         renderer.domElement.style.width = "100%";
         renderer.domElement.style.height = "100%";
@@ -354,30 +355,26 @@ export function HeroCanvas() {
 
         window.addEventListener("resize", handleResize);
 
-        // 7. Animation Loop with IntersectionObserver
+        // 7. Time-Based Animation Loop (120Hz+ Normalized) with Complete Offscreen/Hidden Stop
         let animationFrameId = 0;
-        let isVisible = true;
+        let isRunning = false;
+        let isIntersecting = true;
+        let isTabVisible = document.visibilityState === "visible";
         let pulseTime = 0;
+        let lastFrameTime = performance.now();
 
-        const observer = new IntersectionObserver(
-            ([entry]) => {
-                isVisible = entry.isIntersecting;
-            },
-            { threshold: 0.05 }
-        );
-        observer.observe(container);
+        const renderFrame = (now: number) => {
+            if (!isRunning) return;
 
-        const renderFrame = () => {
-            if (!isVisible) {
-                animationFrameId = requestAnimationFrame(renderFrame);
-                return;
-            }
+            // Normalize delta to 60fps units (16.6667ms = 1.0 unit), clamped to avoid jumps after tab switch
+            const dt = Math.min(Math.max((now - lastFrameTime) / 16.6667, 0.1), 3.0);
+            lastFrameTime = now;
+            pulseTime += dt;
 
-            pulseTime += 1;
-
-            // Smooth parallax lerp
-            currentRotX += (targetRotX - currentRotX) * 0.05;
-            currentRotY += (targetRotY - currentRotY) * 0.05;
+            // Frame-rate independent exponential smoothing
+            const lerpFactor = 1 - Math.pow(0.95, dt);
+            currentRotX += (targetRotX - currentRotX) * lerpFactor;
+            currentRotY += (targetRotY - currentRotY) * lerpFactor;
             constellationGroup.rotation.x = currentRotX;
             constellationGroup.rotation.y = currentRotY + Math.sin(pulseTime * 0.005) * 0.04;
 
@@ -402,22 +399,51 @@ export function HeroCanvas() {
 
             renderer.render(scene, camera);
 
-            if (!prefersReducedMotion) {
+            if (!prefersReducedMotion && isRunning) {
                 animationFrameId = requestAnimationFrame(renderFrame);
             }
         };
+
+        const updateLoopState = () => {
+            const shouldRun = !prefersReducedMotion && isIntersecting && isTabVisible;
+            if (shouldRun && !isRunning) {
+                isRunning = true;
+                lastFrameTime = performance.now();
+                animationFrameId = requestAnimationFrame(renderFrame);
+            } else if (!shouldRun && isRunning) {
+                isRunning = false;
+                cancelAnimationFrame(animationFrameId);
+            }
+        };
+
+        const observer = new IntersectionObserver(
+            ([entry]) => {
+                isIntersecting = entry.isIntersecting;
+                updateLoopState();
+            },
+            { threshold: 0.05 }
+        );
+        observer.observe(container);
+
+        const handleVisibilityChange = () => {
+            isTabVisible = document.visibilityState === "visible";
+            updateLoopState();
+        };
+        document.addEventListener("visibilitychange", handleVisibilityChange);
 
         if (prefersReducedMotion) {
             // Render a single static frame for accessibility
             renderer.render(scene, camera);
         } else {
-            animationFrameId = requestAnimationFrame(renderFrame);
+            updateLoopState();
         }
 
         // 8. Strict Cleanup (React 19 Safe)
         return () => {
+            isRunning = false;
             cancelAnimationFrame(animationFrameId);
             observer.disconnect();
+            document.removeEventListener("visibilitychange", handleVisibilityChange);
             window.removeEventListener("pointermove", handlePointerMove);
             window.removeEventListener("resize", handleResize);
 

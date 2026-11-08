@@ -14,6 +14,7 @@ import { SpeedInsights } from "@vercel/speed-insights/next";
 import { LanguageProvider } from "@/i18n/LanguageContext";
 import { BookingModalProvider } from "@/context/BookingModalContext";
 import { BookingModal } from "@/components/common/BookingModal";
+import { MotionProvider } from "@/components/common/MotionProvider";
 import "./globals.css";
 
 const ibmPlexSans = IBM_Plex_Sans({
@@ -35,6 +36,7 @@ const notoBengali = Noto_Sans_Bengali({
     weight: ["400", "600"],
     variable: "--font-bengali",
     display: "swap",
+    preload: false,
 });
 
 // SEO Metadata targeting Bangladeshi students
@@ -181,21 +183,23 @@ export default function RootLayout({
                         disableTransitionOnChange
                     >
                         <BookingModalProvider>
-                            <ScrollProgress />
-                            <div className="flex flex-col min-h-screen">
-                                <Header />
-                                <main className="flex-grow pt-20 pb-[calc(6.5rem+env(safe-area-inset-bottom,0px))] md:pb-0">
-                                    <ErrorBoundary>
-                                        <PageTransition>{children}</PageTransition>
-                                    </ErrorBoundary>
-                                </main>
-                                <Footer />
-                                <MobileTabBar />
-                            </div>
-                            <BookingModal />
-                            <WhatsAppFAB />
-                            <BackToTop />
-                            <SpeedInsights />
+                            <MotionProvider>
+                                <ScrollProgress />
+                                <div className="flex flex-col min-h-screen">
+                                    <Header />
+                                    <main className="flex-grow pt-20 pb-[calc(6.5rem+env(safe-area-inset-bottom,0px))] md:pb-0">
+                                        <ErrorBoundary>
+                                            <PageTransition>{children}</PageTransition>
+                                        </ErrorBoundary>
+                                    </main>
+                                    <Footer />
+                                    <MobileTabBar />
+                                </div>
+                                <BookingModal />
+                                <WhatsAppFAB />
+                                <BackToTop />
+                                <SpeedInsights />
+                            </MotionProvider>
                         </BookingModalProvider>
                     </ThemeProvider>
                 </LanguageProvider>

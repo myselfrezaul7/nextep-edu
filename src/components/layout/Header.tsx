@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useRef, useSyncExternalStore } from "react";
+import { useState, useSyncExternalStore } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { useTheme } from "next-themes";
@@ -15,6 +15,7 @@ import { usePathname } from "next/navigation";
 import { useMounted } from "@/lib/use-mounted";
 import { destinations as destinationsData } from "@/data/destinations";
 import { useBookingModal } from "@/context/BookingModalContext";
+import { useNavVisible } from "@/lib/scroll-store";
 
 const SearchModal = dynamic(() => import("@/components/common/SearchModal").then(mod => mod.SearchModal), { ssr: false });
 
@@ -32,7 +33,7 @@ const subscribeHash = (callback: () => void) => {
 export function Header() {
     const mounted = useMounted();
     const [dropdownOpen, setDropdownOpen] = useState(false);
-    const [navVisible, setNavVisible] = useState(true);
+    const navVisible = useNavVisible();
     const { theme, setTheme, systemTheme } = useTheme();
     const { t } = useTranslation();
     const { openModal } = useBookingModal();
@@ -42,38 +43,9 @@ export function Header() {
         () => window.location.hash,
         () => ""
     );
-    const [scrollY, setScrollY] = useState(0);
-    const lastScrollY = useRef(0);
-    const scrollTimeout = useRef<NodeJS.Timeout | null>(null);
 
     const currentTheme = theme === "system" ? systemTheme : theme;
     const isDark = mounted && currentTheme === "dark";
-
-    useEffect(() => {
-        const handleScroll = () => {
-            const currentScrollY = window.scrollY;
-            setScrollY(currentScrollY);
-
-            if (currentScrollY <= 20) {
-                setNavVisible(true);
-            } else if (currentScrollY > lastScrollY.current && currentScrollY > 60) {
-                setNavVisible(false);
-            } else if (currentScrollY < lastScrollY.current) {
-                setNavVisible(true);
-            }
-            lastScrollY.current = currentScrollY;
-
-            if (scrollTimeout.current) clearTimeout(scrollTimeout.current);
-            scrollTimeout.current = setTimeout(() => {
-                setNavVisible(true);
-            }, 150);
-        };
-        window.addEventListener("scroll", handleScroll, { passive: true });
-        return () => {
-            window.removeEventListener("scroll", handleScroll);
-            if (scrollTimeout.current) clearTimeout(scrollTimeout.current);
-        };
-    }, []);
 
     const isServicesActive = pathname === "/" && activeHash === "#services";
     const isAboutActive = pathname === "/" && activeHash === "#about";
@@ -87,19 +59,18 @@ export function Header() {
     return (
         <div
             className={cn(
-                "fixed top-0 left-0 w-full z-50 flex justify-center mt-4 px-4 transition-all duration-300 ease-out",
-                navVisible ? "translate-y-0 opacity-100" : "-translate-y-[120%] opacity-0"
+                "fixed top-0 left-0 w-full z-50 flex justify-center mt-4 px-4 transition-[transform,opacity] duration-300 ease-out will-change-transform",
+                navVisible ? "translate-y-0 opacity-100" : "-translate-y-[120%] opacity-0 pointer-events-none"
             )}
         >
             <nav
                 className={cn(
-                    "flex justify-between items-center w-full max-w-5xl px-4 md:px-6 py-2.5 transition-all duration-300",
-                    "rounded-full border glass-nav",
+                    "flex justify-between items-center w-full max-w-5xl px-4 md:px-6 py-2.5 transition-colors duration-200",
+                    "rounded-full border glass-nav saturate-150",
                     isDark
                         ? "bg-slate-900/85 border-white/[0.08] shadow-[0_4px_28px_rgba(0,0,0,0.35)]"
                         : "bg-white/85 border-slate-200/80 shadow-[0_4px_24px_rgba(15,23,42,0.06)]"
                 )}
-                style={{ backdropFilter: `blur(${Math.min(Math.max(scrollY / 8, 12), 20)}px)`, WebkitBackdropFilter: `blur(${Math.min(Math.max(scrollY / 8, 12), 20)}px)` }}
             >
                 {/* Logo */}
                 <Link href="/" className="flex items-center gap-2.5 group shrink-0" onClick={() => window.scrollTo({ top: 0, behavior: "instant" })}>

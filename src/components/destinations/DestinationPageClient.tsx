@@ -35,6 +35,7 @@ import { useState, useEffect } from "react";
 import { useTranslation } from "@/i18n/LanguageContext";
 import { useBookingModal } from "@/context/BookingModalContext";
 import { cn } from "@/lib/utils";
+import { useNavVisible } from "@/lib/scroll-store";
 
 interface SerializedDestination {
     slug: string;
@@ -156,20 +157,11 @@ export function DestinationPageClient({ destination, relatedDestinations = [] }:
         }
         return [];
     });
-    const [tabBarVisible, setTabBarVisible] = useState(true);
+    const tabBarVisible = useNavVisible();
     const { t } = useTranslation();
     const { openModal } = useBookingModal();
 
     const snapshot = COUNTRY_SNAPSHOTS[destination.slug] || DEFAULT_SNAPSHOT;
-
-    useEffect(() => {
-        const handleTabBar = (e: Event) => {
-            const customEvent = e as CustomEvent<{ visible: boolean }>;
-            setTabBarVisible(Boolean(customEvent.detail?.visible));
-        };
-        window.addEventListener("tabbar-visibility", handleTabBar);
-        return () => window.removeEventListener("tabbar-visibility", handleTabBar);
-    }, []);
 
     useEffect(() => {
         const sectionIds = ["overview", "universities", "costs-visa", "checklist", "related"];
@@ -804,7 +796,7 @@ export function DestinationPageClient({ destination, relatedDestinations = [] }:
             <div
                 className="fixed left-3.5 right-3.5 z-40 md:hidden transition-[bottom] duration-300"
                 style={{
-                    bottom: `calc(${tabBarVisible ? "5.25rem" : "0.75rem"} + env(safe-area-inset-bottom, 0px))`,
+                    bottom: `calc(${tabBarVisible ? "5.75rem" : "0.75rem"} + env(safe-area-inset-bottom, 0px))`,
                 }}
             >
                 <div className="surface-card rounded-2xl px-3.5 py-2.5 border border-accent/35 shadow-xl flex items-center justify-between gap-3">
