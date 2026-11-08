@@ -2,7 +2,8 @@
 
 import { motion, useScroll, useTransform } from "framer-motion";
 import { PhoneCall, ClipboardList, SendHorizonal, PlaneTakeoff, Clock } from "lucide-react";
-import { useRef } from "react";
+import { useRef, useState } from "react";
+import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { useTranslation } from "@/i18n/LanguageContext";
 import { useBookingModal } from "@/context/BookingModalContext";
@@ -43,12 +44,30 @@ const stepsData = [
 export function HowItWorksSection() {
     const { t } = useTranslation();
     const { openModal } = useBookingModal();
+    const [activeDot, setActiveDot] = useState(0);
     const containerRef = useRef<HTMLDivElement>(null);
+    const scrollContainerRef = useRef<HTMLDivElement>(null);
     const { scrollYProgress } = useScroll({
         target: containerRef,
         offset: ["start center", "end center"]
     });
     const pathLength = useTransform(scrollYProgress, [0, 0.8], [0, 1]);
+
+    const handleScroll = () => {
+        if (!scrollContainerRef.current) return;
+        const scrollLeft = scrollContainerRef.current.scrollLeft;
+        const cardWidth = scrollContainerRef.current.firstElementChild?.clientWidth || scrollContainerRef.current.offsetWidth;
+        setActiveDot(Math.min(stepsData.length - 1, Math.max(0, Math.round(scrollLeft / (cardWidth + 16)))));
+    };
+
+    const scrollToCard = (index: number) => {
+        if (!scrollContainerRef.current) return;
+        const child = scrollContainerRef.current.children[index] as HTMLElement | undefined;
+        if (child) {
+            child.scrollIntoView({ behavior: "smooth", inline: "center", block: "nearest" });
+            setActiveDot(index);
+        }
+    };
 
     return (
         <section className="py-20 md:py-28 bg-background relative overflow-hidden">
@@ -92,7 +111,7 @@ export function HowItWorksSection() {
                 </div>
 
                 {/* Steps Grid */}
-                <div ref={containerRef} className="relative flex overflow-x-auto snap-x snap-mandatory pb-4 -mx-4 px-4 scrollbar-hide md:grid md:grid-cols-2 lg:grid-cols-4 gap-6 max-w-6xl md:mx-auto">
+                <div ref={containerRef} className="relative max-w-6xl mx-auto">
                     {/* SVG Progress Line */}
                     <div className="hidden lg:block absolute top-20 left-[12.5%] w-[75%] h-[2px] z-0 pointer-events-none">
                         <svg className="w-full h-full" preserveAspectRatio="none">
@@ -107,42 +126,67 @@ export function HowItWorksSection() {
                         </svg>
                     </div>
 
-                    {stepsData.map((step, i) => (
-                        <motion.div
-                            key={step.id}
-                            initial={{ opacity: 0, y: 24 }}
-                            whileInView={{ opacity: 1, y: 0 }}
-                            viewport={{ once: true, amount: 0.2 }}
-                            transition={{ duration: 0.6, delay: i * 0.12, ease: EASE_OUT_EXPO }}
-                            className="relative group w-[78vw] sm:w-[300px] md:w-auto shrink-0 md:shrink snap-center"
-                        >
-                            <div className="surface-card relative rounded-2xl p-6 md:p-7 text-center h-full flex flex-col items-center overflow-hidden">
-                                {/* Step number badge */}
-                                <div className="text-[11px] font-bold tracking-widest text-accent/70 mb-4 uppercase">
-                                    {t("home.howItWorks.stepLabel", undefined, "STEP")} 0{i + 1}
-                                </div>
+                    <div
+                        ref={scrollContainerRef}
+                        onScroll={handleScroll}
+                        className="flex md:grid md:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6 overflow-x-auto md:overflow-visible snap-x snap-mandatory pb-4 md:pb-0 -mx-4 px-4 md:mx-0 md:px-0 scrollbar-hide"
+                    >
+                        {stepsData.map((step, i) => (
+                            <motion.div
+                                key={step.id}
+                                initial={{ opacity: 0, y: 24 }}
+                                whileInView={{ opacity: 1, y: 0 }}
+                                viewport={{ once: true, amount: 0.2 }}
+                                transition={{ duration: 0.6, delay: i * 0.12, ease: EASE_OUT_EXPO }}
+                                className="relative group w-[78vw] sm:w-[300px] md:w-auto md:min-w-0 shrink-0 md:shrink snap-center"
+                            >
+                                <div className="surface-card relative rounded-2xl p-6 md:p-7 text-center h-full flex flex-col items-center overflow-hidden">
+                                    {/* Step number badge */}
+                                    <div className="text-[11px] font-bold tracking-widest text-accent/70 mb-4 uppercase">
+                                        {t("home.howItWorks.stepLabel", undefined, "STEP")} 0{i + 1}
+                                    </div>
 
-                                {/* Icon */}
-                                <div className="w-14 h-14 rounded-2xl bg-accent/10 border border-accent/20 flex items-center justify-center mb-3.5 group-hover:scale-105 group-hover:bg-accent/15 transition-all duration-300">
-                                    <step.icon className="w-6 h-6 text-accent" />
-                                </div>
+                                    {/* Icon */}
+                                    <div className="w-14 h-14 rounded-2xl bg-accent/10 border border-accent/20 flex items-center justify-center mb-3.5 group-hover:scale-105 group-hover:bg-accent/15 transition-all duration-300">
+                                        <step.icon className="w-6 h-6 text-accent" />
+                                    </div>
 
-                                {/* Time Estimate */}
-                                <div className="inline-flex items-center gap-1.5 bg-accent/10 text-accent text-xs font-medium px-3 py-1 rounded-full mb-4">
-                                    <Clock className="w-3 h-3" />
-                                    <span>{step.timeEstimate}</span>
-                                </div>
+                                    {/* Time Estimate */}
+                                    <div className="inline-flex items-center gap-1.5 bg-accent/10 text-accent text-xs font-medium px-3 py-1 rounded-full mb-4">
+                                        <Clock className="w-3 h-3" />
+                                        <span>{step.timeEstimate}</span>
+                                    </div>
 
-                                {/* Content */}
-                                <h3 className="font-heading font-bold text-xl text-primary mb-2.5">
-                                    {t(`home.howItWorks.steps.${step.id}.title`, undefined, step.fallbackTitle)}
-                                </h3>
-                                <p className="text-sm text-muted-foreground leading-relaxed flex-grow">
-                                    {t(`home.howItWorks.steps.${step.id}.description`, undefined, step.fallbackDesc)}
-                                </p>
-                            </div>
-                        </motion.div>
-                    ))}
+                                    {/* Content */}
+                                    <h3 className="font-heading font-bold text-xl text-primary mb-2.5">
+                                        {t(`home.howItWorks.steps.${step.id}.title`, undefined, step.fallbackTitle)}
+                                    </h3>
+                                    <p className="text-sm text-muted-foreground leading-relaxed flex-grow">
+                                        {t(`home.howItWorks.steps.${step.id}.description`, undefined, step.fallbackDesc)}
+                                    </p>
+                                </div>
+                            </motion.div>
+                        ))}
+                    </div>
+
+                    <div className="flex justify-center items-center gap-1.5 mt-5 md:hidden">
+                        {stepsData.map((step, i) => (
+                            <button
+                                key={step.id}
+                                type="button"
+                                onClick={() => scrollToCard(i)}
+                                aria-label={`View ${t(`home.howItWorks.steps.${step.id}.title`, undefined, step.fallbackTitle)}`}
+                                className="p-2 flex items-center justify-center"
+                            >
+                                <span
+                                    className={cn(
+                                        "block h-1.5 rounded-full transition-all duration-300",
+                                        activeDot === i ? "w-6 bg-accent" : "w-1.5 bg-accent/30"
+                                    )}
+                                />
+                            </button>
+                        ))}
+                    </div>
                 </div>
 
                 {/* CTA */}
