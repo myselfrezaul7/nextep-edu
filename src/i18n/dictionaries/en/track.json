@@ -1,0 +1,59 @@
+{
+  "title": "Track Your Application",
+  "subtitle": "Check your live application progress and document verification status.",
+  "resumeLast": "Resume Last Tracked",
+  "open": "Open",
+  "tabCode": "Tracking Code",
+  "tabPhone": "Phone Number",
+  "codeLabel": "Tracking Code",
+  "codePasteHint": "Tip: You can paste the full WhatsApp confirmation message and we'll extract your code.",
+  "phoneLabel": "Registered Phone Number",
+  "searching": "Searching...",
+  "submit": "Track Application",
+  "recentTitle": "Recent Applications",
+  "sync": {
+    "live": "Live Sync",
+    "reconnecting": "Syncing...",
+    "offline": "Offline"
+  },
+  "actionNeeded": {
+    "reuploadTitle": "Action Needed: Re-upload {{count}} Document(s)",
+    "reuploadDesc": "Your counselor left feedback below. Upload a clearer copy to keep your application moving.",
+    "uploadTitle": "Action Needed: Upload Your Documents",
+    "uploadDesc": "Upload your passport, transcripts, or IELTS certificate so our team can verify your file.",
+    "goReupload": "Re-upload Now",
+    "goUpload": "Upload Now"
+  },
+  "results": {
+    "destination": "Destination:",
+    "codeCopied": "Tracking code copied!",
+    "shareParents": "Share Status",
+    "shareCopied": "Status link copied to share with parents!",
+    "askCounselor": "Ask Counselor",
+    "checkAnother": "Check Another Application"
+  },
+  "timeline": {
+    "progress": "Application Progress",
+    "stepCounter": "Step {{step}} of {{total}}",
+    "done": "Done",
+    "current": "Current"
+  },
+  "docs": {
+    "title": "Application Documents",
+    "hint": "Supported: PDF, JPG, PNG (max 5 MB each). Large phone photos are automatically compressed for faster upload.",
+    "submitted": "Submitted Documents",
+    "verified": "Verified",
+    "rejected": "Re-upload Needed",
+    "pending": "Pending Review",
+    "feedback": "Counselor Feedback:",
+    "reuploadCta": "Re-upload Clear Copy",
+    "takePhoto": "Take Photo (Camera)",
+    "uploadGallery": "Upload PDF / Gallery",
+    "dragHint": "Or drag and drop PDF, JPG, or PNG files right here.",
+    "uploading": "Uploading...",
+    "confirmUpload": "Confirm Upload",
+    "uploadSuccess": "Document uploaded successfully!",
+    "uploadSuccessNote": "Our counselor team will review it shortly.",
+    "uploadMore": "Upload another document"
+  }
+}

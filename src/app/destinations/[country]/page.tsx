@@ -66,8 +66,8 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
             canonical: `https://www.nextepedu.com/destinations/${country}`,
             languages: {
                 "en-BD": `https://www.nextepedu.com/destinations/${country}`,
-                "bn-BD": `https://www.nextepedu.com/bn/destinations/${country}`
-            }
+                "bn-BD": `https://www.nextepedu.com/destinations/${country}`,
+            },
         },
     };
 }
@@ -80,7 +80,7 @@ export default async function DestinationCountryPage({ params }: Props) {
         notFound();
     }
 
-    // Serialize data for client component (remove icon functions)
+    // Serialize data for client component (omit lucide icon functions)
     const serializedData = {
         slug: destination.slug,
         name: destination.name,
@@ -88,6 +88,16 @@ export default async function DestinationCountryPage({ params }: Props) {
         heroImage: destination.heroImage,
         heroTitle: destination.hero.title,
         heroDescription: destination.hero.description,
+        region: destination.region,
+        isSchengen: destination.isSchengen,
+        tuitionRange: destination.tuitionRange,
+        tuitionShort: destination.tuitionShort,
+        tuitionTier: destination.tuitionTier,
+        intakes: destination.intakes,
+        workRights: destination.workRights,
+        workRightsShort: destination.workRightsShort,
+        visaTime: destination.visaTime,
+        checklistProfile: destination.checklistProfile,
         benefits: destination.benefits.map((b) => ({
             title: b.title,
             description: b.description,
@@ -95,13 +105,12 @@ export default async function DestinationCountryPage({ params }: Props) {
         universities: destination.universities,
     };
 
-    // Structured data for this specific destination
     const destinationSchema = {
         "@context": "https://schema.org",
         "@type": "Article",
         headline: `Study in ${destination.name} from Bangladesh`,
         description: destination.hero.description,
-        image: `https://nextepedu.com${destination.heroImage}`,
+        image: `https://www.nextepedu.com${destination.heroImage}`,
         author: {
             "@type": "Organization",
             name: "NexTep Edu",
@@ -111,12 +120,12 @@ export default async function DestinationCountryPage({ params }: Props) {
             name: "NexTep Edu",
             logo: {
                 "@type": "ImageObject",
-                url: "https://nextepedu.com/assets/logo.png",
+                url: "https://www.nextepedu.com/assets/logo.png",
             },
         },
         mainEntityOfPage: {
             "@type": "WebPage",
-            "@id": `https://nextepedu.com/destinations/${country}`,
+            "@id": `https://www.nextepedu.com/destinations/${country}`,
         },
     };
 
@@ -134,7 +143,7 @@ export default async function DestinationCountryPage({ params }: Props) {
                 "@type": "ListItem",
                 position: 2,
                 name: "Destinations",
-                item: "https://www.nextepedu.com/#destinations",
+                item: "https://www.nextepedu.com/destinations",
             },
             {
                 "@type": "ListItem",
@@ -145,16 +154,27 @@ export default async function DestinationCountryPage({ params }: Props) {
         ],
     };
 
-    // Get 3 related destinations (excluding current)
+    // Smart "Similar Countries" ranked by region + tuition tier + Schengen match
     const allDestinations = Object.values(destinations);
     const related = allDestinations
         .filter((d) => d.slug !== destination.slug)
+        .map((d) => {
+            let score = 0;
+            if (d.region === destination.region) score += 2;
+            if (d.tuitionTier === destination.tuitionTier) score += 2;
+            if (d.isSchengen && destination.isSchengen) score += 1;
+            return { dest: d, score };
+        })
+        .sort((a, b) => b.score - a.score)
         .slice(0, 3)
-        .map(d => ({
+        .map(({ dest: d }) => ({
             slug: d.slug,
             name: d.name,
             heroImage: d.heroImage,
             flag: d.flag,
+            region: d.region,
+            tuitionShort: d.tuitionShort,
+            workRightsShort: d.workRightsShort,
             benefits: d.benefits.map((b) => ({
                 title: b.title,
                 description: b.description,

@@ -3,13 +3,15 @@
 import { motion } from "framer-motion";
 import { usePathname } from "next/navigation";
 import { useState } from "react";
+import { useMounted } from "@/lib/use-mounted";
 
 const EASE_OUT_EXPO = [0.16, 1, 0.3, 1] as const;
 
 export function PageTransition({ children }: { children: React.ReactNode }) {
     const pathname = usePathname();
-    const [shimmerDoneForPath, setShimmerDoneForPath] = useState<string | null>(null);
-    const showShimmer = shimmerDoneForPath !== pathname;
+    const mounted = useMounted();
+    const [shimmerDoneForPath, setShimmerDoneForPath] = useState<string>(() => pathname);
+    const showShimmer = mounted && shimmerDoneForPath !== pathname;
 
     return (
         <>
@@ -20,7 +22,8 @@ export function PageTransition({ children }: { children: React.ReactNode }) {
                     animate={{ opacity: 0 }}
                     transition={{ duration: 0.45, delay: 0.15 }}
                     onAnimationComplete={() => setShimmerDoneForPath(pathname)}
-                    className="fixed top-0 left-0 w-full h-[2px] overflow-hidden z-[100] pointer-events-none"
+                    className="fixed left-0 w-full h-[2px] overflow-hidden z-[100] pointer-events-none"
+                    style={{ top: "env(safe-area-inset-top, 0px)" }}
                     aria-hidden="true"
                 >
                     <div className="w-full h-full bg-accent animate-shimmer-once" />
@@ -28,13 +31,12 @@ export function PageTransition({ children }: { children: React.ReactNode }) {
             )}
             <motion.div
                 key={pathname}
-                initial={{ opacity: 0, y: 8 }}
-                animate={{ opacity: 1, y: 0 }}
+                initial={mounted ? { opacity: 0 } : false}
+                animate={{ opacity: 1 }}
                 transition={{
-                    duration: 0.28,
+                    duration: 0.24,
                     ease: EASE_OUT_EXPO,
                 }}
-                className="transform-gpu"
             >
                 {children}
             </motion.div>

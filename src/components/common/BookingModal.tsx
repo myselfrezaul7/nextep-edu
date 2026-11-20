@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useRef, useCallback, useMemo } from "react";
+import { useState, useEffect, useRef, useCallback, useMemo, useSyncExternalStore } from "react";
 import { useForm, useWatch } from "react-hook-form";
 import toast from "react-hot-toast";
 import {
@@ -14,11 +14,13 @@ import {
     GraduationCap,
     CheckCircle,
     ChevronLeft,
+    ChevronDown,
     Copy,
     Check,
     Globe2,
     Sparkles,
     AlertCircle,
+    MessageCircle,
 } from "lucide-react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
@@ -33,7 +35,7 @@ import {
 } from "framer-motion";
 import { useTranslation } from "@/i18n/LanguageContext";
 import { useMounted } from "@/lib/use-mounted";
-import { destinations } from "@/data/destinations";
+import { DESTINATIONS_META_LIST } from "@/data/destinations-meta";
 import {
     useBookingModal,
     resolveDestinationName,
@@ -52,7 +54,8 @@ type FormData = {
     website_url?: string; // Honeypot
 };
 
-const DESTINATION_LIST = Object.values(destinations);
+const DRAFT_STORAGE_KEY = "nextep_booking_draft";
+const DESTINATION_LIST = DESTINATIONS_META_LIST;
 
 const STANDARD_TOPICS = [
     "General_Inquiry",
@@ -60,6 +63,22 @@ const STANDARD_TOPICS = [
     "Visa_Processing",
     "Scholarship_Help",
     "LOM_SOP_Writing",
+] as const;
+
+const EDUCATION_OPTIONS = [
+    { value: "Bachelors", key: "common.form.bachelors", fallback: "Bachelor's" },
+    { value: "Masters", key: "common.form.masters", fallback: "Master's" },
+    { value: "PhD", key: "common.form.phd", fallback: "PhD" },
+    { value: "Language_Course", key: "common.form.languageCourse", fallback: "Language Course" },
+    { value: "Foundation_Year", key: "common.form.foundationYear", fallback: "Foundation Year" },
+] as const;
+
+const TOPIC_OPTIONS = [
+    { value: "General_Inquiry", key: "common.form.generalInquiry", fallback: "General Inquiry" },
+    { value: "University_Admission", key: "common.form.universityAdmission", fallback: "University Admission" },
+    { value: "Visa_Processing", key: "common.form.visaProcessing", fallback: "Visa Processing" },
+    { value: "Scholarship_Help", key: "common.form.scholarshipHelp", fallback: "Scholarship Help" },
+    { value: "LOM_SOP_Writing", key: "common.form.lomSopWriting", fallback: "LOM/SOP Writing" },
 ] as const;
 
 const TIME_SLOTS = [
@@ -71,6 +90,14 @@ const TIME_SLOTS = [
     "04:00 PM",
     "05:00 PM",
 ] as const;
+
+const subscribeMobile = (callback: () => void) => {
+    const mq = window.matchMedia("(max-width: 639px)");
+    mq.addEventListener("change", callback);
+    return () => mq.removeEventListener("change", callback);
+};
+
+const getMobileSnapshot = () => window.matchMedia("(max-width: 639px)").matches;
 
 function formatLocalIsoDate(date: Date): string {
     const year = date.getFullYear();
@@ -88,37 +115,58 @@ function getQuickDateOptions() {
     const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
     const dayOfWeek = today.getDay(); // 0 = Sun, 1 = Mon, ..., 6 = Sat
 
-    const tomorrow = new Date(today);
-    tomorrow.setDate(today.getDate() + 1);
+    const addDays = (offset: number) => {
+        const d = new Date(today);
+        d.setDate(today.getDate() + offset);
+        return d;
+    };
 
+    const candidates: Array<{ id: string; label: string; date: Date }> = [];
+    const seen = new Set<string>();
+
+    const pushUnique = (id: string, label: string, date: Date) => {
+        const iso = formatLocalIsoDate(date);
+        if (seen.has(iso)) return false;
+        seen.add(iso);
+        candidates.push({ id, label, date });
+        return true;
+    };
+
+    // Pill 1: Tomorrow
+    pushUnique("tomorrow", "Tomorrow", addDays(1));
+
+    // Pill 2: Upcoming Saturday (or This Sunday when today is Friday and Tomorrow is Saturday)
     const daysUntilSaturday = (6 - dayOfWeek + 7) % 7 || 7;
-    const thisSaturday = new Date(today);
-    thisSaturday.setDate(today.getDate() + daysUntilSaturday);
+    const saturdayLabel = daysUntilSaturday === 7 ? "Next Saturday" : "This Saturday";
+    if (!pushUnique("saturday", saturdayLabel, addDays(daysUntilSaturday))) {
+        pushUnique("sunday", "This Sunday", addDays(2));
+    }
 
+    // Pill 3: Upcoming Monday (or This Tuesday when today is Sunday and Tomorrow is Monday)
     const daysUntilMonday = (1 - dayOfWeek + 7) % 7 || 7;
-    const nextMonday = new Date(today);
-    nextMonday.setDate(today.getDate() + daysUntilMonday);
+    if (!pushUnique("monday", "Next Monday", addDays(daysUntilMonday))) {
+        pushUnique("tuesday", "This Tuesday", addDays(2));
+    }
 
-    return [
-        {
-            id: "tomorrow",
-            label: "Tomorrow",
-            sublabel: formatShortMonthDay(tomorrow),
-            value: formatLocalIsoDate(tomorrow),
-        },
-        {
-            id: "saturday",
-            label: "This Saturday",
-            sublabel: formatShortMonthDay(thisSaturday),
-            value: formatLocalIsoDate(thisSaturday),
-        },
-        {
-            id: "monday",
-            label: "Next Monday",
-            sublabel: formatShortMonthDay(nextMonday),
-            value: formatLocalIsoDate(nextMonday),
-        },
-    ];
+    // Fallback safety to guarantee 3 unique dates
+    let extraOffset = 3;
+    while (candidates.length < 3) {
+        const fallbackDate = addDays(extraOffset);
+        const weekday = fallbackDate.toLocaleDateString("en-US", { weekday: "short" });
+        pushUnique(`day-${extraOffset}`, weekday, fallbackDate);
+        extraOffset += 1;
+    }
+
+    // Always display quick-date pills in chronological order
+    return candidates
+        .slice(0, 3)
+        .sort((a, b) => a.date.getTime() - b.date.getTime())
+        .map((item) => ({
+            id: item.id,
+            label: item.label,
+            sublabel: formatShortMonthDay(item.date),
+            value: formatLocalIsoDate(item.date),
+        }));
 }
 
 function mapTopicPrefill(rawTopic?: string): string {
@@ -127,18 +175,28 @@ function mapTopicPrefill(rawTopic?: string): string {
     if ((STANDARD_TOPICS as readonly string[]).includes(trimmed)) {
         return trimmed;
     }
-    const lower = trimmed.toLowerCase();
-    if (lower === "general inquiry") return "General_Inquiry";
-    if (lower === "university admission" || lower === "university selection" || lower === "offer letter") {
+    const cleaned = trimmed
+        .toLowerCase()
+        .replace(/\s+inquiry$/i, "")
+        .replace(/_/g, " ")
+        .trim();
+
+    if (cleaned === "general" || cleaned === "general inquiry") return "General_Inquiry";
+    if (
+        cleaned.includes("admission") ||
+        cleaned.includes("selection") ||
+        cleaned.includes("offer letter") ||
+        cleaned.includes("university")
+    ) {
         return "University_Admission";
     }
-    if (lower === "visa processing" || lower === "visa support" || lower === "visa assistance") {
+    if (cleaned.includes("visa") || cleaned.includes("bank") || cleaned.includes("solvency")) {
         return "Visa_Processing";
     }
-    if (lower === "scholarship help" || lower === "scholarship hunting" || lower === "scholarship search") {
+    if (cleaned.includes("scholarship") || cleaned.includes("funding")) {
         return "Scholarship_Help";
     }
-    if (lower === "lom/sop writing" || lower === "lom / sop solution") {
+    if (cleaned.includes("lom") || cleaned.includes("sop") || cleaned.includes("motivation")) {
         return "LOM_SOP_Writing";
     }
     return trimmed;
@@ -155,23 +213,53 @@ function mapEducationPrefill(rawLevel?: string): string {
     return rawLevel.trim();
 }
 
+function readDraft(): Partial<FormData> | null {
+    if (typeof window === "undefined") return null;
+    try {
+        const raw = sessionStorage.getItem(DRAFT_STORAGE_KEY);
+        if (!raw) return null;
+        const parsed = JSON.parse(raw);
+        return parsed && typeof parsed === "object" ? (parsed as Partial<FormData>) : null;
+    } catch {
+        return null;
+    }
+}
+
+function writeDraft(data: Partial<FormData>) {
+    if (typeof window === "undefined") return;
+    try {
+        sessionStorage.setItem(DRAFT_STORAGE_KEY, JSON.stringify(data));
+    } catch {
+        // Ignore storage errors
+    }
+}
+
+function clearDraft() {
+    if (typeof window === "undefined") return;
+    try {
+        sessionStorage.removeItem(DRAFT_STORAGE_KEY);
+    } catch {
+        // Ignore storage errors
+    }
+}
+
 function ConfettiExplosion() {
-    const particles = Array.from({ length: 50 });
+    const particles = Array.from({ length: 36 });
     const colors = ["#D4AF37", "#10B981", "#3B82F6", "#EF4444", "#8B5CF6", "#F59E0B", "#EC4899"];
 
     return (
         <div className="absolute inset-0 overflow-hidden pointer-events-none flex items-center justify-center">
             {particles.map((_, i) => {
                 const angle = i * 2.399963;
-                const distance = 50 + ((i * 31) % 200) + (i / 50) * 50;
+                const distance = 50 + ((i * 31) % 180) + (i / 36) * 40;
                 const tx = Math.cos(angle) * distance;
                 const ty = Math.sin(angle) * distance;
                 const color = colors[i % colors.length];
                 const shape = i % 2 === 0 ? "rounded-full" : "rounded-sm";
-                const size = 4 + (i % 8);
+                const size = 4 + (i % 7);
                 const rotate = (i * 45) % 360;
                 const scale = 0.5 + (i % 5) * 0.1;
-                const duration = 1 + (i % 5) * 0.16;
+                const duration = 1 + (i % 5) * 0.14;
 
                 return (
                     <motion.div
@@ -223,8 +311,14 @@ export function BookingModal() {
     const [trackingCode, setTrackingCode] = useState<string | null>(null);
     const [isExistingApp, setIsExistingApp] = useState(false);
     const [codeCopied, setCodeCopied] = useState(false);
+    const [submittedSummary, setSubmittedSummary] = useState<{
+        name: string;
+        destination: string;
+        date: string;
+        time: string;
+    } | null>(null);
     const [step, setStep] = useState(1);
-    const [direction, setDirection] = useState(1); // 1 for forward, -1 for backward
+    const [direction, setDirection] = useState(1);
 
     const {
         register,
@@ -250,19 +344,24 @@ export function BookingModal() {
         },
     });
 
-    const watchedDate = useWatch({ control, name: "date" });
-    const watchedTime = useWatch({ control, name: "time" });
-    const watchedDestination = useWatch({ control, name: "destination" });
-    const watchedTopic = useWatch({ control, name: "topic" });
+    const watchedValues = useWatch({ control });
+    const watchedDate = watchedValues.date || "";
+    const watchedTime = watchedValues.time || "";
+    const watchedDestination = watchedValues.destination || "";
+    const watchedEducation = watchedValues.education_level || "";
+    const watchedTopic = watchedValues.topic || "General_Inquiry";
 
     const [minDate] = useState(() => formatLocalIsoDate(new Date()));
     const quickDates = useMemo(() => getQuickDateOptions(), []);
     const modalRef = useRef<HTMLDivElement>(null);
     const firstInputRef = useRef<HTMLInputElement | null>(null);
+    const emailInputRef = useRef<HTMLInputElement | null>(null);
+    const phoneInputRef = useRef<HTMLInputElement | null>(null);
     const dragControls = useDragControls();
 
     const { theme, systemTheme } = useTheme();
     const mounted = useMounted();
+    const isMobile = useSyncExternalStore(subscribeMobile, getMobileSnapshot, () => false);
     const { t } = useTranslation();
 
     const closeModal = useCallback(() => {
@@ -272,41 +371,70 @@ export function BookingModal() {
             setTrackingCode(null);
             setIsExistingApp(false);
             setCodeCopied(false);
+            setSubmittedSummary(null);
             setStep(1);
             setDirection(1);
-            reset({
-                name: "",
-                email: "",
-                phone: "",
-                destination: "",
-                date: "",
-                time: "",
-                education_level: "",
-                topic: "General_Inquiry",
-                website_url: "",
-            });
         }, 300);
-    }, [closeContextModal, reset]);
+    }, [closeContextModal]);
 
-    // Apply contextual prefill whenever modal opens or prefill changes
+    // Restore session draft + apply contextual prefill whenever modal opens
     useEffect(() => {
         if (!isOpen) return;
+
+        const draft = readDraft();
+        if (draft) {
+            if (draft.name) setValue("name", draft.name, { shouldDirty: false });
+            if (draft.email) setValue("email", draft.email, { shouldDirty: false });
+            if (draft.phone) setValue("phone", draft.phone, { shouldDirty: false });
+            if (draft.date && draft.date >= minDate) setValue("date", draft.date, { shouldDirty: false });
+            if (draft.time) setValue("time", draft.time, { shouldDirty: false });
+        }
 
         const resolvedDest =
             resolveDestinationName(prefill?.destination) ||
             inferDestinationFromText(prefill?.topic) ||
             "";
-        const resolvedTopic = mapTopicPrefill(
-            prefill?.topic || (resolvedDest ? "University_Admission" : "General_Inquiry")
-        );
+        const resolvedTopic = prefill?.topic
+            ? mapTopicPrefill(prefill.topic)
+            : resolvedDest
+                ? "University_Admission"
+                : "";
         const resolvedLevel = mapEducationPrefill(prefill?.educationLevel);
 
-        setValue("destination", resolvedDest, { shouldDirty: Boolean(resolvedDest) });
-        setValue("topic", resolvedTopic, { shouldDirty: Boolean(prefill?.topic) });
-        if (resolvedLevel) {
-            setValue("education_level", resolvedLevel, { shouldDirty: true });
+        setValue("destination", resolvedDest || draft?.destination || "", { shouldDirty: false });
+        setValue("topic", resolvedTopic || draft?.topic || "General_Inquiry", { shouldDirty: false });
+        setValue("education_level", resolvedLevel || draft?.education_level || "", { shouldDirty: false });
+    }, [isOpen, prefill, setValue, minDate]);
+
+    // Persist draft to sessionStorage only when the user actually enters or edits fields
+    // (never pollute sessionStorage with untouched route prefill)
+    useEffect(() => {
+        if (!isOpen || isSuccess) return;
+        const hasUserInput = Boolean(
+            watchedValues.name?.trim() ||
+            watchedValues.email?.trim() ||
+            watchedValues.phone?.trim() ||
+            watchedValues.date ||
+            watchedValues.time ||
+            watchedValues.education_level ||
+            dirtyFields.destination ||
+            dirtyFields.topic
+        );
+        if (hasUserInput) {
+            writeDraft({
+                name: watchedValues.name || "",
+                email: watchedValues.email || "",
+                phone: watchedValues.phone || "",
+                destination: watchedValues.destination || "",
+                date: watchedValues.date || "",
+                time: watchedValues.time || "",
+                education_level: watchedValues.education_level || "",
+                topic: watchedValues.topic || "General_Inquiry",
+            });
+        } else if (Object.keys(dirtyFields).length > 0) {
+            clearDraft();
         }
-    }, [isOpen, prefill, setValue]);
+    }, [isOpen, isSuccess, watchedValues, dirtyFields]);
 
     useEffect(() => {
         if (!isOpen) return;
@@ -319,7 +447,7 @@ export function BookingModal() {
 
             if (e.key === "Tab" && modalRef.current) {
                 const focusable = modalRef.current.querySelectorAll<HTMLElement>(
-                    'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
+                    'button, [href], input:not([type="hidden"]), select, textarea, [tabindex]:not([tabindex="-1"])'
                 );
                 if (focusable.length === 0) return;
 
@@ -454,7 +582,25 @@ export function BookingModal() {
                 return;
             }
 
+            clearDraft();
+            setSubmittedSummary({
+                name: data.name,
+                destination: resolvedDestination || "Study Abroad",
+                date: data.date,
+                time: data.time,
+            });
             setIsSuccess(true);
+            reset({
+                name: "",
+                email: "",
+                phone: "",
+                destination: "",
+                date: "",
+                time: "",
+                education_level: "",
+                topic: "General_Inquiry",
+                website_url: "",
+            });
 
             if (regResult.status === "fulfilled" && regResult.value.success) {
                 if (regResult.value.trackingCode) {
@@ -489,7 +635,6 @@ export function BookingModal() {
 
     const currentTheme = theme === "system" ? systemTheme : theme;
     const isDark = mounted && currentTheme === "dark";
-    const isMobile = mounted && window.innerWidth < 640;
 
     const activeDestinationObj = useMemo(() => {
         if (!watchedDestination) return null;
@@ -557,9 +702,49 @@ export function BookingModal() {
         required: t("common.validation.nameRequired", undefined, "Name is required"),
         minLength: {
             value: 2,
-            message: "Please enter at least 2 characters",
+            message: t("common.validation.nameMin", undefined, "Please enter at least 2 characters"),
         },
     });
+
+    const emailRegistration = register("email", {
+        required: t("common.validation.emailRequired", undefined, "Email is required"),
+        pattern: {
+            value: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
+            message: t("common.validation.invalidEmail", undefined, "Invalid email"),
+        },
+    });
+
+    const phoneRegistration = register("phone", {
+        required: t("common.validation.phoneRequired", undefined, "Phone is required"),
+        pattern: {
+            value: /^[+\d][\d\s\-()]{5,24}$/,
+            message: t("common.validation.invalidPhone", undefined, "Enter a valid phone number (e.g. 017...)"),
+        },
+    });
+
+    const handleCopyTrackingCode = async (code: string) => {
+        try {
+            await navigator.clipboard.writeText(code);
+            setCodeCopied(true);
+            toast.success(t("common.modal.codeCopied", undefined, "Tracking code copied!"));
+            setTimeout(() => setCodeCopied(false), 2000);
+        } catch {
+            toast.error(t("common.modal.copyFailed", undefined, "Could not copy code automatically."));
+        }
+    };
+
+    const whatsappConfirmUrl = useMemo(() => {
+        const parts = [
+            `Hi NexTep Edu! I just booked a free consultation.`,
+            submittedSummary?.name ? `Name: ${submittedSummary.name}` : "",
+            submittedSummary?.destination ? `Destination: ${submittedSummary.destination}` : "",
+            submittedSummary?.date && submittedSummary?.time
+                ? `Preferred Slot: ${submittedSummary.date} at ${submittedSummary.time}`
+                : "",
+            trackingCode ? `Tracking Code: ${trackingCode}` : "",
+        ].filter(Boolean);
+        return `https://wa.me/4915147483493?text=${encodeURIComponent(parts.join("\n"))}`;
+    }, [submittedSummary, trackingCode]);
 
     return (
         <AnimatePresence>
@@ -571,7 +756,7 @@ export function BookingModal() {
                     initial={{ opacity: 0 }}
                     animate={{ opacity: 1 }}
                     exit={{ opacity: 0 }}
-                    transition={{ duration: 0.25 }}
+                    transition={{ duration: 0.2 }}
                     className="fixed inset-0 z-[100] flex items-end sm:items-center justify-center bg-black/60 backdrop-blur-sm sm:p-4"
                     onClick={(e) => {
                         if (e.target === e.currentTarget) closeModal();
@@ -602,10 +787,10 @@ export function BookingModal() {
                         }}
                         ref={modalRef}
                         className={cn(
-                            "relative backdrop-blur-2xl w-full max-w-lg rounded-t-3xl sm:rounded-3xl shadow-2xl border flex flex-col max-h-[92dvh] sm:max-h-[88vh] min-h-[460px] overflow-hidden",
+                            "relative backdrop-blur-2xl w-full max-w-lg rounded-t-3xl sm:rounded-3xl shadow-2xl border flex flex-col max-h-[92dvh] sm:max-h-[88vh] overflow-hidden",
                             isDark
-                                ? "bg-[rgba(15,23,42,0.95)] border-white/10 shadow-[0_8px_40px_rgba(0,0,0,0.55)]"
-                                : "bg-white/95 border-black/5 shadow-[0_8px_40px_rgba(0,0,0,0.14)]"
+                                ? "bg-[rgba(15,23,42,0.96)] border-white/10 shadow-[0_8px_40px_rgba(0,0,0,0.55)]"
+                                : "bg-white/97 border-black/5 shadow-[0_8px_40px_rgba(0,0,0,0.14)]"
                         )}
                     >
                         {/* Glowing Top Accent Line */}
@@ -616,7 +801,7 @@ export function BookingModal() {
                             onPointerDown={(e) => {
                                 if (isMobile) dragControls.start(e);
                             }}
-                            className="sm:hidden flex flex-col items-center justify-center pt-2.5 pb-1 cursor-grab active:cursor-grabbing touch-none select-none"
+                            className="sm:hidden flex flex-col items-center justify-center pt-2.5 pb-1 cursor-grab active:cursor-grabbing touch-none select-none shrink-0"
                             aria-hidden="true"
                         >
                             <div
@@ -630,12 +815,12 @@ export function BookingModal() {
                         {/* Header */}
                         <div
                             onPointerDown={(e) => {
-                                if (isMobile && (e.target as HTMLElement).tagName !== "BUTTON") {
+                                if (isMobile && !(e.target as HTMLElement).closest("button")) {
                                     dragControls.start(e);
                                 }
                             }}
                             className={cn(
-                                "px-5 py-4 md:p-6 border-b flex justify-between items-center z-10 shrink-0",
+                                "px-5 py-3.5 md:p-6 border-b flex justify-between items-center z-10 shrink-0 touch-none",
                                 isDark ? "border-white/10 bg-accent/5" : "border-black/5 bg-accent/5"
                             )}
                         >
@@ -673,7 +858,8 @@ export function BookingModal() {
                                                         isDark ? "text-white/70" : "text-foreground/75"
                                                     )}
                                                 >
-                                                    <ChevronLeft className="w-3.5 h-3.5 mr-1" /> Back to Step {step - 1}
+                                                    <ChevronLeft className="w-3.5 h-3.5 mr-1" />{" "}
+                                                    {t("common.modal.backToStep", undefined, "Back to Step")} {step - 1}
                                                 </button>
                                             ) : (
                                                 <p
@@ -698,7 +884,7 @@ export function BookingModal() {
                                 whileTap={{ scale: 0.92 }}
                                 onClick={closeModal}
                                 className={cn(
-                                    "w-11 h-11 rounded-full transition-colors flex items-center justify-center flex-shrink-0 -mr-1",
+                                    "w-11 h-11 rounded-full transition-colors flex items-center justify-center shrink-0 -mr-1",
                                     isDark ? "hover:bg-white/10 text-white/80" : "hover:bg-black/5 text-foreground/80"
                                 )}
                                 aria-label="Close booking modal"
@@ -708,27 +894,27 @@ export function BookingModal() {
                         </div>
 
                         {/* Content */}
-                        <div className="flex-1 overflow-y-auto overflow-x-hidden relative flex flex-col">
+                        <div className="flex-1 overflow-y-auto overscroll-contain overflow-x-hidden relative flex flex-col min-h-0">
                             {isSuccess ? (
                                 <motion.div
                                     initial={{ opacity: 0, scale: 0.95 }}
                                     animate={{ opacity: 1, scale: 1 }}
                                     transition={{ type: "spring", duration: 0.55 }}
-                                    className="flex-1 flex flex-col items-center text-center p-6 pb-[calc(1.5rem+env(safe-area-inset-bottom,0px))] justify-center overflow-y-auto"
+                                    className="flex-1 flex flex-col items-center text-center p-6 pb-[calc(1.5rem+env(safe-area-inset-bottom,0px))] justify-center overflow-y-auto overscroll-contain"
                                 >
                                     <ConfettiExplosion />
                                     <div
                                         className={cn(
-                                            "w-20 h-20 rounded-full flex items-center justify-center mb-4 relative z-10",
+                                            "w-16 h-16 sm:w-20 sm:h-20 rounded-full flex items-center justify-center mb-4 relative z-10",
                                             isDark ? "bg-green-500/15 text-green-400" : "bg-green-100 text-green-600"
                                         )}
                                     >
-                                        <CheckCircle className="w-10 h-10" />
+                                        <CheckCircle className="w-9 h-9 sm:w-10 sm:h-10" />
                                     </div>
                                     <h4 className="text-2xl sm:text-3xl font-bold font-heading text-primary relative z-10">
                                         {t("common.modal.successTitle", undefined, "We Got Your Request!")}
                                     </h4>
-                                    <p className="text-muted-foreground text-base sm:text-lg max-w-sm mx-auto mt-2 relative z-10">
+                                    <p className="text-muted-foreground text-sm sm:text-base max-w-sm mx-auto mt-2 relative z-10">
                                         {t(
                                             "common.modal.successSubtitle",
                                             undefined,
@@ -745,7 +931,7 @@ export function BookingModal() {
                                         >
                                             <div
                                                 className={cn(
-                                                    "flex items-center justify-center gap-2 px-4 py-2.5 rounded-full border",
+                                                    "flex items-center justify-center gap-2 px-4 py-2 rounded-full border",
                                                     "bg-accent/10 border-accent/20"
                                                 )}
                                             >
@@ -754,13 +940,9 @@ export function BookingModal() {
                                                 </span>
                                                 <button
                                                     type="button"
-                                                    onClick={() => {
-                                                        navigator.clipboard.writeText(trackingCode);
-                                                        setCodeCopied(true);
-                                                        setTimeout(() => setCodeCopied(false), 2000);
-                                                    }}
+                                                    onClick={() => void handleCopyTrackingCode(trackingCode)}
                                                     className={cn(
-                                                        "w-9 h-9 rounded-full flex items-center justify-center transition-colors",
+                                                        "w-11 h-11 rounded-full flex items-center justify-center transition-colors",
                                                         isDark ? "hover:bg-white/10" : "hover:bg-black/5"
                                                     )}
                                                     aria-label="Copy tracking code"
@@ -772,17 +954,16 @@ export function BookingModal() {
                                                     )}
                                                 </button>
                                             </div>
-                                            <p className="text-muted-foreground text-sm">
-                                                Your tracking code is{" "}
-                                                <span className="font-semibold text-accent">{trackingCode}</span>. Use
-                                                this to check your progress anytime.
+                                            <p className="text-muted-foreground text-xs sm:text-sm">
+                                                {t("common.modal.trackingCodeNote", undefined, "Your tracking code is")}{" "}
+                                                <span className="font-semibold text-accent">{trackingCode}</span>.
                                             </p>
                                             <Link
                                                 href={`/track?code=${encodeURIComponent(trackingCode)}`}
                                                 onClick={closeModal}
                                                 className="inline-flex items-center justify-center min-h-[44px] px-4 gap-1 text-sm font-semibold text-accent hover:text-accent/80 transition-colors"
                                             >
-                                                Track Your Application &rarr;
+                                                {t("common.modal.trackApplication", undefined, "Track Your Application")} &rarr;
                                             </Link>
                                         </motion.div>
                                     )}
@@ -795,32 +976,45 @@ export function BookingModal() {
                                             className="w-full max-w-xs mt-5 relative z-10 space-y-2 p-4 rounded-xl bg-accent/10 border border-accent/20 text-center"
                                         >
                                             <p className="text-muted-foreground text-sm">
-                                                An application with this phone number already exists. Your tracking code
-                                                was previously emailed to you.
+                                                {t(
+                                                    "common.modal.existingAppNote",
+                                                    undefined,
+                                                    "An application with this phone number already exists. Your tracking code was previously emailed to you."
+                                                )}
                                             </p>
                                             <Link
                                                 href="/track"
                                                 onClick={closeModal}
                                                 className="inline-flex items-center justify-center min-h-[44px] px-4 gap-1 text-sm font-semibold text-accent hover:text-accent/80 transition-colors"
                                             >
-                                                Track Your Application &rarr;
+                                                {t("common.modal.trackApplication", undefined, "Track Your Application")} &rarr;
                                             </Link>
                                         </motion.div>
                                     )}
 
-                                    <motion.div
-                                        whileTap={{ scale: 0.97 }}
-                                        className="w-full max-w-xs mt-6 relative z-10"
-                                    >
+                                    {/* 1-Tap Send Booking via WhatsApp + Close */}
+                                    <div className="w-full max-w-xs mt-5 relative z-10 space-y-2.5">
+                                        <a
+                                            href={whatsappConfirmUrl}
+                                            target="_blank"
+                                            rel="noopener noreferrer"
+                                            className="w-full min-h-[48px] px-4 rounded-xl bg-[#25D366] hover:bg-[#20bd5a] text-white font-semibold text-sm flex items-center justify-center gap-2 transition-colors shadow-sm"
+                                        >
+                                            <MessageCircle className="w-4 h-4 shrink-0" />
+                                            <span>
+                                                {t("common.modal.sendWhatsApp", undefined, "Send Booking via WhatsApp")}
+                                            </span>
+                                        </a>
                                         <Button
                                             type="button"
+                                            variant="outline"
                                             onClick={closeModal}
                                             size="lg"
-                                            className="w-full h-12 rounded-xl text-base font-bold"
+                                            className="w-full min-h-[48px] rounded-xl text-base font-bold"
                                         >
                                             {t("common.modal.closeWindow", undefined, "Close Window")}
                                         </Button>
-                                    </motion.div>
+                                    </div>
                                 </motion.div>
                             ) : (
                                 <form
@@ -836,7 +1030,7 @@ export function BookingModal() {
                                         tabIndex={-1}
                                     />
 
-                                    <div className="flex-1 relative overflow-y-auto overflow-x-hidden p-5 md:p-6 scrollbar-hide">
+                                    <div className="flex-1 relative overflow-y-auto overscroll-contain overflow-x-hidden p-5 md:p-6 scrollbar-hide">
                                         <AnimatePresence custom={direction} mode="wait">
                                             {step === 1 && (
                                                 <motion.div
@@ -846,15 +1040,15 @@ export function BookingModal() {
                                                     initial="enter"
                                                     animate="center"
                                                     exit="exit"
-                                                    transition={{ duration: 0.25, ease: "easeInOut" }}
+                                                    transition={{ duration: 0.22, ease: "easeInOut" }}
                                                     className="space-y-4"
                                                 >
                                                     <div className="flex items-center justify-between">
                                                         <h4 className="text-base sm:text-lg font-bold text-primary">
-                                                            Contact Details
+                                                            {t("common.modal.step1Title", undefined, "Contact Details")}
                                                         </h4>
                                                         <span className="text-xs text-muted-foreground">
-                                                            Step 1 of 3
+                                                            {t("common.modal.stepOf", { step: "1", total: "3" }, "Step 1 of 3")}
                                                         </span>
                                                     </div>
 
@@ -875,6 +1069,12 @@ export function BookingModal() {
                                                             autoCapitalize="words"
                                                             enterKeyHint="next"
                                                             aria-invalid={Boolean(errors.name)}
+                                                            onKeyDown={(e) => {
+                                                                if (e.key === "Enter") {
+                                                                    e.preventDefault();
+                                                                    emailInputRef.current?.focus();
+                                                                }
+                                                            }}
                                                             {...nameRegistration}
                                                             ref={(e) => {
                                                                 nameRegistration.ref(e);
@@ -914,21 +1114,17 @@ export function BookingModal() {
                                                             spellCheck={false}
                                                             enterKeyHint="next"
                                                             aria-invalid={Boolean(errors.email)}
-                                                            {...register("email", {
-                                                                required: t(
-                                                                    "common.validation.emailRequired",
-                                                                    undefined,
-                                                                    "Email is required"
-                                                                ),
-                                                                pattern: {
-                                                                    value: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
-                                                                    message: t(
-                                                                        "common.validation.invalidEmail",
-                                                                        undefined,
-                                                                        "Invalid email"
-                                                                    ),
-                                                                },
-                                                            })}
+                                                            onKeyDown={(e) => {
+                                                                if (e.key === "Enter") {
+                                                                    e.preventDefault();
+                                                                    phoneInputRef.current?.focus();
+                                                                }
+                                                            }}
+                                                            {...emailRegistration}
+                                                            ref={(e) => {
+                                                                emailRegistration.ref(e);
+                                                                emailInputRef.current = e;
+                                                            }}
                                                             className={getFieldClass("email")}
                                                             placeholder={t(
                                                                 "common.form.emailPlaceholder",
@@ -969,17 +1165,11 @@ export function BookingModal() {
                                                                     void handleNextStep(1);
                                                                 }
                                                             }}
-                                                            {...register("phone", {
-                                                                required: t(
-                                                                    "common.validation.phoneRequired",
-                                                                    undefined,
-                                                                    "Phone is required"
-                                                                ),
-                                                                pattern: {
-                                                                    value: /^[+\d][\d\s\-()]{5,24}$/,
-                                                                    message: "Enter a valid phone number (e.g. 017...)",
-                                                                },
-                                                            })}
+                                                            {...phoneRegistration}
+                                                            ref={(e) => {
+                                                                phoneRegistration.ref(e);
+                                                                phoneInputRef.current = e;
+                                                            }}
                                                             className={getFieldClass("phone")}
                                                             placeholder={t(
                                                                 "common.form.phonePlaceholder",
@@ -1005,15 +1195,15 @@ export function BookingModal() {
                                                     initial="enter"
                                                     animate="center"
                                                     exit="exit"
-                                                    transition={{ duration: 0.25, ease: "easeInOut" }}
+                                                    transition={{ duration: 0.22, ease: "easeInOut" }}
                                                     className="space-y-4"
                                                 >
                                                     <div className="flex items-center justify-between">
                                                         <h4 className="text-base sm:text-lg font-bold text-primary">
-                                                            Schedule Time
+                                                            {t("common.modal.step2Title", undefined, "Schedule Time")}
                                                         </h4>
                                                         <span className="text-xs text-muted-foreground">
-                                                            Step 2 of 3
+                                                            {t("common.modal.stepOf", { step: "2", total: "3" }, "Step 2 of 3")}
                                                         </span>
                                                     </div>
 
@@ -1028,7 +1218,7 @@ export function BookingModal() {
                                                             )}
                                                         </label>
 
-                                                        {/* 1-Tap Quick-Date Pills */}
+                                                        {/* Deduplicated 1-Tap Quick-Date Pills */}
                                                         <div
                                                             className="grid grid-cols-3 gap-2 mb-2.5"
                                                             role="group"
@@ -1038,8 +1228,9 @@ export function BookingModal() {
                                                                 const isSelected = watchedDate === pill.value;
                                                                 return (
                                                                     <button
-                                                                        key={pill.id}
+                                                                        key={pill.value}
                                                                         type="button"
+                                                                        aria-pressed={isSelected}
                                                                         onClick={() =>
                                                                             setValue("date", pill.value, {
                                                                                 shouldValidate: true,
@@ -1048,9 +1239,9 @@ export function BookingModal() {
                                                                             })
                                                                         }
                                                                         className={cn(
-                                                                            "min-h-[44px] px-2.5 py-1.5 rounded-xl border text-left transition-all flex flex-col justify-center active:scale-[0.98]",
+                                                                            "min-h-[46px] px-2.5 py-1.5 rounded-xl border text-left transition-all flex flex-col justify-center active:scale-[0.98]",
                                                                             isSelected
-                                                                                ? "bg-accent/15 border-accent text-accent font-semibold shadow-sm"
+                                                                                ? "bg-accent/15 border-accent text-accent font-semibold shadow-2xs"
                                                                                 : isDark
                                                                                   ? "bg-white/[0.03] border-white/10 text-white/80 hover:border-white/25"
                                                                                   : "bg-slate-500/[0.04] border-black/10 text-foreground/80 hover:border-black/25"
@@ -1090,7 +1281,7 @@ export function BookingModal() {
                                                     </div>
 
                                                     <div>
-                                                        <label htmlFor="booking-time" className={labelClass}>
+                                                        <div className={labelClass}>
                                                             <span className="flex items-center gap-2">
                                                                 <Clock className="w-4 h-4 text-accent" />
                                                                 {t("common.form.time", undefined, "Time")}
@@ -1098,12 +1289,24 @@ export function BookingModal() {
                                                             {watchedTime && !errors.time && (
                                                                 <Check className="w-4 h-4 text-emerald-500" />
                                                             )}
-                                                        </label>
+                                                        </div>
 
-                                                        {/* Quick 1-Tap Time Slot Chips for Mobile & Desktop */}
+                                                        {/* Hidden registered field for validation */}
+                                                        <input
+                                                            type="hidden"
+                                                            {...register("time", {
+                                                                required: t(
+                                                                    "common.validation.timeRequired",
+                                                                    undefined,
+                                                                    "Time is required"
+                                                                ),
+                                                            })}
+                                                        />
+
+                                                        {/* 1-Tap Time Slot Chips (no redundant select dropdown) */}
                                                         <div
-                                                            className="grid grid-cols-3 sm:grid-cols-4 gap-2 mb-2.5"
-                                                            role="group"
+                                                            className="grid grid-cols-3 sm:grid-cols-4 gap-2"
+                                                            role="radiogroup"
                                                             aria-label="Available time slots"
                                                         >
                                                             {TIME_SLOTS.map((slot) => {
@@ -1112,6 +1315,8 @@ export function BookingModal() {
                                                                     <button
                                                                         key={slot}
                                                                         type="button"
+                                                                        role="radio"
+                                                                        aria-checked={isSelected}
                                                                         onClick={() =>
                                                                             setValue("time", slot, {
                                                                                 shouldValidate: true,
@@ -1120,9 +1325,9 @@ export function BookingModal() {
                                                                             })
                                                                         }
                                                                         className={cn(
-                                                                            "min-h-[44px] px-2 py-2 rounded-xl border text-xs font-semibold transition-all active:scale-[0.98]",
+                                                                            "min-h-[46px] px-2 py-2 rounded-xl border text-xs font-semibold transition-all active:scale-[0.98]",
                                                                             isSelected
-                                                                                ? "bg-accent/15 border-accent text-accent shadow-sm"
+                                                                                ? "bg-accent/15 border-accent text-accent shadow-2xs"
                                                                                 : isDark
                                                                                   ? "bg-white/[0.03] border-white/10 text-white/80 hover:border-white/25"
                                                                                   : "bg-slate-500/[0.04] border-black/10 text-foreground/80 hover:border-black/25"
@@ -1134,34 +1339,6 @@ export function BookingModal() {
                                                             })}
                                                         </div>
 
-                                                        <select
-                                                            id="booking-time"
-                                                            aria-invalid={Boolean(errors.time)}
-                                                            {...register("time", {
-                                                                required: t(
-                                                                    "common.validation.timeRequired",
-                                                                    undefined,
-                                                                    "Time is required"
-                                                                ),
-                                                            })}
-                                                            className={cn(
-                                                                getFieldClass("time"),
-                                                                "appearance-none cursor-pointer"
-                                                            )}
-                                                        >
-                                                            <option value="">
-                                                                {t(
-                                                                    "common.form.selectTime",
-                                                                    undefined,
-                                                                    "Select Time"
-                                                                )}
-                                                            </option>
-                                                            {TIME_SLOTS.map((slot) => (
-                                                                <option key={slot} value={slot}>
-                                                                    {slot}
-                                                                </option>
-                                                            ))}
-                                                        </select>
                                                         {errors.time && (
                                                             <p className={errorClass} role="alert">
                                                                 <AlertCircle className="w-3.5 h-3.5 shrink-0" />
@@ -1180,15 +1357,15 @@ export function BookingModal() {
                                                     initial="enter"
                                                     animate="center"
                                                     exit="exit"
-                                                    transition={{ duration: 0.25, ease: "easeInOut" }}
+                                                    transition={{ duration: 0.22, ease: "easeInOut" }}
                                                     className="space-y-4"
                                                 >
                                                     <div className="flex items-center justify-between">
                                                         <h4 className="text-base sm:text-lg font-bold text-primary">
-                                                            Study Goals
+                                                            {t("common.modal.step3Title", undefined, "Study Goals")}
                                                         </h4>
                                                         <span className="text-xs text-muted-foreground">
-                                                            Step 3 of 3
+                                                            {t("common.modal.stepOf", { step: "3", total: "3" }, "Step 3 of 3")}
                                                         </span>
                                                     </div>
 
@@ -1196,47 +1373,54 @@ export function BookingModal() {
                                                         <label htmlFor="booking-destination" className={labelClass}>
                                                             <span className="flex items-center gap-2">
                                                                 <Globe2 className="w-4 h-4 text-accent" />
-                                                                Preferred Destination
+                                                                {t("common.form.destination", undefined, "Preferred Destination")}
                                                             </span>
                                                             {watchedDestination && (
                                                                 <Check className="w-4 h-4 text-emerald-500" />
                                                             )}
                                                         </label>
-                                                        <select
-                                                            id="booking-destination"
-                                                            {...register("destination")}
-                                                            className={cn(
-                                                                getFieldClass("destination"),
-                                                                "appearance-none cursor-pointer"
-                                                            )}
-                                                        >
-                                                            <option value="">Undecided / Open to Advice</option>
-                                                            {DESTINATION_LIST.map((dest) => (
-                                                                <option key={dest.slug} value={dest.name}>
-                                                                    {dest.flag} {dest.name}
+                                                        <div className="relative">
+                                                            <select
+                                                                id="booking-destination"
+                                                                {...register("destination")}
+                                                                className={cn(
+                                                                    getFieldClass("destination"),
+                                                                    "appearance-none cursor-pointer pr-10"
+                                                                )}
+                                                            >
+                                                                <option value="">
+                                                                    {t(
+                                                                        "common.form.undecidedDestination",
+                                                                        undefined,
+                                                                        "Undecided / Open to Advice"
+                                                                    )}
                                                                 </option>
-                                                            ))}
-                                                        </select>
+                                                                {DESTINATION_LIST.map((dest) => (
+                                                                    <option key={dest.slug} value={dest.name}>
+                                                                        {dest.flag} {dest.name}
+                                                                    </option>
+                                                                ))}
+                                                            </select>
+                                                            <ChevronDown
+                                                                className="w-4 h-4 text-muted-foreground pointer-events-none absolute right-3.5 top-1/2 -translate-y-1/2"
+                                                                aria-hidden="true"
+                                                            />
+                                                        </div>
                                                     </div>
 
+                                                    {/* Education Level 1-Tap Chips */}
                                                     <div>
-                                                        <label htmlFor="booking-education" className={labelClass}>
+                                                        <div className={labelClass}>
                                                             <span className="flex items-center gap-2">
                                                                 <GraduationCap className="w-4 h-4 text-accent" />
-                                                                {t(
-                                                                    "common.form.educationLevel",
-                                                                    undefined,
-                                                                    "Education Level"
-                                                                )}
+                                                                {t("common.form.educationLevel", undefined, "Education Level")}
                                                             </span>
-                                                            {touchedFields.education_level &&
-                                                                !errors.education_level && (
-                                                                    <Check className="w-4 h-4 text-emerald-500" />
-                                                                )}
-                                                        </label>
-                                                        <select
-                                                            id="booking-education"
-                                                            aria-invalid={Boolean(errors.education_level)}
+                                                            {watchedEducation && !errors.education_level && (
+                                                                <Check className="w-4 h-4 text-emerald-500" />
+                                                            )}
+                                                        </div>
+                                                        <input
+                                                            type="hidden"
                                                             {...register("education_level", {
                                                                 required: t(
                                                                     "common.validation.educationRequired",
@@ -1244,42 +1428,41 @@ export function BookingModal() {
                                                                     "Education level is required"
                                                                 ),
                                                             })}
-                                                            className={cn(
-                                                                getFieldClass("education_level"),
-                                                                "appearance-none cursor-pointer"
-                                                            )}
+                                                        />
+                                                        <div
+                                                            className="flex flex-wrap gap-2"
+                                                            role="radiogroup"
+                                                            aria-label={t("common.form.educationLevel", undefined, "Education Level")}
                                                         >
-                                                            <option value="">
-                                                                {t(
-                                                                    "common.form.selectLevel",
-                                                                    undefined,
-                                                                    "Select Level"
-                                                                )}
-                                                            </option>
-                                                            <option value="Bachelors">
-                                                                {t("common.form.bachelors", undefined, "Bachelor's")}
-                                                            </option>
-                                                            <option value="Masters">
-                                                                {t("common.form.masters", undefined, "Master's")}
-                                                            </option>
-                                                            <option value="PhD">
-                                                                {t("common.form.phd", undefined, "PhD")}
-                                                            </option>
-                                                            <option value="Language_Course">
-                                                                {t(
-                                                                    "common.form.languageCourse",
-                                                                    undefined,
-                                                                    "Language Course"
-                                                                )}
-                                                            </option>
-                                                            <option value="Foundation_Year">
-                                                                {t(
-                                                                    "common.form.foundationYear",
-                                                                    undefined,
-                                                                    "Foundation Year"
-                                                                )}
-                                                            </option>
-                                                        </select>
+                                                            {EDUCATION_OPTIONS.map((opt) => {
+                                                                const isSelected = watchedEducation === opt.value;
+                                                                return (
+                                                                    <button
+                                                                        key={opt.value}
+                                                                        type="button"
+                                                                        role="radio"
+                                                                        aria-checked={isSelected}
+                                                                        onClick={() =>
+                                                                            setValue("education_level", opt.value, {
+                                                                                shouldValidate: true,
+                                                                                shouldDirty: true,
+                                                                                shouldTouch: true,
+                                                                            })
+                                                                        }
+                                                                        className={cn(
+                                                                            "min-h-[44px] px-3.5 py-2 rounded-xl border text-xs font-semibold transition-all active:scale-[0.98]",
+                                                                            isSelected
+                                                                                ? "bg-accent/15 border-accent text-accent shadow-2xs"
+                                                                                : isDark
+                                                                                  ? "bg-white/[0.03] border-white/10 text-white/80 hover:border-white/25"
+                                                                                  : "bg-slate-500/[0.04] border-black/10 text-foreground/80 hover:border-black/25"
+                                                                        )}
+                                                                    >
+                                                                        {t(opt.key, undefined, opt.fallback)}
+                                                                    </button>
+                                                                );
+                                                            })}
+                                                        </div>
                                                         {errors.education_level && (
                                                             <p className={errorClass} role="alert">
                                                                 <AlertCircle className="w-3.5 h-3.5 shrink-0" />
@@ -1288,66 +1471,59 @@ export function BookingModal() {
                                                         )}
                                                     </div>
 
+                                                    {/* Topic 1-Tap Chips */}
                                                     <div>
-                                                        <label htmlFor="booking-topic" className={labelClass}>
+                                                        <div className={labelClass}>
                                                             <span className="flex items-center gap-2">
                                                                 <BookOpen className="w-4 h-4 text-accent" />
-                                                                {t(
-                                                                    "common.form.interestedIn",
-                                                                    undefined,
-                                                                    "Interested In"
-                                                                )}
+                                                                {t("common.form.interestedIn", undefined, "Interested In")}
                                                             </span>
-                                                        </label>
-                                                        <select
-                                                            id="booking-topic"
-                                                            {...register("topic")}
-                                                            className={cn(
-                                                                getFieldClass("topic"),
-                                                                "appearance-none cursor-pointer"
-                                                            )}
+                                                        </div>
+                                                        <input type="hidden" {...register("topic")} />
+                                                        <div
+                                                            className="flex flex-wrap gap-2"
+                                                            role="radiogroup"
+                                                            aria-label={t("common.form.interestedIn", undefined, "Interested In")}
                                                         >
                                                             {isCustomTopic && (
-                                                                <option value={watchedTopic}>
+                                                                <button
+                                                                    type="button"
+                                                                    role="radio"
+                                                                    aria-checked={true}
+                                                                    onClick={() => setValue("topic", watchedTopic)}
+                                                                    className="min-h-[44px] px-3.5 py-2 rounded-xl border text-xs font-semibold bg-accent/15 border-accent text-accent shadow-2xs"
+                                                                >
                                                                     {watchedTopic.replace(/_/g, " ")}
-                                                                </option>
+                                                                </button>
                                                             )}
-                                                            <option value="General_Inquiry">
-                                                                {t(
-                                                                    "common.form.generalInquiry",
-                                                                    undefined,
-                                                                    "General Inquiry"
-                                                                )}
-                                                            </option>
-                                                            <option value="University_Admission">
-                                                                {t(
-                                                                    "common.form.universityAdmission",
-                                                                    undefined,
-                                                                    "University Admission"
-                                                                )}
-                                                            </option>
-                                                            <option value="Visa_Processing">
-                                                                {t(
-                                                                    "common.form.visaProcessing",
-                                                                    undefined,
-                                                                    "Visa Processing"
-                                                                )}
-                                                            </option>
-                                                            <option value="Scholarship_Help">
-                                                                {t(
-                                                                    "common.form.scholarshipHelp",
-                                                                    undefined,
-                                                                    "Scholarship Help"
-                                                                )}
-                                                            </option>
-                                                            <option value="LOM_SOP_Writing">
-                                                                {t(
-                                                                    "common.form.lomSopWriting",
-                                                                    undefined,
-                                                                    "LOM/SOP Writing"
-                                                                )}
-                                                            </option>
-                                                        </select>
+                                                            {TOPIC_OPTIONS.map((opt) => {
+                                                                const isSelected = watchedTopic === opt.value;
+                                                                return (
+                                                                    <button
+                                                                        key={opt.value}
+                                                                        type="button"
+                                                                        role="radio"
+                                                                        aria-checked={isSelected}
+                                                                        onClick={() =>
+                                                                            setValue("topic", opt.value, {
+                                                                                shouldValidate: true,
+                                                                                shouldDirty: true,
+                                                                            })
+                                                                        }
+                                                                        className={cn(
+                                                                            "min-h-[44px] px-3.5 py-2 rounded-xl border text-xs font-semibold transition-all active:scale-[0.98]",
+                                                                            isSelected
+                                                                                ? "bg-accent/15 border-accent text-accent shadow-2xs"
+                                                                                : isDark
+                                                                                  ? "bg-white/[0.03] border-white/10 text-white/80 hover:border-white/25"
+                                                                                  : "bg-slate-500/[0.04] border-black/10 text-foreground/80 hover:border-black/25"
+                                                                        )}
+                                                                    >
+                                                                        {t(opt.key, undefined, opt.fallback)}
+                                                                    </button>
+                                                                );
+                                                            })}
+                                                        </div>
                                                     </div>
                                                 </motion.div>
                                             )}
@@ -1369,7 +1545,7 @@ export function BookingModal() {
                                                     className="h-12 sm:h-14 px-5 rounded-xl font-semibold shrink-0"
                                                 >
                                                     <ChevronLeft className="w-4 h-4 mr-1" />
-                                                    Back
+                                                    {t("common.modal.back", undefined, "Back")}
                                                 </Button>
                                             )}
                                             <motion.div whileTap={{ scale: 0.98 }} className="flex-1">
@@ -1379,7 +1555,7 @@ export function BookingModal() {
                                                         onClick={() => void handleNextStep(step)}
                                                         className="w-full h-12 sm:h-14 text-base sm:text-lg font-bold rounded-xl shadow-lg hover:shadow-xl transition-all"
                                                     >
-                                                        Next Step
+                                                        {t("common.modal.nextStep", undefined, "Next Step")}
                                                     </Button>
                                                 ) : (
                                                     <Button
@@ -1395,11 +1571,7 @@ export function BookingModal() {
                                                                 </span>
                                                             </>
                                                         ) : (
-                                                            t(
-                                                                "common.modal.confirmBooking",
-                                                                undefined,
-                                                                "Confirm Booking"
-                                                            )
+                                                            t("common.modal.confirmBooking", undefined, "Confirm Booking")
                                                         )}
                                                     </Button>
                                                 )}

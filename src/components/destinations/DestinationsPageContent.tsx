@@ -1,30 +1,88 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect, useMemo, useRef } from "react";
+import { useSearchParams } from "next/navigation";
 import { useTranslation } from "@/i18n/LanguageContext";
-import { DestinationsGrid, type DestinationFilterCategory } from "@/components/destinations/DestinationsGrid";
+import {
+    DestinationsGrid,
+    filterDestinations,
+    type DestinationFilterCategory,
+} from "@/components/destinations/DestinationsGrid";
 import { destinations } from "@/data/destinations";
-import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
-import { Search, X, Sparkles } from "lucide-react";
+import { Search, X, Sparkles, LayoutGrid, Rows3 } from "lucide-react";
 import { useBookingModal } from "@/context/BookingModalContext";
+import { useNavVisible } from "@/lib/scroll-store";
 import { cn } from "@/lib/utils";
 
-const EXPLORER_CHIPS: { id: DestinationFilterCategory; label: string }[] = [
-    { id: "all", label: "All Countries" },
-    { id: "europe", label: "Europe" },
-    { id: "schengen", label: "Schengen Zone" },
-    { id: "north-america", label: "North America" },
-    { id: "asia-pacific", label: "Asia-Pacific" },
-    { id: "budget", label: "Low / No Tuition" },
-    { id: "work-rights", label: "High Work Rights" },
+const EXPLORER_CHIPS: { id: DestinationFilterCategory; key: string; label: string }[] = [
+    { id: "all", key: "destinations.filters.all", label: "All Countries" },
+    { id: "europe", key: "destinations.filters.europe", label: "Europe" },
+    { id: "schengen", key: "destinations.filters.schengen", label: "Schengen Zone" },
+    { id: "north-america", key: "destinations.filters.northAmerica", label: "North America" },
+    { id: "asia-pacific", key: "destinations.filters.asiaPacific", label: "Asia-Pacific" },
+    { id: "budget", key: "destinations.filters.lowTuition", label: "Low / No Tuition" },
+    { id: "work-rights", key: "destinations.filters.workRights", label: "High Work Rights" },
 ];
 
+const VALID_CATEGORIES = new Set<DestinationFilterCategory>(EXPLORER_CHIPS.map((c) => c.id));
+
+function parseCategoryParam(raw: string | null): DestinationFilterCategory {
+    if (!raw) return "all";
+    const normalized = raw.toLowerCase().trim();
+    if (normalized === "affordable" || normalized === "scholarships") return "budget";
+    if (VALID_CATEGORIES.has(normalized as DestinationFilterCategory)) {
+        return normalized as DestinationFilterCategory;
+    }
+    return "all";
+}
+
 export function DestinationsPageContent() {
+    const searchParams = useSearchParams();
     const { t } = useTranslation();
     const { openModal } = useBookingModal();
-    const [searchQuery, setSearchQuery] = useState("");
-    const [activeCategory, setActiveCategory] = useState<DestinationFilterCategory>("all");
+    const navVisible = useNavVisible();
+
+    const [searchQuery, setSearchQuery] = useState(() => searchParams.get("q") || "");
+    const [activeCategory, setActiveCategory] = useState<DestinationFilterCategory>(() =>
+        parseCategoryParam(searchParams.get("category"))
+    );
+    const [compactMobile, setCompactMobile] = useState(false);
+
+    // Sync incoming route query param changes (e.g. SearchModal quick action while already on /destinations)
+    const searchParamsString = searchParams.toString();
+    const prevSearchParamsRef = useRef(searchParamsString);
+    useEffect(() => {
+        if (prevSearchParamsRef.current === searchParamsString) return;
+        prevSearchParamsRef.current = searchParamsString;
+        const incomingQ = searchParams.get("q") || "";
+        const incomingCat = parseCategoryParam(searchParams.get("category"));
+        const frame = requestAnimationFrame(() => {
+            setSearchQuery(incomingQ);
+            setActiveCategory(incomingCat);
+        });
+        return () => cancelAnimationFrame(frame);
+    }, [searchParams, searchParamsString]);
+
+    // Sync local filter edits to URL without page reload so Back button restores exact filter state
+    useEffect(() => {
+        if (typeof window === "undefined") return;
+        const params = new URLSearchParams();
+        if (activeCategory !== "all") params.set("category", activeCategory);
+        if (searchQuery.trim()) params.set("q", searchQuery.trim());
+        const qs = params.toString();
+        const nextUrl = qs ? `/destinations?${qs}` : "/destinations";
+        if (window.location.pathname + window.location.search !== nextUrl) {
+            prevSearchParamsRef.current = qs;
+            window.history.replaceState(null, "", nextUrl);
+        }
+    }, [activeCategory, searchQuery]);
+
+    const totalCount = Object.keys(destinations).length;
+    const matchCount = useMemo(
+        () => filterDestinations(activeCategory, searchQuery, false).length,
+        [activeCategory, searchQuery]
+    );
 
     const resetFilters = () => {
         setSearchQuery("");
@@ -32,97 +90,157 @@ export function DestinationsPageContent() {
     };
 
     return (
-        <main className="min-h-screen">
-            {/* Hero Section */}
-            <section className="py-12 md:py-20 bg-gradient-to-b from-accent/[0.05] to-transparent border-b border-border/40">
+        <div className="min-h-screen">
+            {/* Hero Intro */}
+            <section className="pt-8 pb-6 md:py-16 bg-gradient-to-b from-accent/[0.05] to-transparent">
                 <div className="container mx-auto px-4">
                     <div className="max-w-3xl mx-auto text-center">
-                        <div className="inline-block px-3.5 py-1.5 rounded-full bg-accent/10 text-accent font-semibold text-xs tracking-wider uppercase mb-4 border border-accent/20">
-                            {Object.keys(destinations).length} Study Destinations
+                        <div className="inline-block px-3.5 py-1.5 rounded-full bg-accent/10 text-accent font-semibold text-xs tracking-wider uppercase mb-3 border border-accent/20">
+                            {totalCount} {t("destinations.page.countBadge", undefined, "Study Destinations")}
                         </div>
-                        <motion.h1
-                            initial={{ opacity: 0, y: 18 }}
-                            animate={{ opacity: 1, y: 0 }}
-                            className="text-3xl sm:text-4xl md:text-5xl font-bold font-heading text-primary mb-4"
-                        >
+                        <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold font-heading text-primary mb-3">
                             {t("destinations.page.title", undefined, "Explore Study Abroad Destinations")}
-                        </motion.h1>
-                        <p className="text-base md:text-lg text-muted-foreground leading-relaxed mb-8">
+                        </h1>
+                        <p className="text-sm sm:text-base md:text-lg text-muted-foreground leading-relaxed">
                             {t(
                                 "destinations.page.subtitle",
                                 undefined,
                                 "Compare tuition, post-study work opportunities, and partner universities across our global network."
                             )}
                         </p>
-
-                        {/* Interactive Search & Quick Filter Bar */}
-                        <div className="max-w-2xl mx-auto space-y-4">
-                            <div className="relative">
-                                <Search className="w-5 h-5 text-muted-foreground absolute left-4 top-1/2 -translate-y-1/2 pointer-events-none" />
-                                <input
-                                    type="search"
-                                    inputMode="search"
-                                    enterKeyHint="search"
-                                    value={searchQuery}
-                                    onChange={(e) => setSearchQuery(e.target.value)}
-                                    placeholder="Search by country, university (e.g. Oxford, TUM), or benefit..."
-                                    className="w-full min-h-[50px] pl-12 pr-12 py-3 rounded-2xl border border-border/80 bg-card/90 backdrop-blur-md text-sm sm:text-base text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-accent shadow-sm transition-all"
-                                />
-                                {searchQuery && (
-                                    <button
-                                        type="button"
-                                        onClick={() => setSearchQuery("")}
-                                        aria-label="Clear search"
-                                        className="absolute right-2.5 top-1/2 -translate-y-1/2 w-9 h-9 rounded-full flex items-center justify-center hover:bg-muted text-muted-foreground hover:text-foreground transition-colors"
-                                    >
-                                        <X className="w-4 h-4" />
-                                    </button>
-                                )}
-                            </div>
-
-                            <div className="flex items-center justify-start sm:justify-center gap-2 overflow-x-auto scrollbar-hide -mx-4 px-4 sm:mx-0 sm:px-0 py-1 snap-x">
-                                {EXPLORER_CHIPS.map((chip) => {
-                                    const isActive = activeCategory === chip.id;
-                                    return (
-                                        <button
-                                            key={chip.id}
-                                            type="button"
-                                            onClick={() => setActiveCategory(chip.id)}
-                                            className={cn(
-                                                "px-4 min-h-[40px] rounded-full text-xs sm:text-sm font-semibold whitespace-nowrap transition-all shrink-0 snap-start border",
-                                                isActive
-                                                    ? "bg-accent text-slate-950 border-accent shadow-xs"
-                                                    : "bg-card/80 text-muted-foreground border-border/70 hover:text-foreground hover:border-accent/40"
-                                            )}
-                                        >
-                                            {chip.label}
-                                        </button>
-                                    );
-                                })}
-                            </div>
-                        </div>
                     </div>
                 </div>
             </section>
 
+            {/* Sticky Search + Filter Bar (synced with Header visibility) */}
+            <div
+                className={cn(
+                    "sticky z-30 bg-background/92 backdrop-blur-xl border-y border-border/60 transition-[top] duration-300 ease-out",
+                    navVisible ? "top-[calc(4.75rem+env(safe-area-inset-top,0px))]" : "top-0"
+                )}
+            >
+                <div className="container mx-auto px-4 py-3 space-y-2.5 max-w-5xl">
+                    {/* Search Input */}
+                    <div className="relative">
+                        <Search className="w-5 h-5 text-muted-foreground absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
+                        <input
+                            type="search"
+                            inputMode="search"
+                            enterKeyHint="search"
+                            value={searchQuery}
+                            onChange={(e) => setSearchQuery(e.target.value)}
+                            placeholder={t(
+                                "destinations.page.searchPlaceholder",
+                                undefined,
+                                "Search by country, university (e.g. Oxford, TUM), or benefit..."
+                            )}
+                            className="w-full min-h-[48px] pl-11 pr-12 py-2.5 rounded-2xl border border-border/80 bg-card/90 text-base sm:text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-accent shadow-2xs transition-all [&::-webkit-search-cancel-button]:hidden"
+                        />
+                        {searchQuery && (
+                            <button
+                                type="button"
+                                onClick={() => setSearchQuery("")}
+                                aria-label="Clear search"
+                                className="absolute right-1 top-1/2 -translate-y-1/2 w-11 h-11 rounded-full flex items-center justify-center hover:bg-muted text-muted-foreground hover:text-foreground transition-colors"
+                            >
+                                <X className="w-4 h-4" />
+                            </button>
+                        )}
+                    </div>
+
+                    {/* Horizontal Filter Chips with Right-Edge Scroll Fade */}
+                    <div className="relative">
+                        <div className="flex items-center justify-start sm:justify-center gap-2 overflow-x-auto scrollbar-hide -mx-4 px-4 sm:mx-0 sm:px-0 py-0.5 snap-x">
+                            {EXPLORER_CHIPS.map((chip) => {
+                                const isActive = activeCategory === chip.id;
+                                return (
+                                    <button
+                                        key={chip.id}
+                                        type="button"
+                                        onClick={() => setActiveCategory(chip.id)}
+                                        className={cn(
+                                            "px-4 min-h-[44px] rounded-full text-xs sm:text-sm font-semibold whitespace-nowrap transition-all shrink-0 snap-start border",
+                                            isActive
+                                                ? "bg-accent text-slate-950 border-accent shadow-2xs"
+                                                : "bg-card/85 text-muted-foreground border-border/70 hover:text-foreground hover:border-accent/40"
+                                        )}
+                                    >
+                                        {t(chip.key, undefined, chip.label)}
+                                    </button>
+                                );
+                            })}
+                        </div>
+                        <div
+                            aria-hidden="true"
+                            className="sm:hidden pointer-events-none absolute right-0 top-0 bottom-0 w-10 bg-gradient-to-l from-background to-transparent"
+                        />
+                    </div>
+
+                    {/* Live Count + Mobile Compact 2-Col Toggle */}
+                    <div className="flex items-center justify-between gap-2 pt-0.5">
+                        <p className="text-xs font-medium text-muted-foreground">
+                            {t("destinations.page.showingPrefix", undefined, "Showing")}{" "}
+                            <span className="font-bold text-primary">{matchCount}</span>{" "}
+                            {t("destinations.page.showingOf", undefined, "of")}{" "}
+                            <span className="font-bold text-primary">{totalCount}</span>{" "}
+                            {t("destinations.page.showingSuffix", undefined, "countries")}
+                        </p>
+
+                        <div className="flex items-center gap-1.5 md:hidden">
+                            <button
+                                type="button"
+                                onClick={() => setCompactMobile(false)}
+                                aria-label="Single column view"
+                                aria-pressed={!compactMobile}
+                                className={cn(
+                                    "min-h-[38px] px-2.5 rounded-lg border text-xs font-semibold flex items-center gap-1 transition-colors",
+                                    !compactMobile
+                                        ? "bg-accent/15 border-accent/40 text-accent"
+                                        : "bg-card border-border/60 text-muted-foreground"
+                                )}
+                            >
+                                <Rows3 className="w-3.5 h-3.5" />
+                                <span>Cards</span>
+                            </button>
+                            <button
+                                type="button"
+                                onClick={() => setCompactMobile(true)}
+                                aria-label="Compact two column view"
+                                aria-pressed={compactMobile}
+                                className={cn(
+                                    "min-h-[38px] px-2.5 rounded-lg border text-xs font-semibold flex items-center gap-1 transition-colors",
+                                    compactMobile
+                                        ? "bg-accent/15 border-accent/40 text-accent"
+                                        : "bg-card border-border/60 text-muted-foreground"
+                                )}
+                            >
+                                <LayoutGrid className="w-3.5 h-3.5" />
+                                <span>Compact</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
             {/* Destinations Grid */}
-            <section className="py-12 md:py-20">
+            <section className="py-8 md:py-16">
                 <div className="container mx-auto px-4">
                     <DestinationsGrid
                         searchQuery={searchQuery}
                         activeCategory={activeCategory}
+                        compactMobile={compactMobile}
                         onResetFilters={resetFilters}
                     />
                 </div>
             </section>
 
             {/* CTA Section */}
-            <section className="py-16 md:py-24 bg-surface/60 dark:bg-card/40 border-t border-border/50">
+            <section className="py-12 md:py-20 bg-surface/60 dark:bg-card/40 border-t border-border/50">
                 <div className="container mx-auto px-4 text-center">
                     <h2 className="text-2xl md:text-3xl font-bold font-heading text-primary mb-3">
                         {t("destinations.page.ctaTitle", undefined, "Not Sure Which Country Fits Your Profile?")}
                     </h2>
-                    <p className="text-muted-foreground mb-8 max-w-xl mx-auto text-sm md:text-base">
+                    <p className="text-muted-foreground mb-7 max-w-xl mx-auto text-sm md:text-base">
                         {t(
                             "destinations.page.ctaSubtitle",
                             undefined,
@@ -136,9 +254,16 @@ export function DestinationsPageContent() {
                             onClick={() => openModal({ topic: "Country & University Shortlisting" })}
                         >
                             <Sparkles className="w-4 h-4" />
-                            <span>Book Free Profile Assessment</span>
+                            <span>
+                                {t("destinations.page.bookAssessment", undefined, "Book Free Profile Assessment")}
+                            </span>
                         </Button>
-                        <Button size="lg" variant="outline" className="rounded-full px-8 min-h-[48px] w-full sm:w-auto gap-2" asChild>
+                        <Button
+                            size="lg"
+                            variant="outline"
+                            className="rounded-full px-8 min-h-[48px] w-full sm:w-auto gap-2"
+                            asChild
+                        >
                             <a
                                 href="https://wa.me/4915147483493?text=Hi%2C%20I%20need%20help%20choosing%20a%20study%20destination"
                                 target="_blank"
@@ -153,6 +278,6 @@ export function DestinationsPageContent() {
                     </div>
                 </div>
             </section>
-        </main>
+        </div>
     );
 }

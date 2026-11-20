@@ -12,6 +12,7 @@ import crypto from "crypto";
 const ALLOWED_MIME_TYPES = new Set([
     "application/pdf",
     "image/jpeg",
+    "image/jpg",
     "image/png",
 ]);
 
@@ -86,19 +87,6 @@ export async function POST(request: NextRequest) {
             );
         }
 
-        if (
-            typeof fileType !== "string" ||
-            !ALLOWED_MIME_TYPES.has(fileType.toLowerCase())
-        ) {
-            return NextResponse.json(
-                {
-                    success: false,
-                    error: "Invalid file type. Only PDF, JPG, and PNG are allowed.",
-                },
-                { status: 400 }
-            );
-        }
-
         if (typeof fileName !== "string" || !fileName.trim()) {
             return NextResponse.json(
                 { success: false, error: "File name is required." },
@@ -112,6 +100,18 @@ export async function POST(request: NextRequest) {
                 {
                     success: false,
                     error: "Invalid file extension. Only .pdf, .jpg, .jpeg, and .png are allowed.",
+                },
+                { status: 400 }
+            );
+        }
+
+        // Allow empty MIME fallback when mobile browsers omit File.type for valid extensions
+        const normalizedType = typeof fileType === "string" ? fileType.toLowerCase().trim() : "";
+        if (normalizedType && !ALLOWED_MIME_TYPES.has(normalizedType)) {
+            return NextResponse.json(
+                {
+                    success: false,
+                    error: "Invalid file type. Only PDF, JPG, and PNG are allowed.",
                 },
                 { status: 400 }
             );
@@ -142,15 +142,12 @@ export async function POST(request: NextRequest) {
             );
         }
 
-        // Record initial pending review metadata with original filename
+        // Defer "pending" review metadata creation until PUT upload confirmation
+        // so dropped mobile connections never leave orphaned review records.
         const cleanOriginalName = fileName
             .trim()
             .replace(/^.*[\\/]/, "")
             .slice(0, 120);
-        await updateDocumentReviewMeta(cleanTrackingCode, storedFileName, {
-            status: "pending",
-            originalName: cleanOriginalName,
-        });
 
         return NextResponse.json({
             success: true,
@@ -220,6 +217,7 @@ export async function PUT(request: NextRequest) {
                     cleanTrackingCode,
                     cleanStoredFile,
                     {
+                        status: "pending",
                         originalName: cleanOriginal,
                     }
                 );

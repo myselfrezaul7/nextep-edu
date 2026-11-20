@@ -49,7 +49,10 @@ export function Footer() {
     };
 
     const scrollToTop = () => {
-        window.scrollTo({ top: 0, behavior: "smooth" });
+        const prefersReduced =
+            typeof window !== "undefined" &&
+            window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+        window.scrollTo({ top: 0, behavior: prefersReduced ? "auto" : "smooth" });
     };
 
     return (
@@ -76,7 +79,7 @@ export function Footer() {
                 <div className="container mx-auto px-4 py-14 md:py-20 relative z-10 text-center max-w-3xl">
                     <span className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-accent/15 border border-accent/30 text-accent text-xs font-semibold tracking-wider uppercase mb-5">
                         <Sparkles className="w-3.5 h-3.5" />
-                        <span>Free 1-on-1 Profile Evaluation</span>
+                        <span>{t("common.footer.badge", undefined, "Free 1-on-1 Profile Evaluation")}</span>
                     </span>
 
                     <h3 className="text-2xl sm:text-3xl md:text-4xl font-bold font-heading text-white mb-3.5 leading-tight">
@@ -98,15 +101,15 @@ export function Footer() {
                     <div className="flex flex-wrap items-center justify-center gap-2.5 sm:gap-4 mb-8">
                         <span className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-white/[0.05] border border-white/10 text-xs font-medium text-white/85">
                             <Users className="w-3.5 h-3.5 text-accent" />
-                            <span>200+ Consultations</span>
+                            <span>{t("common.footer.statConsultations", undefined, "200+ Consultations")}</span>
                         </span>
                         <span className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-white/[0.05] border border-white/10 text-xs font-medium text-white/85">
                             <Globe2 className="w-3.5 h-3.5 text-accent" />
-                            <span>17+ Countries</span>
+                            <span>{t("common.footer.statCountries", undefined, "17+ Countries")}</span>
                         </span>
                         <span className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-white/[0.05] border border-white/10 text-xs font-medium text-white/85">
                             <CheckCircle2 className="w-3.5 h-3.5 text-accent" />
-                            <span>98% Visa Success</span>
+                            <span>{t("common.footer.statVisa", undefined, "98% Visa Success")}</span>
                         </span>
                     </div>
 
@@ -139,7 +142,7 @@ export function Footer() {
                                 rel="noopener noreferrer"
                             >
                                 <MessageCircle className="w-4 h-4 text-[#25D366]" />
-                                <span>Chat on WhatsApp</span>
+                                <span>{t("common.footer.chatWhatsApp", undefined, "Chat on WhatsApp")}</span>
                             </a>
                         </Button>
                     </div>
@@ -176,13 +179,17 @@ export function Footer() {
                                         NexTep Edu
                                     </span>
                                     <span className="text-[11px] font-medium text-muted-foreground tracking-wide">
-                                        Global Education Consultancy
+                                        {t("common.footer.brandTagline", undefined, "Global Education Consultancy")}
                                     </span>
                                 </div>
                             </Link>
 
                             <p className="text-sm leading-relaxed text-muted-foreground dark:text-white/70 max-w-sm">
-                                Your trusted partner for global higher education from Bangladesh. We simplify every step from university shortlisting to visa approval.
+                                {t(
+                                    "common.footer.brandDescription",
+                                    undefined,
+                                    "Your trusted partner for global higher education from Bangladesh. We simplify every step from university shortlisting to visa approval."
+                                )}
                             </p>
 
                             {/* 44x44px Tactile Social Pills */}
@@ -298,7 +305,7 @@ export function Footer() {
                                             href="/track"
                                             className="min-h-[40px] md:min-h-0 flex items-center font-medium text-accent hover:underline"
                                         >
-                                            Track Application
+                                            {t("common.footer.trackApplication", undefined, "Track Application")}
                                         </Link>
                                     </li>
                                 </ul>
@@ -404,10 +411,10 @@ export function Footer() {
                                     </div>
                                     <div className="min-w-0">
                                         <p className="text-xs font-bold text-primary truncate">
-                                            Live Application Portal
+                                            {t("common.footer.portalTitle", undefined, "Live Application Portal")}
                                         </p>
                                         <p className="text-[11px] text-muted-foreground truncate">
-                                            Track visa & offer status in real time
+                                            {t("common.footer.portalSubtitle", undefined, "Track visa & offer status in real time")}
                                         </p>
                                     </div>
                                 </div>
@@ -419,20 +426,20 @@ export function Footer() {
             </div>
 
             {/* Bottom Copyright Bar */}
-            <div className="border-t border-slate-200/80 dark:border-white/[0.08] bg-surface/40 dark:bg-[#090E1B] pb-[calc(6.5rem+env(safe-area-inset-bottom,0px))] md:pb-0">
+            <div className="border-t border-slate-200/80 dark:border-white/[0.08] bg-surface/40 dark:bg-[#090E1B] pb-[calc(6.5rem+env(safe-area-inset-bottom,0px))] lg:pb-0">
                 <div className="container mx-auto px-4 py-5 md:py-6 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-muted-foreground dark:text-white/55">
                     <p className="text-center sm:text-left">
-                        &copy; {new Date().getFullYear()} NexTep Edu. All rights reserved.
+                        &copy; {new Date().getFullYear()} {t("common.footer.copyright", undefined, "NexTep Edu. All rights reserved.")}
                     </p>
                     <div className="flex items-center gap-4">
-                        <span>Built for Bangladeshi Scholars</span>
+                        <span>{t("common.footer.builtFor", undefined, "Built for Bangladeshi Scholars")}</span>
                         <span aria-hidden="true" className="text-border">|</span>
                         <button
                             type="button"
                             onClick={scrollToTop}
-                            className="inline-flex items-center gap-1.5 font-semibold text-foreground dark:text-white/80 hover:text-accent transition-colors min-h-[36px] px-2 rounded-lg"
+                            className="inline-flex items-center gap-1.5 font-semibold text-foreground dark:text-white/80 hover:text-accent transition-colors min-h-[44px] px-2 rounded-lg"
                         >
-                            <span>Back to top</span>
+                            <span>{t("common.footer.backToTop", undefined, "Back to top")}</span>
                             <ArrowUp className="w-3.5 h-3.5 text-accent" />
                         </button>
                     </div>

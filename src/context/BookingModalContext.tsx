@@ -9,7 +9,7 @@ import {
     type ReactNode,
 } from "react";
 import { usePathname } from "next/navigation";
-import { destinations } from "@/data/destinations";
+import { DESTINATIONS_META, DESTINATIONS_META_LIST } from "@/data/destinations-meta";
 
 export interface BookingModalPrefill {
     destination?: string;
@@ -24,7 +24,7 @@ interface BookingModalContextValue {
     closeModal: () => void;
 }
 
-const KNOWN_DESTINATIONS = Object.values(destinations);
+const KNOWN_DESTINATIONS = DESTINATIONS_META_LIST;
 
 export function resolveDestinationName(input?: string): string | undefined {
     if (!input || typeof input !== "string") return undefined;
@@ -131,7 +131,7 @@ export function BookingModalProvider({ children }: { children: ReactNode }) {
         const match = pathname.match(/^\/destinations\/([^/?#]+)/);
         if (!match?.[1]) return undefined;
         const slug = decodeURIComponent(match[1]).toLowerCase();
-        return destinations[slug]?.name;
+        return DESTINATIONS_META[slug]?.name;
     }, [pathname]);
 
     const openModal = useCallback(
@@ -169,6 +169,27 @@ export function BookingModalProvider({ children }: { children: ReactNode }) {
         window.addEventListener("open-booking-modal", handleOpenEvent);
         window.addEventListener("close-booking-modal", handleCloseEvent);
         window.__openBookingModal = openModal;
+
+        // Open booking modal automatically when launched from PWA shortcut (/?book=1)
+        const params = new URLSearchParams(window.location.search);
+        if (params.get("book") === "1") {
+            const frame = requestAnimationFrame(() => {
+                openModal();
+                params.delete("book");
+                const qs = params.toString();
+                window.history.replaceState(
+                    null,
+                    "",
+                    qs ? `${window.location.pathname}?${qs}` : window.location.pathname
+                );
+            });
+            return () => {
+                cancelAnimationFrame(frame);
+                window.removeEventListener("open-booking-modal", handleOpenEvent);
+                window.removeEventListener("close-booking-modal", handleCloseEvent);
+                delete window.__openBookingModal;
+            };
+        }
 
         return () => {
             window.removeEventListener("open-booking-modal", handleOpenEvent);

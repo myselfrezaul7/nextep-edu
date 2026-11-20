@@ -124,8 +124,28 @@ html[lang="bn"] body {
     line-height: 1.8;
 }
 
+html[lang="bn"] .font-heading {
+    font-family: var(--font-bengali), var(--font-ibm-plex-sans), system-ui, -apple-system, sans-serif;
+    line-height: 1.38;
+}
+
+html[lang="bn"] nav span,
+html[lang="bn"] button {
+    line-height: 1.45;
+}
+
 html[lang="bn"] .text-sm {
     line-height: 1.75;
+}
+
+/* Eliminate 300ms double-tap delay on interactive mobile controls */
+button,
+a,
+[role="button"],
+input,
+select,
+textarea {
+    touch-action: manipulation;
 }
 
 *:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; border-radius: 4px; }
@@ -278,6 +298,9 @@ button {
 }
 
 @media (prefers-reduced-motion: reduce) {
+    html {
+        scroll-behavior: auto;
+    }
     .animate-marquee,
     .animate-shimmer,
     .animate-shimmer-once {

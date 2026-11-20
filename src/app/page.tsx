@@ -4,7 +4,7 @@ import { ServicesSection } from "@/components/home/ServicesSection";
 import { HowItWorksSection } from "@/components/home/HowItWorksSection";
 import { AboutSection } from "@/components/home/AboutSection";
 import { TestimonialCarousel } from "@/components/home/TestimonialCarousel";
-import { DestinationsGrid } from "@/components/destinations/DestinationsGrid";
+import { HomeDestinationsSection } from "@/components/home/HomeDestinationsSection";
 
 export const metadata: Metadata = {
     title: "NexTep Edu | Study Abroad Consultancy Bangladesh | Expert Guidance for Bangladeshi Students",
@@ -23,25 +23,7 @@ export default function Home() {
             <div className="cv-auto">
                 <HowItWorksSection />
             </div>
-
-            {/* Destinations Section with distinct surface rhythm */}
-            <section id="destinations" className="py-20 md:py-28 bg-surface/60 dark:bg-card/40 border-y border-border/50 cv-auto">
-                <div className="container mx-auto px-4">
-                    <div className="text-center mb-14">
-                        <span className="inline-block px-3.5 py-1.5 rounded-full bg-accent/10 border border-accent/20 text-accent text-xs font-semibold tracking-wider uppercase mb-4">
-                            Study Abroad Destinations
-                        </span>
-                        <h2 className="text-3xl md:text-5xl font-bold font-heading text-primary mb-4">
-                            Where Do You Want to Study?
-                        </h2>
-                        <p className="text-base md:text-lg text-muted-foreground max-w-2xl mx-auto">
-                            Explore top study destinations for Bangladeshi students. Each country offers unique opportunities for your academic journey.
-                        </p>
-                    </div>
-                    <DestinationsGrid featuredOnly={true} />
-                </div>
-            </section>
-
+            <HomeDestinationsSection />
             <div className="cv-auto">
                 <AboutSection />
             </div>

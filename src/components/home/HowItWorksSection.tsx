@@ -2,13 +2,21 @@
 
 import { motion, useScroll, useTransform } from "framer-motion";
 import { PhoneCall, ClipboardList, SendHorizonal, PlaneTakeoff, Clock } from "lucide-react";
-import { useRef, useState } from "react";
+import { useRef, useState, useSyncExternalStore } from "react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { useTranslation } from "@/i18n/LanguageContext";
 import { useBookingModal } from "@/context/BookingModalContext";
 
 const EASE_OUT_EXPO = [0.16, 1, 0.3, 1] as const;
+
+const subscribeDesktop = (callback: () => void) => {
+    const mq = window.matchMedia("(min-width: 768px)");
+    mq.addEventListener("change", callback);
+    return () => mq.removeEventListener("change", callback);
+};
+
+const getDesktopSnapshot = () => window.matchMedia("(min-width: 768px)").matches;
 
 const stepsData = [
     {
@@ -47,30 +55,31 @@ export function HowItWorksSection() {
     const [activeDot, setActiveDot] = useState(0);
     const containerRef = useRef<HTMLDivElement>(null);
     const scrollContainerRef = useRef<HTMLDivElement>(null);
+    const isDesktop = useSyncExternalStore(subscribeDesktop, getDesktopSnapshot, () => false);
     const { scrollYProgress } = useScroll({
         target: containerRef,
-        offset: ["start center", "end center"]
+        offset: ["start center", "end center"],
     });
     const pathLength = useTransform(scrollYProgress, [0, 0.8], [0, 1]);
 
     const handleScroll = () => {
-        if (!scrollContainerRef.current) return;
-        const scrollLeft = scrollContainerRef.current.scrollLeft;
-        const cardWidth = scrollContainerRef.current.firstElementChild?.clientWidth || scrollContainerRef.current.offsetWidth;
-        setActiveDot(Math.min(stepsData.length - 1, Math.max(0, Math.round(scrollLeft / (cardWidth + 16)))));
+        const container = scrollContainerRef.current;
+        if (!container) return;
+        const cardWidth = container.firstElementChild?.clientWidth || container.offsetWidth;
+        const idx = Math.round(container.scrollLeft / (cardWidth + 16));
+        setActiveDot(Math.min(stepsData.length - 1, Math.max(0, idx)));
     };
 
     const scrollToCard = (index: number) => {
-        if (!scrollContainerRef.current) return;
-        const child = scrollContainerRef.current.children[index] as HTMLElement | undefined;
-        if (child) {
-            child.scrollIntoView({ behavior: "smooth", inline: "center", block: "nearest" });
-            setActiveDot(index);
-        }
+        const container = scrollContainerRef.current;
+        if (!container) return;
+        const cardWidth = container.firstElementChild?.clientWidth || container.offsetWidth;
+        container.scrollTo({ left: index * (cardWidth + 16), behavior: "smooth" });
+        setActiveDot(index);
     };
 
     return (
-        <section className="py-20 md:py-28 bg-background relative overflow-hidden">
+        <section className="py-16 md:py-28 bg-background relative overflow-hidden">
             {/* Subtle background accents */}
             <div className="absolute inset-0 pointer-events-none">
                 <div className="absolute top-[10%] left-[5%] w-[300px] h-[300px] bg-accent/[0.04] rounded-full blur-3xl" />
@@ -79,7 +88,7 @@ export function HowItWorksSection() {
 
             <div className="container mx-auto px-4 relative z-10">
                 {/* Header */}
-                <div className="text-center mb-12 md:mb-20">
+                <div className="text-center mb-10 md:mb-20">
                     <motion.div
                         initial={{ opacity: 0, y: 12 }}
                         whileInView={{ opacity: 1, y: 0 }}
@@ -117,7 +126,10 @@ export function HowItWorksSection() {
                         <svg className="w-full h-full" preserveAspectRatio="none">
                             <line x1="0" y1="1" x2="100%" y2="1" stroke="currentColor" className="text-accent/20" strokeWidth="2" strokeDasharray="6 6" />
                             <motion.line
-                                x1="0" y1="1" x2="100%" y2="1"
+                                x1="0"
+                                y1="1"
+                                x2="100%"
+                                y2="1"
                                 stroke="currentColor"
                                 className="text-accent"
                                 strokeWidth="2"
@@ -129,16 +141,16 @@ export function HowItWorksSection() {
                     <div
                         ref={scrollContainerRef}
                         onScroll={handleScroll}
-                        className="flex md:grid md:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6 overflow-x-auto md:overflow-visible snap-x snap-mandatory pb-4 md:pb-0 -mx-4 px-4 md:mx-0 md:px-0 scrollbar-hide"
+                        className="flex md:grid md:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6 overflow-x-auto md:overflow-visible snap-x snap-mandatory scroll-pl-4 pb-4 md:pb-0 -mx-4 px-4 md:mx-0 md:px-0 scrollbar-hide"
                     >
                         {stepsData.map((step, i) => (
                             <motion.div
                                 key={step.id}
-                                initial={{ opacity: 0, y: 24 }}
-                                whileInView={{ opacity: 1, y: 0 }}
+                                initial={isDesktop ? { opacity: 0, y: 24 } : false}
+                                whileInView={isDesktop ? { opacity: 1, y: 0 } : undefined}
                                 viewport={{ once: true, amount: 0.2 }}
-                                transition={{ duration: 0.6, delay: i * 0.12, ease: EASE_OUT_EXPO }}
-                                className="relative group w-[78vw] sm:w-[300px] md:w-auto md:min-w-0 shrink-0 md:shrink snap-center"
+                                transition={{ duration: 0.6, delay: isDesktop ? i * 0.12 : 0, ease: EASE_OUT_EXPO }}
+                                className="relative group w-[80vw] sm:w-[300px] md:w-auto md:min-w-0 shrink-0 md:shrink snap-start"
                             >
                                 <div className="surface-card relative rounded-2xl p-6 md:p-7 text-center h-full flex flex-col items-center overflow-hidden">
                                     {/* Step number badge */}
@@ -169,14 +181,14 @@ export function HowItWorksSection() {
                         ))}
                     </div>
 
-                    <div className="flex justify-center items-center gap-1.5 mt-5 md:hidden">
+                    <div className="flex justify-center items-center gap-0.5 mt-4 md:hidden">
                         {stepsData.map((step, i) => (
                             <button
                                 key={step.id}
                                 type="button"
                                 onClick={() => scrollToCard(i)}
                                 aria-label={`View ${t(`home.howItWorks.steps.${step.id}.title`, undefined, step.fallbackTitle)}`}
-                                className="p-2 flex items-center justify-center"
+                                className="min-h-[44px] min-w-[32px] px-1.5 flex items-center justify-center"
                             >
                                 <span
                                     className={cn(
@@ -194,12 +206,12 @@ export function HowItWorksSection() {
                     initial={{ opacity: 0, y: 18 }}
                     whileInView={{ opacity: 1, y: 0 }}
                     viewport={{ once: true }}
-                    transition={{ delay: 0.4, duration: 0.5 }}
-                    className="text-center mt-12 md:mt-16"
+                    transition={{ delay: 0.25, duration: 0.5 }}
+                    className="text-center mt-10 md:mt-16"
                 >
                     <Button
                         size="lg"
-                        className="rounded-full text-base px-8 h-12 font-semibold"
+                        className="rounded-full text-base px-8 min-h-[48px] font-semibold"
                         onClick={() => openModal({ topic: "General_Inquiry" })}
                     >
                         {t("home.howItWorks.ctaButton", undefined, "Start With Step 1 - It's Free")}

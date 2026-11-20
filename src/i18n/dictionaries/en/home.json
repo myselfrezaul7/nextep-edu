@@ -6,42 +6,62 @@
     "description": "Expert guidance for Bangladeshi students aspiring to study abroad. We make your international education journey seamless and successful.",
     "ctaPrimary": "Let's Talk",
     "ctaSecondary": "See Our Work",
+    "popularLabel": "Popular:",
+    "allCountriesChip": "17+ Countries",
     "trustedBy": "Trusted by ",
     "students": " students",
     "across": " across ",
-    "countries": "20+ countries"
+    "countries": "17+ countries",
+    "visaSuccessBadge": "98% Visa Success",
+    "verifiedTrackRecord": "Verified Track Record",
+    "zeroFeesBadge": "Zero Advance Fees",
+    "payAfterDelivery": "Pay After Delivery"
   },
   "services": {
     "title": "What We ",
     "titleAccent": "Actually",
     "titleSuffix": " Do For You",
     "subtitle": "Detailed SOPs, visa support, scholarship hunting - we handle the gritty details so you can focus on packing your bags.",
+    "includedDeliverables": "Included deliverables",
+    "hideDeliverables": "Hide deliverables",
+    "getHelpPrefix": "Get Help with ",
     "items": {
       "lom": {
         "title": "LOM / SOP Solution",
-        "description": "We craft your story, not just edit grammar. Our experts help you write compelling Letters of Motivation and SOPs that admissions officers actually read."
+        "description": "We craft your story, not just edit grammar. Our experts help you write compelling Letters of Motivation and SOPs that admissions officers actually read.",
+        "details": "Includes brainstorming sessions, up to 3 review rounds, and plagiarism checks."
       },
       "offer": {
         "title": "Offer Letter",
-        "description": "Fast-tracked applications via our university network. We ensure your application is complete and error-free to maximize acceptance chances."
+        "description": "Fast-tracked applications via our university network. We ensure your application is complete and error-free to maximize acceptance chances.",
+        "details": "Direct communication with university admissions and priority processing."
       },
       "visa": {
         "title": "Visa Support",
-        "description": "End-to-end guidance from appointment booking to mock interviews. We know the checklists inside out."
+        "description": "End-to-end guidance from appointment booking to mock interviews. We know the checklists inside out.",
+        "details": "Document verification, embassy interview prep, and form filling assistance."
       },
       "selection": {
         "title": "University Selection",
-        "description": "Oxford or Toronto? We help you shortlist unis that fit your vibe, budget, and goals."
+        "description": "Oxford or Toronto? We help you shortlist unis that fit your vibe, budget, and goals.",
+        "details": "Personalized shortlisting based on profile evaluation and career goals."
       },
       "bank": {
         "title": "Bank Solvency",
-        "description": "Struggling to show funds? We guide you on proper documentation, blocked accounts, and financial proof strategies that satisfy visa officers."
+        "description": "Struggling to show funds? We guide you on proper documentation, blocked accounts, and financial proof strategies that satisfy visa officers.",
+        "details": "Step-by-step guidance on blocked accounts and sponsor documentation."
       },
       "scholarship": {
         "title": "Scholarship Hunting",
-        "description": "Studying abroad is expensive. We find hidden financial aid options and help you apply effectively."
+        "description": "Studying abroad is expensive. We find hidden financial aid options and help you apply effectively.",
+        "details": "Assistance with DAAD, Erasmus+, and university-specific scholarships."
       }
     }
+  },
+  "destinations": {
+    "badge": "Study Abroad Destinations",
+    "title": "Where Do You Want to Study?",
+    "subtitle": "Explore top study destinations for Bangladeshi students. Each country offers unique opportunities for your academic journey."
   },
   "about": {
     "title": "Why Students Trust Us",

@@ -39,6 +39,8 @@ export interface UploadedDocumentInfo {
     id?: string;
     created_at: string;
     url?: string | null;
+    viewUrl?: string | null;
+    downloadUrl?: string | null;
     status?: DocumentVerificationStatus;
     feedback?: string;
     originalName?: string;

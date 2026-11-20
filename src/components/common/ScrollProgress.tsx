@@ -15,7 +15,11 @@ export function ScrollProgress() {
     }, []);
 
     return (
-        <div className="fixed top-0 left-0 w-full h-[2px] z-[60] pointer-events-none" aria-hidden="true">
+        <div
+            className="fixed left-0 w-full h-[2px] z-[60] pointer-events-none"
+            style={{ top: "env(safe-area-inset-top, 0px)" }}
+            aria-hidden="true"
+        >
             <div
                 ref={progressRef}
                 className="h-full w-full origin-left bg-accent/85 will-change-transform"

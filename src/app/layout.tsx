@@ -1,19 +1,11 @@
 import type { Metadata, Viewport } from "next";
 import { IBM_Plex_Sans, Playfair_Display, Noto_Sans_Bengali } from "next/font/google";
 import { ThemeProvider } from "@/components/theme-provider";
-import { Header } from "@/components/layout/Header";
-import { Footer } from "@/components/layout/Footer";
-import { MobileTabBar } from "@/components/layout/MobileTabBar";
+import { SiteShell } from "@/components/layout/SiteShell";
 import { StructuredData } from "@/components/common/structured-data";
-import { WhatsAppFAB } from "@/components/common/WhatsAppFAB";
-import { ScrollProgress } from "@/components/common/ScrollProgress";
-import { BackToTop } from "@/components/common/BackToTop";
-import { PageTransition } from "@/components/common/PageTransition";
-import { ErrorBoundary } from "@/components/common/ErrorBoundary";
 import { SpeedInsights } from "@vercel/speed-insights/next";
 import { LanguageProvider } from "@/i18n/LanguageContext";
 import { BookingModalProvider } from "@/context/BookingModalContext";
-import { BookingModal } from "@/components/common/BookingModal";
 import { MotionProvider } from "@/components/common/MotionProvider";
 import "./globals.css";
 
@@ -33,7 +25,7 @@ const playfair = Playfair_Display({
 
 const notoBengali = Noto_Sans_Bengali({
     subsets: ["bengali"],
-    weight: ["400", "600"],
+    weight: ["400", "500", "600", "700"],
     variable: "--font-bengali",
     display: "swap",
     preload: false,
@@ -130,11 +122,16 @@ export const metadata: Metadata = {
     },
     // Category
     category: "Education",
-    // Icons
+    // Icons & Apple Web App PWA settings
     icons: {
         icon: "/assets/favicon.ico",
         shortcut: "/assets/favicon-16x16.png",
         apple: "/assets/apple-touch-icon.png",
+    },
+    appleWebApp: {
+        capable: true,
+        title: "NexTep Edu",
+        statusBarStyle: "black-translucent",
     },
     // Additional geo-targeting
     other: {
@@ -156,6 +153,7 @@ export const viewport: Viewport = {
     initialScale: 1,
     maximumScale: 5,
     viewportFit: "cover",
+    interactiveWidget: "resizes-content",
 };
 
 export default function RootLayout({
@@ -166,8 +164,6 @@ export default function RootLayout({
     return (
         <html lang="en" suppressHydrationWarning>
             <head>
-                <link rel="preconnect" href="https://fonts.googleapis.com" />
-                <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
                 <link rel="preconnect" href="https://api.web3forms.com" />
                 <StructuredData />
                 <link rel="alternate" hrefLang="en" href="https://www.nextepedu.com" />
@@ -184,20 +180,7 @@ export default function RootLayout({
                     >
                         <BookingModalProvider>
                             <MotionProvider>
-                                <ScrollProgress />
-                                <div className="flex flex-col min-h-screen">
-                                    <Header />
-                                    <main className="flex-grow pt-20 pb-[calc(6.5rem+env(safe-area-inset-bottom,0px))] md:pb-0">
-                                        <ErrorBoundary>
-                                            <PageTransition>{children}</PageTransition>
-                                        </ErrorBoundary>
-                                    </main>
-                                    <Footer />
-                                    <MobileTabBar />
-                                </div>
-                                <BookingModal />
-                                <WhatsAppFAB />
-                                <BackToTop />
+                                <SiteShell>{children}</SiteShell>
                                 <SpeedInsights />
                             </MotionProvider>
                         </BookingModalProvider>

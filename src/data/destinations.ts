@@ -1,4 +1,13 @@
 import { LucideIcon, MapPin, Building2, Globe2, Wallet, Clock, Users, BookOpen, Trophy, Sun, Coffee, Landmark, Train, Award } from "lucide-react";
+import {
+    DESTINATIONS_META,
+    type DestinationMeta,
+    type DestinationRegion,
+    type TuitionTier,
+    type ChecklistProfile,
+} from "@/data/destinations-meta";
+
+export type { DestinationMeta, DestinationRegion, TuitionTier, ChecklistProfile };
 
 export interface University {
     name: string;
@@ -10,11 +19,8 @@ export interface Benefit {
     icon: LucideIcon;
 }
 
-export interface Destination {
-    slug: string;
-    name: string;
+export interface Destination extends DestinationMeta {
     heroImage: string;
-    flag: string;
     hero: {
         title: string;
         description: string;
@@ -24,7 +30,13 @@ export interface Destination {
     universities: University[];
 }
 
-export const destinations: Record<string, Destination> = {
+type DestinationCore = Omit<Destination, keyof DestinationMeta> & {
+    slug: string;
+    name: string;
+    flag: string;
+};
+
+const rawDestinations: Record<string, DestinationCore> = {
     uk: {
         slug: "uk",
         name: "United Kingdom",
@@ -292,7 +304,7 @@ export const destinations: Record<string, Destination> = {
     belgium: {
         slug: "belgium",
         name: "Belgium",
-        heroImage: "/assets/destinations/belgium.png",
+        heroImage: "/assets/belgium_hero_blend.png",
         flag: "🇧🇪",
         hero: {
             title: "Study in Belgium",
@@ -432,5 +444,15 @@ export const destinations: Record<string, Destination> = {
             { name: "Latvia University of Life Sciences" },
             { name: "Turiba University" },
         ],
-    }
+    },
 };
+
+export const destinations: Record<string, Destination> = Object.fromEntries(
+    Object.entries(rawDestinations).map(([slug, core]) => [
+        slug,
+        {
+            ...DESTINATIONS_META[slug],
+            ...core,
+        },
+    ])
+);

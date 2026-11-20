@@ -1,10 +1,10 @@
 "use client";
 
-import { useState, useSyncExternalStore } from "react";
+import { useState, useEffect, useSyncExternalStore } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { useTheme } from "next-themes";
-import { Moon, Sun, ChevronDown, ArrowRight } from "lucide-react";
+import { Moon, Sun, ChevronDown, ArrowRight, Search } from "lucide-react";
 import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
@@ -13,16 +13,16 @@ import { useTranslation } from "@/i18n/LanguageContext";
 import dynamic from "next/dynamic";
 import { usePathname } from "next/navigation";
 import { useMounted } from "@/lib/use-mounted";
-import { destinations as destinationsData } from "@/data/destinations";
+import { DESTINATIONS_META_LIST } from "@/data/destinations-meta";
 import { useBookingModal } from "@/context/BookingModalContext";
 import { useNavVisible } from "@/lib/scroll-store";
 
 const SearchModal = dynamic(() => import("@/components/common/SearchModal").then(mod => mod.SearchModal), { ssr: false });
 
-const allDestinations = Object.values(destinationsData).map(d => ({
+const allDestinations = DESTINATIONS_META_LIST.map((d) => ({
     name: d.name,
     href: `/destinations/${d.slug}`,
-    flag: d.flag
+    flag: d.flag,
 }));
 
 const subscribeHash = (callback: () => void) => {
@@ -33,6 +33,8 @@ const subscribeHash = (callback: () => void) => {
 export function Header() {
     const mounted = useMounted();
     const [dropdownOpen, setDropdownOpen] = useState(false);
+    const [searchOpen, setSearchOpen] = useState(false);
+    const [hasOpenedSearch, setHasOpenedSearch] = useState(false);
     const navVisible = useNavVisible();
     const { theme, setTheme, systemTheme } = useTheme();
     const { t } = useTranslation();
@@ -44,6 +46,24 @@ export function Header() {
         () => ""
     );
 
+    const openSearchModal = () => {
+        setHasOpenedSearch(true);
+        setSearchOpen(true);
+    };
+
+    // Single global Cmd/Ctrl + K shortcut handler across desktop & mobile
+    useEffect(() => {
+        const handleKeyDown = (e: KeyboardEvent) => {
+            if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === "k") {
+                e.preventDefault();
+                setHasOpenedSearch(true);
+                setSearchOpen(true);
+            }
+        };
+        window.addEventListener("keydown", handleKeyDown);
+        return () => window.removeEventListener("keydown", handleKeyDown);
+    }, []);
+
     const currentTheme = theme === "system" ? systemTheme : theme;
     const isDark = mounted && currentTheme === "dark";
 
@@ -53,19 +73,20 @@ export function Header() {
     const isTrackActive = pathname.startsWith("/track");
 
     const toggleTheme = () => {
-        setTheme(theme === "dark" ? "light" : "dark");
+        setTheme(isDark ? "light" : "dark");
     };
 
     return (
         <div
             className={cn(
-                "fixed top-0 left-0 w-full z-50 flex justify-center mt-4 px-4 transition-[transform,opacity] duration-300 ease-out will-change-transform",
+                "fixed left-0 w-full z-50 flex justify-center mt-3 sm:mt-4 px-3 sm:px-4 transition-[transform,opacity] duration-300 ease-out will-change-transform",
                 navVisible ? "translate-y-0 opacity-100" : "-translate-y-[120%] opacity-0 pointer-events-none"
             )}
+            style={{ top: "env(safe-area-inset-top, 0px)" }}
         >
             <nav
                 className={cn(
-                    "flex justify-between items-center w-full max-w-5xl px-4 md:px-6 py-2.5 transition-colors duration-200",
+                    "flex justify-between items-center w-full max-w-5xl px-3 sm:px-4 md:px-6 py-2 sm:py-2.5 transition-colors duration-200",
                     "rounded-full border glass-nav saturate-150",
                     isDark
                         ? "bg-slate-900/85 border-white/[0.08] shadow-[0_4px_28px_rgba(0,0,0,0.35)]"
@@ -73,18 +94,17 @@ export function Header() {
                 )}
             >
                 {/* Logo */}
-                <Link href="/" className="flex items-center gap-2.5 group shrink-0" onClick={() => window.scrollTo({ top: 0, behavior: "instant" })}>
-                    <div className="relative w-9 h-9 overflow-hidden rounded-lg">
+                <Link href="/" className="flex items-center gap-1.5 sm:gap-2.5 group shrink-0 min-w-0" onClick={() => window.scrollTo({ top: 0, behavior: "instant" })}>
+                    <div className="relative w-8 h-8 sm:w-9 sm:h-9 overflow-hidden rounded-lg shrink-0">
                         <Image
                             src="/assets/logo.png"
                             alt="NexTep Edu Logo"
                             fill
                             className="object-contain"
                             sizes="36px"
-                            priority
                         />
                     </div>
-                    <span className="font-heading font-bold text-xl text-primary group-hover:text-accent transition-colors">
+                    <span className="font-heading font-bold text-lg sm:text-xl text-primary group-hover:text-accent transition-colors whitespace-nowrap">
                         NexTep Edu
                     </span>
                 </Link>
@@ -164,7 +184,15 @@ export function Header() {
 
                     <div className="w-px h-5 bg-border/70 mx-0.5" />
 
-                    <SearchModal />
+                    <motion.button
+                        type="button"
+                        whileTap={{ scale: 0.9 }}
+                        onClick={openSearchModal}
+                        className="p-2 w-9 h-9 flex items-center justify-center rounded-full text-foreground/80 hover:bg-black/5 dark:hover:bg-white/10 hover:text-accent transition-colors shrink-0"
+                        aria-label={t("common.search.triggerLabel", undefined, "Search destinations, services, and pages")}
+                    >
+                        <Search className="w-4 h-4" />
+                    </motion.button>
 
                     <LanguageToggle />
 
@@ -174,7 +202,7 @@ export function Header() {
                         className="p-2 w-9 h-9 flex items-center justify-center rounded-full hover:bg-muted transition-colors text-primary shrink-0"
                         aria-label="Toggle Theme"
                     >
-                        {mounted && theme === "dark" ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
+                        {isDark ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
                     </motion.button>
 
                     <Button
@@ -187,21 +215,38 @@ export function Header() {
                 </div>
 
                 {/* Mobile Icons (Search, Language, Theme) */}
-                <div className="flex items-center gap-1 lg:hidden">
-                    <SearchModal />
-                    <div className="w-px h-4 bg-border/60 mx-0.5" />
+                <div className="flex items-center gap-0.5 sm:gap-1 lg:hidden shrink-0">
+                    <motion.button
+                        type="button"
+                        whileTap={{ scale: 0.9 }}
+                        onClick={openSearchModal}
+                        className="p-2 w-11 h-11 flex items-center justify-center rounded-full text-foreground/80 hover:bg-black/5 dark:hover:bg-white/10 hover:text-accent transition-colors shrink-0"
+                        aria-label={t("common.search.triggerLabel", undefined, "Search destinations, services, and pages")}
+                    >
+                        <Search className="w-5 h-5" />
+                    </motion.button>
+                    <div className="hidden sm:block w-px h-4 bg-border/60 mx-0.5" />
                     <LanguageToggle />
-                    <div className="w-px h-4 bg-border/60 mx-0.5" />
+                    <div className="hidden sm:block w-px h-4 bg-border/60 mx-0.5" />
                     <motion.button
                         whileTap={{ scale: 0.95 }}
                         onClick={toggleTheme}
                         className="p-2 w-11 h-11 flex items-center justify-center rounded-full hover:bg-muted transition-colors text-primary shrink-0"
                         aria-label="Toggle theme"
                     >
-                        {mounted && theme === "dark" ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
+                        {isDark ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
                     </motion.button>
                 </div>
             </nav>
+
+            {(searchOpen || hasOpenedSearch) && (
+                <SearchModal
+                    isOpen={searchOpen}
+                    onOpen={openSearchModal}
+                    onClose={() => setSearchOpen(false)}
+                    renderTrigger={false}
+                />
+            )}
         </div>
     );
 }

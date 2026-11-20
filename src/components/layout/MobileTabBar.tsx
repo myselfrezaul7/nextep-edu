@@ -42,7 +42,6 @@ export function MobileTabBar() {
                 const id = mostVisible.target.id;
                 if (id === "hero") setActiveHash("");
                 else if (id === "services") setActiveHash("#services");
-                else if (id === "about") setActiveHash("#about");
             }
         };
 
@@ -55,7 +54,6 @@ export function MobileTabBar() {
         const sections = [
             document.getElementById("hero"),
             document.getElementById("services"),
-            document.getElementById("about"),
         ];
 
         sections.forEach((section) => {
@@ -79,18 +77,29 @@ export function MobileTabBar() {
         return null;
     }
 
-    const isHomeActive = pathname === "/" && (!activeHash || activeHash === "");
     const isServicesActive = pathname === "/" && activeHash === "#services";
+    const isHomeActive = pathname === "/" && !isServicesActive;
     const isCountriesActive = pathname.startsWith("/destinations");
     const isTrackActive = pathname.startsWith("/track");
+
+    const scrollToTopSmooth = () => {
+        const prefersReduced =
+            typeof window !== "undefined" &&
+            window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+        window.scrollTo({ top: 0, behavior: prefersReduced ? "auto" : "smooth" });
+    };
 
     const handleNavClick = (hash: string) => {
         triggerHaptic();
         if (pathname !== "/") {
             router.push(`/${hash}`);
         } else if (hash === "") {
-            window.scrollTo({ top: 0, behavior: "smooth" });
-            history.replaceState(null, "", " ");
+            scrollToTopSmooth();
+            history.replaceState(null, "", "/");
+            setActiveHash("");
+        } else if (hash === "#services" && isServicesActive) {
+            scrollToTopSmooth();
+            history.replaceState(null, "", "/");
             setActiveHash("");
         } else {
             const element = document.querySelector(hash);
@@ -104,6 +113,10 @@ export function MobileTabBar() {
 
     const handleRouteClick = (href: string) => {
         triggerHaptic();
+        if (pathname === href) {
+            scrollToTopSmooth();
+            return;
+        }
         router.push(href);
     };
 
@@ -116,7 +129,7 @@ export function MobileTabBar() {
         <nav
             aria-label="Mobile primary navigation"
             className={cn(
-                "fixed left-3.5 right-3.5 z-50 md:hidden will-change-transform",
+                "fixed left-3.5 right-3.5 max-w-lg mx-auto z-50 lg:hidden will-change-transform",
                 "px-2.5 py-2 rounded-[1.75rem] border glass-nav saturate-[1.8]",
                 "bg-white/75 dark:bg-slate-900/78 border-slate-200/85 dark:border-white/[0.1]",
                 "shadow-[0_10px_34px_rgba(15,23,42,0.12),inset_0_1px_0_rgba(255,255,255,0.75)] dark:shadow-[0_12px_38px_rgba(0,0,0,0.55),inset_0_1px_0_rgba(255,255,255,0.08)]",
@@ -200,7 +213,7 @@ export function MobileTabBar() {
                         type="button"
                         onClick={handleBookClick}
                         aria-label={t("common.tab.book", undefined, "Book Free Consultation")}
-                        className="group relative flex flex-col items-center justify-center focus:outline-none active:scale-[0.92] transition-transform duration-150"
+                        className="group relative flex flex-col items-center justify-center rounded-2xl focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 active:scale-[0.92] transition-transform duration-150"
                     >
                         <div className="-mt-6 w-13 h-13 rounded-full bg-gradient-to-br from-[#E6C55A] via-[#D4AF37] to-[#B8901F] text-slate-950 ring-4 ring-background shadow-[0_8px_24px_rgba(212,175,55,0.42)] flex items-center justify-center transition-transform duration-200 group-hover:scale-105">
                             <CalendarCheck className="w-5 h-5" strokeWidth={2.3} />

@@ -29,7 +29,8 @@ let started = false;
 
 const TOP_THRESHOLD = 24;
 const HIDE_AFTER = 80;
-const DIRECTION_HYSTERESIS = 6;
+const DIRECTION_HYSTERESIS = 20;
+const BOTTOM_BOUNCE_GUARD = 24;
 const FOLD_THRESHOLD = 400;
 
 function update() {
@@ -44,6 +45,9 @@ function update() {
     let navVisible = state.navVisible;
     if (y <= TOP_THRESHOLD) {
         navVisible = true;
+        lastY = y;
+    } else if (max > 0 && y >= max - BOTTOM_BOUNCE_GUARD) {
+        // Ignore iOS bottom rubber-band overscroll bounce
         lastY = y;
     } else if (delta > DIRECTION_HYSTERESIS && y > HIDE_AFTER) {
         navVisible = false;

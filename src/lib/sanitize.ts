@@ -43,3 +43,16 @@ export function getPhoneVariants(raw: unknown): string[] {
     }
     return Array.from(variants).filter(Boolean);
 }
+
+/**
+ * Converts a raw or normalized phone number into a valid wa.me digit string.
+ * Bangladeshi local mobile numbers (01XXXXXXXXX) are prefixed with country code 88.
+ */
+export function toWhatsAppPhone(raw: unknown): string {
+    const normalized = normalizePhone(raw);
+    if (!normalized) return "";
+    if (/^01\d{9}$/.test(normalized)) {
+        return `88${normalized}`;
+    }
+    return normalized.replace(/[^\d]/g, "");
+}

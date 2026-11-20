@@ -126,16 +126,27 @@ export async function getApplicationDocumentsWithMeta(
     const enriched = await Promise.all(
         validFiles.map(async (file) => {
             const meta = reviewMap[file.name];
-            let signedUrl: string | null = null;
+            const cleanOriginalName = meta?.originalName || file.name;
+            let viewUrl: string | null = null;
+            let downloadUrl: string | null = null;
 
             if (includeSignedUrls) {
-                const { data: urlData, error: urlError } = await supabaseAdmin.storage
-                    .from("documents")
-                    .createSignedUrl(`${cleanCode}/${file.name}`, 60 * 60, {
-                        download: true,
-                    });
-                if (!urlError && urlData?.signedUrl) {
-                    signedUrl = urlData.signedUrl;
+                const filePath = `${cleanCode}/${file.name}`;
+                const [viewResult, downloadResult] = await Promise.all([
+                    supabaseAdmin.storage
+                        .from("documents")
+                        .createSignedUrl(filePath, 60 * 60),
+                    supabaseAdmin.storage
+                        .from("documents")
+                        .createSignedUrl(filePath, 60 * 60, {
+                            download: cleanOriginalName,
+                        }),
+                ]);
+                if (!viewResult.error && viewResult.data?.signedUrl) {
+                    viewUrl = viewResult.data.signedUrl;
+                }
+                if (!downloadResult.error && downloadResult.data?.signedUrl) {
+                    downloadUrl = downloadResult.data.signedUrl;
                 }
             }
 
@@ -143,10 +154,12 @@ export async function getApplicationDocumentsWithMeta(
                 name: file.name,
                 id: file.id || file.name,
                 created_at: file.created_at || new Date().toISOString(),
-                url: signedUrl,
+                url: viewUrl || downloadUrl,
+                viewUrl,
+                downloadUrl,
                 status: meta?.status || "pending",
                 feedback: meta?.feedback || "",
-                originalName: meta?.originalName || file.name,
+                originalName: cleanOriginalName,
                 updated_at:
                     meta?.updated_at || file.created_at || new Date().toISOString(),
             } satisfies UploadedDocumentInfo;

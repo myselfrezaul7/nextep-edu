@@ -4,14 +4,13 @@ import { useEffect, useRef } from "react";
 import { ArrowUp } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { usePathname } from "next/navigation";
-import { subscribeScrollFrame, useNavVisible, usePastFold } from "@/lib/scroll-store";
+import { subscribeScrollFrame, usePastFold } from "@/lib/scroll-store";
 
 const RING_CIRCUMFERENCE = 289.026;
 
 export function BackToTop() {
     const pathname = usePathname();
     const visible = usePastFold();
-    const tabBarVisible = useNavVisible();
     const ringRef = useRef<SVGCircleElement>(null);
 
     useEffect(() => {
@@ -29,27 +28,24 @@ export function BackToTop() {
         return null;
     }
 
-    const isCountryDetailPage = pathname.startsWith("/destinations/") && pathname !== "/destinations";
-    const baseRem = tabBarVisible
-        ? (isCountryDetailPage ? "10.75rem" : "6.75rem")
-        : (isCountryDetailPage ? "5.5rem" : "1.5rem");
-    const bottomOffset = `calc(${baseRem} + env(safe-area-inset-bottom, 0px))`;
-
     const scrollToTop = () => {
-        window.scrollTo({ top: 0, behavior: "smooth" });
+        const prefersReduced =
+            typeof window !== "undefined" &&
+            window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+        window.scrollTo({ top: 0, behavior: prefersReduced ? "auto" : "smooth" });
     };
 
     return (
         <AnimatePresence>
             {visible && (
                 <motion.button
-                    initial={{ opacity: 0, scale: 0.85 }}
-                    animate={{ opacity: 1, scale: 1 }}
-                    exit={{ opacity: 0, scale: 0.85 }}
+                    type="button"
+                    initial={{ opacity: 0, scale: 0.85, y: 12 }}
+                    animate={{ opacity: 1, scale: 1, y: 0 }}
+                    exit={{ opacity: 0, scale: 0.85, y: 12 }}
                     transition={{ duration: 0.2, ease: "easeOut" }}
                     onClick={scrollToTop}
-                    style={{ bottom: bottomOffset }}
-                    className="fixed md:!bottom-6 left-4 sm:left-5 z-50 w-11 h-11 rounded-full surface-card flex items-center justify-center text-accent transition-[bottom] duration-300"
+                    className="hidden lg:flex fixed bottom-6 left-5 z-50 w-11 h-11 rounded-full surface-card items-center justify-center text-accent will-change-transform"
                     aria-label="Scroll to top"
                 >
                     <svg className="absolute inset-0 w-full h-full -rotate-90 pointer-events-none" viewBox="0 0 100 100">
