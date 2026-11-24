@@ -47,7 +47,7 @@ export function StructuredData() {
         foundingDate: "2018",
         contactPoint: {
             "@type": "ContactPoint",
-            telephone: "+4915147483493",
+            email: "info@nextepedu.com",
             contactType: "customer service"
         },
         aggregateRating: {
@@ -94,7 +94,6 @@ export function StructuredData() {
         name: "NexTep Edu - Study Abroad Consultancy Dhaka",
         image: "https://www.nextepedu.com/opengraph-image.jpg",
         url: "https://www.nextepedu.com",
-        telephone: "+4915147483493",
         priceRange: "$$",
         address: {
             "@type": "PostalAddress",

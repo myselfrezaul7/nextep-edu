@@ -68,7 +68,7 @@ export function ShortlistCompareDrawer({
 
     return (
         <>
-            {/* Floating Compare Pill - Left bottom on mobile (clear of WhatsAppFAB on right) */}
+            {/* Floating Compare Pill - Left bottom on mobile */}
             <div
                 className={cn(
                     "fixed left-4 sm:left-5 z-40 will-change-transform transition-[transform,opacity] duration-300 ease-out lg:translate-y-0 lg:left-20",

@@ -10,7 +10,7 @@ import { MobileTabBar } from "@/components/layout/MobileTabBar";
 import { ScrollProgress } from "@/components/common/ScrollProgress";
 import { PageTransition } from "@/components/common/PageTransition";
 import { ErrorBoundary } from "@/components/common/ErrorBoundary";
-import { WhatsAppFAB } from "@/components/common/WhatsAppFAB";
+import { PortfolioNoticeModal } from "@/components/common/PortfolioNoticeModal";
 import { BackToTop } from "@/components/common/BackToTop";
 import { ServiceWorkerRegistrar } from "@/components/common/ServiceWorkerRegistrar";
 import { ShortlistCompareDrawer } from "@/components/destinations/ShortlistCompareDrawer";
@@ -87,7 +87,7 @@ export function SiteShell({ children }: { children: React.ReactNode }) {
                     </div>
                     <BookingModalHost />
                     <ShortlistCompareDrawer hasBottomDockWhenScrolled={isCountryDetailPage} />
-                    <WhatsAppFAB />
+                    <PortfolioNoticeModal />
                     <BackToTop />
                 </>
             )}

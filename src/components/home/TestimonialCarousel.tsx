@@ -10,17 +10,17 @@ import { useTranslation } from "@/i18n/LanguageContext";
 
 const testimonials = [
     {
-        text: "NexTep Edu guided me through every step of my application to Germany. From document preparation to university selection, their support was invaluable. Now I'm pursuing my Master's in IMIS and it's been an incredible journey.",
+        text: "NexTep Edu guided me through every step of my application to Germany. From document preparation to program selection, their support was invaluable. Now I'm pursuing my Master's in Germany and it's been an incredible journey.",
         author: "Mehedi Drubok",
-        university: "IMIS, South Westphalia University of Applied Sciences, Germany",
+        destination: "Student in Germany",
         flag: "🇩🇪",
         initials: "MD",
         visaDate: "January 12, 2025",
     },
     {
-        text: "I couldn't have imagined studying in Germany without NexTep Edu's help. They made the complex admission process feel simple and were always there to answer my questions. My dream of studying at Wismar University came true!",
+        text: "I couldn't have imagined studying in Germany without NexTep Edu's help. They made the complex admission process feel simple and were always there to answer my questions. My dream of studying in Germany came true!",
         author: "Jannatul Ferdous",
-        university: "Wismar University of Applied Sciences, Germany",
+        destination: "Student in Germany",
         flag: "🇩🇪",
         initials: "JF",
         visaDate: "February 10, 2025",
@@ -28,7 +28,7 @@ const testimonials = [
     {
         text: "What I loved is they didn't just help with applications, they helped me figure out where to live, how to manage money abroad, everything. It's like having an older sibling.",
         author: "Tanvir Hasan",
-        university: "Monash University, Australia",
+        destination: "Student in Australia",
         flag: "🇦🇺",
         initials: "TH",
         visaDate: "March 22, 2025",
@@ -36,7 +36,7 @@ const testimonials = [
     {
         text: "No pushy sales tactics, no fake promises. Just real people doing their job well. I respected that, and it made me trust them with my education.",
         author: "Nusrat Jahan",
-        university: "University of Leeds, UK",
+        destination: "Student in the UK",
         flag: "🇬🇧",
         initials: "NJ",
         visaDate: "June 8, 2025",
@@ -44,7 +44,7 @@ const testimonials = [
     {
         text: "I was worried about the costs of studying in Europe, but the team found an incredibly affordable program in Latvia that perfectly matched my career goals.",
         author: "Rafiul Islam",
-        university: "Riga Technical University, Latvia",
+        destination: "Student in Latvia",
         flag: "🇱🇻",
         initials: "RI",
         visaDate: "April 15, 2025",
@@ -52,7 +52,7 @@ const testimonials = [
     {
         text: "The guidance on English-taught programs in the Mediterranean was spot on. Highly recommend their services for anyone looking beyond the traditional destinations.",
         author: "Ayesha Khan",
-        university: "University of Nicosia, Cyprus",
+        destination: "Student in Cyprus",
         flag: "🇨🇾",
         initials: "AK",
         visaDate: "May 2, 2025",
@@ -60,7 +60,7 @@ const testimonials = [
     {
         text: "They didn't just help me get admitted, they helped me strategize my post-graduation work opportunities in North America. Worth every penny.",
         author: "Sakib Hossain",
-        university: "University of Toronto, Canada",
+        destination: "Student in Canada",
         flag: "🇨🇦",
         initials: "SH",
         visaDate: "July 20, 2025",
@@ -141,7 +141,7 @@ export function TestimonialCarousel() {
                         </span>
                     </h4>
                     <p className="text-xs text-muted-foreground line-clamp-2 mt-0.5 leading-snug">
-                        {story.university}
+                        {story.destination}
                     </p>
                     <p
                         className={cn(

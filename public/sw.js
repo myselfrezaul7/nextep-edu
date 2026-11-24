@@ -1,4 +1,4 @@
-const CACHE_VERSION = "nextep-edu-v3";
+const CACHE_VERSION = "nextep-edu-v4";
 const SHELL_ASSETS = [
   "/offline.html",
   "/offline",

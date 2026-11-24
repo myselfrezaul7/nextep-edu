@@ -126,14 +126,12 @@
     "selectHint": "to select",
     "brandLabel": "NexTep Edu Search"
   },
-  "whatsapp": {
-    "fabLabel": "Chat with us on WhatsApp",
-    "title": "NexTep Edu Support",
-    "replyTime": "Typically replies within 5 mins",
-    "close": "Close chat preview",
-    "greeting": "Hello! Need help shortlisting universities or checking visa requirements?",
-    "cta": "Continue on WhatsApp",
-    "nudge": "Questions? Chat with a counselor",
-    "dismiss": "Dismiss message"
+  "portfolioNotice": {
+    "badge": "Portfolio & Prototype Notice",
+    "title": "Non-Commercial Student Portfolio / Prototype Project",
+    "notCommercial": "Not a commercial service",
+    "description": "This website is an independent student portfolio and software engineering prototype built for educational and demonstration purposes only. No commercial consultancy, paid services, or official visa processing are offered here.",
+    "cta": "I Understand - Explore Prototype",
+    "close": "Close notice"
   }
 }

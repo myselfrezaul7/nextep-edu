@@ -32,7 +32,6 @@ import {
     Share2,
     Bookmark,
     BookmarkCheck,
-    MessageCircle,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useState, useEffect, useRef, useSyncExternalStore } from "react";
@@ -383,9 +382,6 @@ export function DestinationPageClient({ destination, relatedDestinations = [] }:
     );
 
     const readinessPercent = Math.round((checkedDocs.length / checklistItems.length) * 100);
-
-    const waMessage = `Hi NexTep Edu! I'm interested in studying in ${destination.name} (${checkedDocs.length}/${checklistItems.length} checklist items ready). Can you guide me on admissions and visa?`;
-    const waUrl = `https://wa.me/4915147483493?text=${encodeURIComponent(waMessage)}`;
 
     const jumpLinks = [
         { id: "overview", label: t("destinations.detail.jumpOverview", undefined, "Why Study Here") },
@@ -1120,17 +1116,6 @@ export function DestinationPageClient({ destination, relatedDestinations = [] }:
                                 >
                                     {t("common.footer.ctaButton", undefined, "Book Free Consultation")}
                                 </Button>
-                                <Button
-                                    size="lg"
-                                    variant="outline"
-                                    className="rounded-full border-white/25 bg-white/[0.06] text-white hover:bg-white/15 hover:text-white px-8 min-h-[48px] w-full sm:w-auto gap-2"
-                                    asChild
-                                >
-                                    <a href={waUrl} target="_blank" rel="noopener noreferrer">
-                                        <MessageCircle className="w-4 h-4 text-[#25D366]" />
-                                        <span>{t("destinations.detail.chatWhatsApp", undefined, "WhatsApp Counselor")}</span>
-                                    </a>
-                                </Button>
                             </div>
 
                             <div className="mt-7 flex flex-wrap justify-center gap-4 sm:gap-6 text-white/70 text-xs md:text-sm">
@@ -1165,16 +1150,6 @@ export function DestinationPageClient({ destination, relatedDestinations = [] }:
                 style={{ bottom: "calc(0.75rem + env(safe-area-inset-bottom, 0px))" }}
             >
                 <div className="glass-nav bg-white/90 dark:bg-slate-900/90 border border-accent/35 rounded-2xl p-2 shadow-xl flex items-center gap-2">
-                    <a
-                        href={waUrl}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="min-h-[44px] px-3 rounded-xl bg-[#25D366] hover:bg-[#20bd5a] text-white text-xs font-bold flex items-center justify-center gap-1.5 shrink-0 transition-colors"
-                        aria-label={`WhatsApp about ${destination.name}`}
-                    >
-                        <MessageCircle className="w-4 h-4 shrink-0" />
-                        <span className="truncate max-w-[92px]">{destination.name}</span>
-                    </a>
                     <button
                         type="button"
                         onClick={() => void handleShare()}

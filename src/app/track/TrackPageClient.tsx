@@ -20,7 +20,7 @@ import {
     Copy,
     Check,
     Share2,
-    MessageCircle,
+    Mail,
     UploadCloud,
     Sparkles,
 } from "lucide-react";
@@ -521,15 +521,6 @@ export function TrackPageClient() {
     const canUploadDocs = Boolean(data && (data.current_step <= 2 || rejectedDocsCount > 0));
     const needsInitialUpload = Boolean(data && data.current_step <= 2 && uploadedDocs.length === 0);
 
-    const activeStepLabel =
-        data?.notes.find((s) => s.step === data.current_step)?.label ||
-        (data ? `Step ${data.current_step}` : "");
-    const counselorWhatsAppUrl = data
-        ? `https://wa.me/4915147483493?text=${encodeURIComponent(
-              `Hi NexTep Edu! I'm checking my application ${data.tracking_code} (${data.name}) currently on Step ${data.current_step}/${data.notes.length} (${activeStepLabel}). I have a quick question.`
-          )}`
-        : "https://wa.me/4915147483493";
-
     const renderLiveSyncBadge = () => {
         if (syncStatus === "offline") {
             return (
@@ -966,7 +957,7 @@ export function TrackPageClient() {
                                     </div>
                                 </div>
 
-                                {/* Quick Student Utility Bar: Share with Parents + Contextual WhatsApp */}
+                                {/* Quick Student Utility Bar: Share Status + Email Support */}
                                 <div className="grid grid-cols-2 gap-2.5 pt-3 border-t border-border/50">
                                     <button
                                         type="button"
@@ -979,14 +970,14 @@ export function TrackPageClient() {
                                         </span>
                                     </button>
                                     <a
-                                        href={counselorWhatsAppUrl}
-                                        target="_blank"
-                                        rel="noopener noreferrer"
-                                        className="min-h-[44px] px-3 rounded-xl bg-[#25D366]/15 hover:bg-[#25D366]/25 border border-[#25D366]/30 text-emerald-700 dark:text-emerald-300 text-xs font-semibold flex items-center justify-center gap-1.5 transition-colors"
+                                        href={`mailto:info@nextepedu.com?subject=${encodeURIComponent(
+                                            `Application Inquiry (${data.tracking_code})`
+                                        )}`}
+                                        className="min-h-[44px] px-3 rounded-xl border border-border/70 bg-background/70 hover:border-accent/40 text-foreground text-xs font-semibold flex items-center justify-center gap-1.5 transition-colors"
                                     >
-                                        <MessageCircle className="w-4 h-4 text-[#25D366] shrink-0" />
+                                        <Mail className="w-4 h-4 text-accent shrink-0" />
                                         <span className="truncate">
-                                            {t("track.results.askCounselor", undefined, "Ask Counselor")}
+                                            {t("track.results.askCounselor", undefined, "Email Support")}
                                         </span>
                                     </a>
                                 </div>

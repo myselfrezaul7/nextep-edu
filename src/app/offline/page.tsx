@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { WifiOff, RefreshCw, Home, Globe2, MessageCircle } from "lucide-react";
+import { WifiOff, RefreshCw, Home, Globe2, Mail } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 export default function OfflinePage() {
@@ -56,15 +56,13 @@ export default function OfflinePage() {
                 </div>
 
                 <div className="pt-4 border-t border-border/60 text-xs text-muted-foreground space-y-1.5">
-                    <p>Need urgent counselor support once back online?</p>
+                    <p>Need support once you are back online?</p>
                     <a
-                        href="https://wa.me/4915147483493"
-                        target="_blank"
-                        rel="noopener noreferrer"
+                        href="mailto:info@nextepedu.com"
                         className="inline-flex items-center gap-1.5 font-semibold text-accent hover:underline"
                     >
-                        <MessageCircle className="w-3.5 h-3.5" />
-                        <span>WhatsApp: +49 151 47483493</span>
+                        <Mail className="w-3.5 h-3.5" />
+                        <span>info@nextepedu.com</span>
                     </a>
                 </div>
             </div>

@@ -4,7 +4,6 @@ import Link from "next/link";
 import Image from "next/image";
 import {
     Mail,
-    Phone,
     MapPin,
     Facebook,
     Instagram,
@@ -16,7 +15,6 @@ import {
     CheckCircle2,
     Globe2,
     Users,
-    MessageCircle,
 } from "lucide-react";
 import { useState } from "react";
 import { cn } from "@/lib/utils";
@@ -130,21 +128,6 @@ export function Footer() {
                             </span>
                             <ArrowUpRight className="w-4 h-4" />
                         </Button>
-                        <Button
-                            size="lg"
-                            variant="outline"
-                            className="rounded-full font-semibold text-sm sm:text-base px-7 min-h-[48px] w-full sm:w-auto gap-2 border-white/20 bg-white/[0.05] text-white hover:bg-white/12 hover:text-white"
-                            asChild
-                        >
-                            <a
-                                href="https://wa.me/4915147483493?text=Hi%21%20I%27d%20like%20to%20book%20a%20free%20study%20abroad%20consultation."
-                                target="_blank"
-                                rel="noopener noreferrer"
-                            >
-                                <MessageCircle className="w-4 h-4 text-[#25D366]" />
-                                <span>{t("common.footer.chatWhatsApp", undefined, "Chat on WhatsApp")}</span>
-                            </a>
-                        </Button>
                     </div>
                 </div>
             </div>
@@ -211,15 +194,6 @@ export function Footer() {
                                     className="w-11 h-11 rounded-full border border-slate-200/90 dark:border-white/10 bg-slate-100/80 dark:bg-white/[0.04] text-muted-foreground dark:text-white/70 hover:text-accent hover:border-accent/50 flex items-center justify-center transition-colors active:scale-95"
                                 >
                                     <Instagram className="w-4 h-4" />
-                                </a>
-                                <a
-                                    href="https://wa.me/4915147483493"
-                                    target="_blank"
-                                    rel="noopener noreferrer"
-                                    aria-label="Message NexTep Edu on WhatsApp"
-                                    className="w-11 h-11 rounded-full border border-slate-200/90 dark:border-white/10 bg-slate-100/80 dark:bg-white/[0.04] text-muted-foreground dark:text-white/70 hover:text-[#25D366] hover:border-[#25D366]/50 flex items-center justify-center transition-colors active:scale-95"
-                                >
-                                    <MessageCircle className="w-4 h-4" />
                                 </a>
                             </div>
                         </div>
@@ -368,18 +342,6 @@ export function Footer() {
                             </h4>
 
                             <div className="space-y-2.5 text-sm">
-                                <a
-                                    href="https://wa.me/4915147483493"
-                                    target="_blank"
-                                    rel="noopener noreferrer"
-                                    className="flex items-center gap-3 p-2.5 rounded-xl border border-border/50 bg-surface/50 dark:bg-white/[0.03] hover:border-accent/40 text-muted-foreground dark:text-white/75 hover:text-foreground transition-colors"
-                                >
-                                    <div className="w-8 h-8 rounded-lg bg-accent/12 text-accent flex items-center justify-center shrink-0">
-                                        <Phone className="w-4 h-4" />
-                                    </div>
-                                    <span className="font-medium">+49 151 47483493</span>
-                                </a>
-
                                 <a
                                     href="mailto:info@nextepedu.com"
                                     className="flex items-center gap-3 p-2.5 rounded-xl border border-border/50 bg-surface/50 dark:bg-white/[0.03] hover:border-accent/40 text-muted-foreground dark:text-white/75 hover:text-foreground transition-colors"

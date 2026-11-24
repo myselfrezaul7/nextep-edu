@@ -20,7 +20,6 @@ import {
     Globe2,
     Sparkles,
     AlertCircle,
-    MessageCircle,
 } from "lucide-react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
@@ -311,12 +310,6 @@ export function BookingModal() {
     const [trackingCode, setTrackingCode] = useState<string | null>(null);
     const [isExistingApp, setIsExistingApp] = useState(false);
     const [codeCopied, setCodeCopied] = useState(false);
-    const [submittedSummary, setSubmittedSummary] = useState<{
-        name: string;
-        destination: string;
-        date: string;
-        time: string;
-    } | null>(null);
     const [step, setStep] = useState(1);
     const [direction, setDirection] = useState(1);
 
@@ -371,7 +364,6 @@ export function BookingModal() {
             setTrackingCode(null);
             setIsExistingApp(false);
             setCodeCopied(false);
-            setSubmittedSummary(null);
             setStep(1);
             setDirection(1);
         }, 300);
@@ -583,12 +575,6 @@ export function BookingModal() {
             }
 
             clearDraft();
-            setSubmittedSummary({
-                name: data.name,
-                destination: resolvedDestination || "Study Abroad",
-                date: data.date,
-                time: data.time,
-            });
             setIsSuccess(true);
             reset({
                 name: "",
@@ -732,19 +718,6 @@ export function BookingModal() {
             toast.error(t("common.modal.copyFailed", undefined, "Could not copy code automatically."));
         }
     };
-
-    const whatsappConfirmUrl = useMemo(() => {
-        const parts = [
-            `Hi NexTep Edu! I just booked a free consultation.`,
-            submittedSummary?.name ? `Name: ${submittedSummary.name}` : "",
-            submittedSummary?.destination ? `Destination: ${submittedSummary.destination}` : "",
-            submittedSummary?.date && submittedSummary?.time
-                ? `Preferred Slot: ${submittedSummary.date} at ${submittedSummary.time}`
-                : "",
-            trackingCode ? `Tracking Code: ${trackingCode}` : "",
-        ].filter(Boolean);
-        return `https://wa.me/4915147483493?text=${encodeURIComponent(parts.join("\n"))}`;
-    }, [submittedSummary, trackingCode]);
 
     return (
         <AnimatePresence>
@@ -992,22 +965,11 @@ export function BookingModal() {
                                         </motion.div>
                                     )}
 
-                                    {/* 1-Tap Send Booking via WhatsApp + Close */}
-                                    <div className="w-full max-w-xs mt-5 relative z-10 space-y-2.5">
-                                        <a
-                                            href={whatsappConfirmUrl}
-                                            target="_blank"
-                                            rel="noopener noreferrer"
-                                            className="w-full min-h-[48px] px-4 rounded-xl bg-[#25D366] hover:bg-[#20bd5a] text-white font-semibold text-sm flex items-center justify-center gap-2 transition-colors shadow-sm"
-                                        >
-                                            <MessageCircle className="w-4 h-4 shrink-0" />
-                                            <span>
-                                                {t("common.modal.sendWhatsApp", undefined, "Send Booking via WhatsApp")}
-                                            </span>
-                                        </a>
+                                    {/* Close Button */}
+                                    <div className="w-full max-w-xs mt-5 relative z-10">
                                         <Button
                                             type="button"
-                                            variant="outline"
+                                            variant="accent"
                                             onClick={closeModal}
                                             size="lg"
                                             className="w-full min-h-[48px] rounded-xl text-base font-bold"
